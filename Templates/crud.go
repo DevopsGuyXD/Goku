@@ -93,7 +93,9 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 //-------------------------- %[1]v CREATE
 // @Description Create a %[1]v
 // @Tags %[1]v
+// @Accept json
 // @Produce json
+// @Param data body object true "Add a new %[1]v"
 // @Success 200 {array} map[string]interface{}
 // @Router /%[1]v [post]
 func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +108,7 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 }
 
 //-------------------------- %[1]v GET BY ID
-// @Description Specific %[1]v
+// @Description Single %[1]v
 // @Tags %[1]v
 // @Produce json
 // @Success 200 {array} map[string]interface{}
@@ -114,7 +116,10 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 		
-	json.NewEncoder(w).Encode("Place_holder")
+	id := chi.URLParam(r, "id")
+	response := models.GET_%[1]v_by_id(id)
+
+	json.NewEncoder(w).Encode(response)
 }
 
 //-------------------------- %[1]v UPDATE BY ID
@@ -303,6 +308,53 @@ func CREATE_%[2]v(request io.ReadCloser) string {
 	}
 
 	return response
+}
+
+// -------------------------- GET %[2]v by ID
+func GET_%[2]v_by_id(id string) []map[string]interface{} {
+	var results []map[string]interface{}
+
+	var database = config.InitDatabase()
+	defer database.Close()
+
+	data, err := database.Query("SELECT * FROM %[2]v WHERE id = ?", id)
+	utils.CheckForNil(err)
+	defer data.Close()
+
+	columns, err := data.Columns()
+	utils.CheckForNil(err)
+
+	for data.Next() {
+		values := make([]interface{}, len(columns))
+		valuePtrs := make([]interface{}, len(columns))
+		rowMap := make(map[string]interface{})
+
+		for i := range values {
+			valuePtrs[i] = &values[i]
+		}
+
+		err := data.Scan(valuePtrs...)
+		utils.CheckForNil(err)
+
+		for i, col := range columns {
+			val := values[i]
+
+			switch v := val.(type) {
+			case []byte:
+				rowMap[col] = string(v)
+			default:
+				rowMap[col] = v
+			}
+		}
+
+		results = append(results, rowMap)
+	}
+
+	if err = data.Err(); err != nil {
+		utils.CheckForNil(err)
+	}
+
+	return results
 }
 
 // -------------------------- UPDATE %[2]v
