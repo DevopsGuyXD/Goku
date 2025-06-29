@@ -1,0 +1,3 @@
+go build -o goku.exe
+cp ./goku.exe D:/Programming/Go/bin
+rm -f goku.exe

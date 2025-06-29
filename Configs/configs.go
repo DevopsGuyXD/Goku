@@ -1,0 +1,155 @@
+package configs
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"os/exec"
+	"regexp"
+	"runtime"
+
+	utils "github.com/DevopsGuyXD/Goku/Utils"
+)
+
+// ====================================== RUN DEV
+func RunDev() {
+
+	var shell, flag string
+
+	if runtime.GOOS == "windows" {
+		shell = "cmd.exe"
+		flag = "/C"
+	} else {
+		shell = "sh"
+		flag = "-c"
+	}
+
+	fmt.Printf("\n🔧 Running in Dev mode\n\n")
+
+	cmd := exec.Command(shell, flag, "go run .")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+
+	err := cmd.Run()
+	utils.CheckForNil(err)
+
+	os.Exit(0)
+}
+
+// ====================================== CREATE BUILD
+func CreateBuild() {
+
+	if runtime.GOOS == "windows" {
+
+		_, err := exec.Command("sh", "-c", "go build -o ./dist/app.exe . && cp .env ./dist").Output()
+		utils.CheckForNil(err)
+
+		fmt.Println()
+		utils.InitSpinner("Building your app")
+		fmt.Print("\rBuilding your app ✅ \n")
+	} else {
+
+		_, err := exec.Command("sh", "-c", "go build -o ./dist/app . && cp .env ./dist").Output()
+		utils.CheckForNil(err)
+
+		fmt.Println()
+		utils.InitSpinner("Building your app")
+		fmt.Print("\rBuilding your app ✅ \n")
+	}
+}
+
+// ====================================== DOCKER BUILD
+func CreateDockerImage(dockerImageName string) {
+	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build -t %s .", dockerImageName))
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Println("Error getting StdoutPipe:", err)
+		return
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		fmt.Println("Error getting StderrPipe:", err)
+		return
+	}
+
+	if err := cmd.Start(); err != nil {
+		fmt.Println("Error starting command:", err)
+		return
+	}
+
+	// Regex to remove BuildKit prefixes like: #5 or #12
+	buildkitPrefix := regexp.MustCompile(`^#\d+\s*`)
+
+	// Stream stdout
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			line := buildkitPrefix.ReplaceAllString(scanner.Text(), "")
+			fmt.Println(line)
+		}
+	}()
+
+	// Stream stderr
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			line := buildkitPrefix.ReplaceAllString(scanner.Text(), "")
+			fmt.Println(line)
+		}
+	}()
+
+	if err := cmd.Wait(); err != nil {
+		fmt.Println("Command finished with error:", err)
+		return
+	}
+
+	fmt.Printf("\nDocker build completed successfully ✅ \n")
+}
+
+func ListDockerImage(dockerImageName string) {
+	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", dockerImageName)).Output()
+	utils.CheckForNil(err)
+
+	fmt.Printf("\n%v", string(res))
+}
+
+// ====================================== RUN PRODUCTION
+func RunProd() {
+
+	var shell, flag string
+
+	if runtime.GOOS == "windows" {
+		shell = "cmd.exe"
+		flag = "/C"
+
+		fmt.Printf("\n🔥 Running in Production mode\n\n")
+
+		cmd := exec.Command(shell, flag, "go run .")
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Stdin = os.Stdin
+
+		err := cmd.Run()
+		utils.CheckForNil(err)
+
+		os.Exit(0)
+	} else {
+		shell = "sh"
+		flag = "-c"
+
+		fmt.Printf("\n🔥 Running in Production mode\n\n")
+
+		cmd := exec.Command(shell, flag, "go run .")
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Stdin = os.Stdin
+
+		err := cmd.Run()
+		utils.CheckForNil(err)
+
+		os.Exit(0)
+	}
+}
