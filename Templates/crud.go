@@ -143,8 +143,8 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	request := r.Body
-	response := models.DELETE_%[1]v(request)
+	id := chi.URLParam(r, "id")
+	response := models.DELETE_%[1]v(id)
 
 	json.NewEncoder(w).Encode(response)
 }`, crudName, project)
