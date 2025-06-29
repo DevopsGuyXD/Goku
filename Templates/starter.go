@@ -178,7 +178,6 @@ import (
 )
 
 // // -------------------------- HOME CONTROLLER
-// GET_books godoc
 // @Description Home
 // @Tags Home
 // @Produce json
@@ -195,7 +194,6 @@ func GET_home(w http.ResponseWriter, r *http.Request) {
 }
 
 // //-------------------------- HEALTH CONTROLLER
-// GET_books godoc
 // @Description Health
 // @Tags Health
 // @Produce json
