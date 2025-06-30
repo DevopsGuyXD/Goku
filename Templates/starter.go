@@ -16,6 +16,7 @@ func StarterTemplate(projectName string) {
 
 	createFolders(folderName)
 
+	fmt.Println()
 	fmt.Printf("\rCreating %v ✅ \n", projectName)
 }
 
