@@ -219,7 +219,7 @@ func configFile(folderName, subFolder string) {
 	utils.CheckForNil(err)
 	defer file.Close()
 
-	data := fmt.Sprintf(
+	data :=
 		`package config
 
 import (
@@ -234,7 +234,7 @@ func InitDatabase() *sql.DB {
 	utils.CheckForNil(err)
 
 	return database
-}`)
+}`
 	utils.WriteFile(file, data)
 }
 
@@ -245,13 +245,13 @@ func modelFile(folderName, subFolder string) {
 	utils.CheckForNil(err)
 	defer file.Close()
 
-	data := fmt.Sprintf(
+	data :=
 		`package models
 
 //-------------------------- MODELS
 func AppModels(){
 
-}`)
+}`
 	utils.WriteFile(file, data)
 }
 

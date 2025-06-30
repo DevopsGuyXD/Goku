@@ -119,7 +119,11 @@ func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	response := models.GET_%[1]v_by_id(id)
 
-	json.NewEncoder(w).Encode(response)
+	if response != nil {
+		json.NewEncoder(w).Encode(response)
+	} else {
+		json.NewEncoder(w).Encode("No records found")
+	}
 }
 
 //-------------------------- %[1]v UPDATE BY ID
