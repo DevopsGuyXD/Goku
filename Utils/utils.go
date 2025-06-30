@@ -201,7 +201,6 @@ func CalledFromLocation() string {
 }
 
 // ====================================== SPINNER
-
 func Spinner(done chan bool, message string) {
 	spinChars := `-\|/`
 	i := 0

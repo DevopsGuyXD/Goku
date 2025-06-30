@@ -21,7 +21,8 @@ func DockerFile() {
 
 	if exists {
 
-		data = `FROM golang:1.24.4 AS builder
+		data =
+			`FROM golang:latest AS builder
 WORKDIR /app
 
     ENV CGO_ENABLED=0 \
