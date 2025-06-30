@@ -169,7 +169,7 @@ func crudModel(crudName string) {
 	databaseFolder := "Sqlite"
 	databaseFile := "./Sqlite/app.db"
 
-	utils.CreateFolder(databaseFolder)
+	utils.CreateSingleFolder(databaseFolder)
 	utils.CreateFile(databaseFile)
 
 	file, err := os.Create(fmt.Sprintf("./Models/%v.go", crudName))
@@ -442,8 +442,6 @@ func DELETE_%[2]v(id string) string {
 
 	utils.UpdatingMain(crudName)
 
-	fmt.Println()
-	utils.InitSpinner("Adding CRUD")
 	fmt.Printf("\rAdding \"%v\" CRUD ✅ \n", crudName)
 
 	utils.InstallDependencies()

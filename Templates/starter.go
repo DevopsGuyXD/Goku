@@ -12,12 +12,10 @@ func StarterTemplate(projectName string) {
 
 	folderName := projectName
 
-	utils.CreateFolder(folderName)
+	utils.CreateSingleFolder(folderName)
 
 	createFolders(folderName)
 
-	fmt.Println()
-	utils.InitSpinner("Creating Project")
 	fmt.Printf("\rCreating %v ✅ \n", projectName)
 }
 
@@ -29,7 +27,7 @@ func createFolders(folderName string) {
 
 		folder := fmt.Sprintf("%v/%v", folderName, subFolder)
 
-		utils.CreateFolder(folder)
+		utils.CreateSingleFolder(folder)
 		createFiles(folderName, subFolder)
 	}
 }

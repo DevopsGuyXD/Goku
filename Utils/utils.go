@@ -37,23 +37,38 @@ func InstallDependencies() {
 
 	Swagger()
 
-	_, err := exec.Command("sh", "-c", "go mod tidy").Output()
-	CheckForNil(err)
+	done := make(chan bool)
+	go Spinner(done, "Installing Dependencies")
 
-	fmt.Println()
-	InitSpinner("Installing Dependencies")
-	fmt.Printf("\rInstalling Dependencies ✅ \n")
+	cmd := exec.Command("sh", "-c", "go mod tidy")
+	err := cmd.Run()
+	if err != nil {
+		fmt.Printf("\rInstalling Dependencies ❌\n")
+		close(done)
+		return
+	}
+
+	close(done)
+	fmt.Printf("\rInstalling Dependencies ✅\n")
 }
 
 // ====================================== INIT SWAGGER
 func Swagger() {
+
+	done := make(chan bool)
+	go Spinner(done, "Updating Swagger")
+
 	calledFrom := CalledFromLocation()
 
-	_, err := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/swaggo/swag/cmd/swag@v1.8.12 init --dir \"%s\"", calledFrom)).Output()
-	CheckForNil(err)
+	cmd := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/swaggo/swag/cmd/swag@v1.8.12 init --dir \"%s\"", calledFrom))
+	err := cmd.Run()
+	if err != nil {
+		fmt.Printf("\rUpdating Swagger ❌\n")
+		close(done)
+		return
+	}
 
-	fmt.Println()
-	InitSpinner("Updating Swagger")
+	close(done)
 	fmt.Print("\rUpdating Swagger ✅ \n")
 }
 
@@ -78,7 +93,7 @@ func AllOptions() {
 }
 
 // ====================================== CREATE FOLDER
-func CreateFolder(folderName string) {
+func CreateSingleFolder(folderName string) {
 	err := os.Mkdir(folderName, 0755)
 	CheckForNil(err)
 }
@@ -163,24 +178,26 @@ func CalledFromLocation() string {
 }
 
 // ====================================== SPINNER
-func Spinner(delay time.Duration, done chan bool, message string) {
+
+func Spinner(done chan bool, message string) {
+	spinChars := `-\|/`
+	i := 0
 	for {
-		for _, r := range `-\|/` {
-			select {
-			case <-done:
-				return
-			default:
-				fmt.Printf("\r%s %c", message, r)
-				time.Sleep(delay)
-			}
+		select {
+		case <-done:
+			return
+		default:
+			fmt.Printf("\r%s %c", message, spinChars[i%len(spinChars)])
+			time.Sleep(100 * time.Millisecond)
+			i++
 		}
 	}
 }
 
 // ====================================== INIT SPINNER
-func InitSpinner(message string) {
-	done := make(chan bool)
-	go Spinner(100*time.Millisecond, done, message)
-	time.Sleep(1 * time.Second)
-	done <- true
-}
+// func InitSpinner(message string) {
+// 	done := make(chan bool)
+// 	go Spinner(done, message)
+// 	time.Sleep(1 * time.Second)
+// 	done <- true
+// }

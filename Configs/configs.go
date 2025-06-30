@@ -40,21 +40,34 @@ func RunDev() {
 // ====================================== CREATE BUILD
 func CreateBuild() {
 
+	done := make(chan bool)
+
 	if runtime.GOOS == "windows" {
+		go utils.Spinner(done, "Building your app")
 
-		_, err := exec.Command("sh", "-c", "go build -o ./dist/app.exe . && cp .env ./dist").Output()
-		utils.CheckForNil(err)
+		cmd := exec.Command("sh", "-c", "go build -o ./dist/app.exe . && cp .env ./dist")
+		err := cmd.Run()
+		if err != nil {
+			fmt.Printf("\rBuilding your app ❌\n")
+			close(done)
+			return
+		}
 
-		fmt.Println()
-		utils.InitSpinner("Building your app")
+		close(done)
 		fmt.Print("\rBuilding your app ✅ \n")
+
 	} else {
+		go utils.Spinner(done, "Building your app")
 
-		_, err := exec.Command("sh", "-c", "go build -o ./dist/app . && cp .env ./dist").Output()
-		utils.CheckForNil(err)
+		cmd := exec.Command("sh", "-c", "go build -o ./dist/app . && cp .env ./dist")
+		err := cmd.Run()
+		if err != nil {
+			fmt.Printf("\rBuilding your app ❌\n")
+			close(done)
+			return
+		}
 
-		fmt.Println()
-		utils.InitSpinner("Building your app")
+		close(done)
 		fmt.Print("\rBuilding your app ✅ \n")
 	}
 }
