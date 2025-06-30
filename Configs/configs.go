@@ -15,6 +15,7 @@ import (
 func RunDev() {
 
 	var shell, flag string
+	calledFrom := utils.CalledFromLocation()
 
 	if runtime.GOOS == "windows" {
 		shell = "cmd.exe"
@@ -26,7 +27,7 @@ func RunDev() {
 
 	fmt.Printf("\n🔧 Running in Dev mode\n\n")
 
-	cmd := exec.Command(shell, flag, "go run .")
+	cmd := exec.Command(shell, flag, fmt.Sprintf("go run github.com/air-verse/air@latest air --dir \"%s\"", calledFrom))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin

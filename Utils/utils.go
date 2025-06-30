@@ -35,7 +35,7 @@ func CheckForNil(err error) {
 // ====================================== INSTALL DEPENDENCIES
 func InstallDependencies() {
 
-	Swagger()
+	initSwagger()
 
 	done := make(chan bool)
 	go Spinner(done, "Installing Dependencies")
@@ -48,12 +48,16 @@ func InstallDependencies() {
 		return
 	}
 
+	if !FilsExists(".air.toml") {
+		initair()
+	}
+
 	close(done)
 	fmt.Printf("\rInstalling Dependencies ✅\n")
 }
 
 // ====================================== INIT SWAGGER
-func Swagger() {
+func initSwagger() {
 
 	done := make(chan bool)
 	go Spinner(done, "Updating Swagger")
@@ -70,6 +74,15 @@ func Swagger() {
 
 	close(done)
 	fmt.Print("\rUpdating Swagger ✅ \n")
+}
+
+// ====================================== INIT Air
+func initair() {
+
+	calledFrom := CalledFromLocation()
+
+	_, err := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/air-verse/air@latest init --dir \"%s\"", calledFrom)).Output()
+	CheckForNil(err)
 }
 
 // ====================================== ERROR HANDLING
@@ -169,6 +182,16 @@ func FolderExists(path string) bool {
 	}
 
 	return false
+}
+
+// ====================================== FOLDER EXISTS
+func FilsExists(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 // ====================================== FIND WHICH PROJECT IS CALLING GOKU
