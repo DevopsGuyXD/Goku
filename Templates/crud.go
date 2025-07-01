@@ -27,10 +27,10 @@ func crudRoute(crudName string) {
 		`	//-------------------------- %[1]v
 	router.Route("/%[1]v", func(r chi.Router) {
 		r.Get("/", controller.GET_%[1]v)
+		r.Post("/", controller.POST_%[1]v)
 		r.Get("/{id}", controller.GET_%[1]v_id)
-		r.Post("/create", controller.POST_%[1]v)
-		r.Put("/update", controller.UPDATE_%[1]v)
-		r.Delete("/delete", controller.DELETE_%[1]v)
+		r.Put("/{id}", controller.UPDATE_%[1]v)
+		r.Delete("/{id}", controller.DELETE_%[1]v)
 	})
 		`, crudName)
 
@@ -69,10 +69,10 @@ import (
 	"net/http"
 
 	models "github.com/DevopsGuyXD/%[2]v/Models"
+	"github.com/go-chi/chi/v5"
 )
 
 //-------------------------- %[1]v GET ALL
-// GET_%[1]v godoc
 // @Description All %[1]v
 // @Tags %[1]v
 // @Produce json
@@ -90,26 +90,14 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//-------------------------- %[1]v GET BY ID
-// GET_%[1]v godoc
-// @Description Specific %[1]v
-// @Tags %[1]v
-// @Produce json
-// @Success 200 {array} map[string]interface{}
-// @Router /%[1]v/{id} [get]
-func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-		
-	json.NewEncoder(w).Encode("Place_holder")
-}
-
 //-------------------------- %[1]v CREATE
-// GET_%[1]v godoc
 // @Description Create a %[1]v
 // @Tags %[1]v
+// @Accept json
 // @Produce json
+// @Param data body object true "Add a new %[1]v"
 // @Success 200 {array} map[string]interface{}
-// @Router /%[1]v/create [post]
+// @Router /%[1]v [post]
 func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -119,34 +107,53 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+//-------------------------- %[1]v GET BY ID
+// @Description Single %[1]v
+// @Tags %[1]v
+// @Produce json
+// @Success 200 {array} map[string]interface{}
+// @Router /%[1]v/{id} [get]
+func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+		
+	id := chi.URLParam(r, "id")
+	response := models.GET_%[1]v_by_id(id)
+
+	if response != nil {
+		json.NewEncoder(w).Encode(response)
+	} else {
+		json.NewEncoder(w).Encode("No records found")
+	}
+}
+
 //-------------------------- %[1]v UPDATE BY ID
-// GET_%[1]v godoc
 // @Description Update %[1]v
 // @Tags %[1]v
 // @Produce json
 // @Success 200 {array} map[string]interface{}
-// @Router /%[1]v/update [put]
+// @Router /%[1]v/{id} [put]
 func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	
+	id := chi.URLParam(r, "id")
 	request := r.Body
-	response := models.UPDATE_%[1]v(request)
+
+	response := models.UPDATE_%[1]v(id, request)
 
 	json.NewEncoder(w).Encode(response)
 }
 
 //-------------------------- %[1]v DELETE
-// GET_%[1]v godoc
 // @Description Delete %[1]v
 // @Tags %[1]v
 // @Produce json
 // @Success 200 {array} map[string]interface{}
-// @Router /%[1]v/delete [delete]
+// @Router /%[1]v/{id} [delete]
 func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	request := r.Body
-	response := models.DELETE_%[1]v(request)
+	id := chi.URLParam(r, "id")
+	response := models.DELETE_%[1]v(id)
 
 	json.NewEncoder(w).Encode(response)
 }`, crudName, project)
@@ -166,7 +173,7 @@ func crudModel(crudName string) {
 	databaseFolder := "Sqlite"
 	databaseFile := "./Sqlite/app.db"
 
-	utils.CreateFolder(databaseFolder)
+	utils.CreateSingleFolder(databaseFolder)
 	utils.CreateFile(databaseFile)
 
 	file, err := os.Create(fmt.Sprintf("./Models/%v.go", crudName))
@@ -307,11 +314,61 @@ func CREATE_%[2]v(request io.ReadCloser) string {
 	return response
 }
 
-// // -------------------------- UPDATE %[2]v
-func UPDATE_%[2]v(request io.ReadCloser) string {
+// -------------------------- GET %[2]v by ID
+func GET_%[2]v_by_id(id string) []map[string]interface{} {
+	var results []map[string]interface{}
+
+	var database = config.InitDatabase()
+	defer database.Close()
+
+	data, err := database.Query("SELECT * FROM %[2]v WHERE id = ?", id)
+	utils.CheckForNil(err)
+	defer data.Close()
+
+	columns, err := data.Columns()
+	utils.CheckForNil(err)
+
+	for data.Next() {
+		values := make([]interface{}, len(columns))
+		valuePtrs := make([]interface{}, len(columns))
+		rowMap := make(map[string]interface{})
+
+		for i := range values {
+			valuePtrs[i] = &values[i]
+		}
+
+		err := data.Scan(valuePtrs...)
+		utils.CheckForNil(err)
+
+		for i, col := range columns {
+			val := values[i]
+
+			switch v := val.(type) {
+			case []byte:
+				rowMap[col] = string(v)
+			default:
+				rowMap[col] = v
+			}
+		}
+
+		results = append(results, rowMap)
+	}
+
+	if err = data.Err(); err != nil {
+		utils.CheckForNil(err)
+	}
+
+	return results
+}
+
+// -------------------------- UPDATE %[2]v
+func UPDATE_%[2]v(id string, request io.ReadCloser) string {
 
 	var response string
 	var data map[string]interface{}
+
+	setParts := []string{}
+	setValues := []interface{}{}
 
 	var database = config.InitDatabase()
 	defer database.Close()
@@ -319,32 +376,23 @@ func UPDATE_%[2]v(request io.ReadCloser) string {
 	err := json.NewDecoder(request).Decode(&data)
 	utils.CheckForNil(err)
 
-	setParts := []string{}
-	setValues := []interface{}{}
-	whereParts := []string{}
-	whereValues := []interface{}{}
-
 	for k, v := range data {
-		if strings.HasPrefix(k, "set_") {
-			column := strings.TrimPrefix(k, "set_")
-			setParts = append(setParts, fmt.Sprintf("%%s = ?", column))
-			setValues = append(setValues, v)
-		} else {
-			whereParts = append(whereParts, fmt.Sprintf("%%s = ?", k))
-			whereValues = append(whereValues, v)
-		}
+		setParts = append(setParts, fmt.Sprintf("%%s = ?", k))
+		setValues = append(setValues, v)
 	}
 
-	query := fmt.Sprintf("UPDATE %[2]v SET %%s WHERE %%s",
-		strings.Join(setParts, ", "),
-		strings.Join(whereParts, " AND "))
+	if len(setParts) == 0 {
+		return "No fields provided for update"
+	}
 
-	values := append(setValues, whereValues...)
+	query := fmt.Sprintf("UPDATE %[2]v SET %%s WHERE id = ?",
+		strings.Join(setParts, ", "))
+
+	values := append(setValues, id)
 
 	res, err := database.Exec(query, values...)
 	if err != nil {
 		response = "DB update error"
-
 	} else {
 		rowsAffected, err := res.RowsAffected()
 		utils.CheckForNil(err)
@@ -359,34 +407,21 @@ func UPDATE_%[2]v(request io.ReadCloser) string {
 	return response
 }
 
-// // -------------------------- DELETE %[2]v
-func DELETE_%[2]v(request io.ReadCloser) string {
+// -------------------------- DELETE %[2]v
+func DELETE_%[2]v(id string) string {
 
 	var response string
-	var data map[string]interface{}
 
 	var database = config.InitDatabase()
 	defer database.Close()
 
-	err := json.NewDecoder(request).Decode(&data)
-	utils.CheckForNil(err)
+	query := fmt.Sprintf("DELETE FROM %[2]v WHERE id=%%s", id)
 
-	conditions := []string{}
-	values := []interface{}{}
-
-	for k, v := range data {
-		conditions = append(conditions, fmt.Sprintf("%%s = ?", k))
-		values = append(values, v)
-	}
-
-	query := fmt.Sprintf("DELETE FROM %[2]v WHERE %%s",
-		strings.Join(conditions, " AND "))
-
-	res, err := database.Exec(query, values...)
+	res, err := database.Exec(query)
 	if err != nil {
 		response = "DB delete error"
-	} else {
 
+	} else {
 		rowsAffected, err := res.RowsAffected()
 		utils.CheckForNil(err)
 
@@ -395,6 +430,7 @@ func DELETE_%[2]v(request io.ReadCloser) string {
 		} else {
 			response = "No records deleted"
 		}
+		
 	}
 
 	return response
@@ -410,9 +446,7 @@ func DELETE_%[2]v(request io.ReadCloser) string {
 
 	utils.UpdatingMain(crudName)
 
-	fmt.Println()
-	utils.InitSpinner("Adding CRUD")
-	fmt.Printf("\rAdding \"%v\" CRUD ✅ \n", crudName)
+	fmt.Printf("\rAdding \"%v\" CRUD \n", crudName)
 
 	utils.InstallDependencies()
 }

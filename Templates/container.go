@@ -21,7 +21,8 @@ func DockerFile() {
 
 	if exists {
 
-		data = `FROM golang:1.23.5 AS builder
+		data =
+			`FROM golang:latest AS builder
 WORKDIR /app
 
     ENV CGO_ENABLED=0 \
@@ -84,5 +85,5 @@ WORKDIR /app
 	}
 	utils.WriteFile(file, data)
 
-	fmt.Println("\nAdded dockerfile ✅ ")
+	fmt.Println("\nAdded dockerfile ")
 }

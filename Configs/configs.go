@@ -15,6 +15,7 @@ import (
 func RunDev() {
 
 	var shell, flag string
+	calledFrom := utils.CalledFromLocation()
 
 	if runtime.GOOS == "windows" {
 		shell = "cmd.exe"
@@ -26,7 +27,7 @@ func RunDev() {
 
 	fmt.Printf("\n🔧 Running in Dev mode\n\n")
 
-	cmd := exec.Command(shell, flag, "go run .")
+	cmd := exec.Command(shell, flag, fmt.Sprintf("go run github.com/air-verse/air@latest air --dir \"%s\"", calledFrom))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
@@ -40,22 +41,35 @@ func RunDev() {
 // ====================================== CREATE BUILD
 func CreateBuild() {
 
+	done := make(chan bool)
+
 	if runtime.GOOS == "windows" {
+		go utils.Spinner(done, "Building your app")
 
-		_, err := exec.Command("sh", "-c", "go build -o ./dist/app.exe . && cp .env ./dist").Output()
-		utils.CheckForNil(err)
+		cmd := exec.Command("sh", "-c", "go build -o ./dist/app.exe . && cp .env ./dist")
+		err := cmd.Run()
+		if err != nil {
+			fmt.Printf("\rBuilding your app ❌\n")
+			close(done)
+			return
+		}
 
-		fmt.Println()
-		utils.InitSpinner("Building your app")
-		fmt.Print("\rBuilding your app ✅ \n")
+		close(done)
+		fmt.Print("\rBuilding your app \n")
+
 	} else {
+		go utils.Spinner(done, "Building your app")
 
-		_, err := exec.Command("sh", "-c", "go build -o ./dist/app . && cp .env ./dist").Output()
-		utils.CheckForNil(err)
+		cmd := exec.Command("sh", "-c", "go build -o ./dist/app . && cp .env ./dist")
+		err := cmd.Run()
+		if err != nil {
+			fmt.Printf("\rBuilding your app ❌\n")
+			close(done)
+			return
+		}
 
-		fmt.Println()
-		utils.InitSpinner("Building your app")
-		fmt.Print("\rBuilding your app ✅ \n")
+		close(done)
+		fmt.Print("\rBuilding your app \n")
 	}
 }
 
@@ -106,7 +120,7 @@ func CreateDockerImage(dockerImageName string) {
 		return
 	}
 
-	fmt.Printf("\nDocker build completed successfully ✅ \n")
+	fmt.Printf("\nDocker build completed successfully \n")
 }
 
 func ListDockerImage(dockerImageName string) {

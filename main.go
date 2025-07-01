@@ -12,15 +12,6 @@ import (
 
 func main() {
 
-	// wd, _ := os.Getwd()
-	// exe, _ := os.Executable()
-
-	// fmt.Println("Called from:", wd)
-	// fmt.Println("Executable located at:", exe)
-	// fmt.Println("Executable directory:", filepath.Dir(exe))
-
-	// fmt.Println(wd)
-
 	switch {
 	// ====================================== -o
 	case len(os.Args) == 1:

@@ -12,13 +12,12 @@ func StarterTemplate(projectName string) {
 
 	folderName := projectName
 
-	utils.CreateFolder(folderName)
+	utils.CreateSingleFolder(folderName)
 
 	createFolders(folderName)
 
 	fmt.Println()
-	utils.InitSpinner("Creating Project")
-	fmt.Printf("\rCreating %v ✅ \n", projectName)
+	fmt.Printf("\rCreating %v \n", projectName)
 }
 
 // ====================================== CREATE FOLDER
@@ -29,7 +28,7 @@ func createFolders(folderName string) {
 
 		folder := fmt.Sprintf("%v/%v", folderName, subFolder)
 
-		utils.CreateFolder(folder)
+		utils.CreateSingleFolder(folder)
 		createFiles(folderName, subFolder)
 	}
 }
@@ -178,7 +177,6 @@ import (
 )
 
 // // -------------------------- HOME CONTROLLER
-// GET_books godoc
 // @Description Home
 // @Tags Home
 // @Produce json
@@ -195,7 +193,6 @@ func GET_home(w http.ResponseWriter, r *http.Request) {
 }
 
 // //-------------------------- HEALTH CONTROLLER
-// GET_books godoc
 // @Description Health
 // @Tags Health
 // @Produce json
@@ -222,7 +219,7 @@ func configFile(folderName, subFolder string) {
 	utils.CheckForNil(err)
 	defer file.Close()
 
-	data := fmt.Sprintf(
+	data :=
 		`package config
 
 import (
@@ -237,7 +234,7 @@ func InitDatabase() *sql.DB {
 	utils.CheckForNil(err)
 
 	return database
-}`)
+}`
 	utils.WriteFile(file, data)
 }
 
@@ -248,13 +245,13 @@ func modelFile(folderName, subFolder string) {
 	utils.CheckForNil(err)
 	defer file.Close()
 
-	data := fmt.Sprintf(
+	data :=
 		`package models
 
 //-------------------------- MODELS
 func AppModels(){
 
-}`)
+}`
 	utils.WriteFile(file, data)
 }
 

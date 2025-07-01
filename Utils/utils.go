@@ -35,26 +35,54 @@ func CheckForNil(err error) {
 // ====================================== INSTALL DEPENDENCIES
 func InstallDependencies() {
 
-	Swagger()
+	initSwagger()
 
-	_, err := exec.Command("sh", "-c", "go mod tidy").Output()
-	CheckForNil(err)
+	done := make(chan bool)
+	go Spinner(done, "Installing Dependencies")
 
-	fmt.Println()
-	InitSpinner("Installing Dependencies")
-	fmt.Printf("\rInstalling Dependencies ✅ \n")
+	cmd := exec.Command("sh", "-c", "go mod tidy")
+	err := cmd.Run()
+	if err != nil {
+		fmt.Printf("\rInstalling Dependencies ❌\n")
+		close(done)
+		return
+	}
+
+	if !FilsExists(".air.toml") {
+		initair()
+	}
+
+	close(done)
+	fmt.Printf("\rInstalling Dependencies \n")
 }
 
 // ====================================== INIT SWAGGER
-func Swagger() {
+func initSwagger() {
+
+	done := make(chan bool)
+	go Spinner(done, "Updating Swagger")
+
 	calledFrom := CalledFromLocation()
 
-	_, err := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/swaggo/swag/cmd/swag@v1.8.12 init --dir \"%s\"", calledFrom)).Output()
-	CheckForNil(err)
+	cmd := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/swaggo/swag/cmd/swag@v1.8.12 init --dir \"%s\"", calledFrom))
+	err := cmd.Run()
+	if err != nil {
+		fmt.Printf("\rUpdating Swagger ❌\n")
+		close(done)
+		return
+	}
 
-	fmt.Println()
-	InitSpinner("Updating Swagger")
-	fmt.Print("\rUpdating Swagger ✅ \n")
+	close(done)
+	fmt.Print("\rUpdating Swagger\n")
+}
+
+// ====================================== INIT Air
+func initair() {
+
+	calledFrom := CalledFromLocation()
+
+	_, err := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/air-verse/air@latest init --dir \"%s\"", calledFrom)).Output()
+	CheckForNil(err)
 }
 
 // ====================================== ERROR HANDLING
@@ -78,7 +106,7 @@ func AllOptions() {
 }
 
 // ====================================== CREATE FOLDER
-func CreateFolder(folderName string) {
+func CreateSingleFolder(folderName string) {
 	err := os.Mkdir(folderName, 0755)
 	CheckForNil(err)
 }
@@ -156,6 +184,16 @@ func FolderExists(path string) bool {
 	return false
 }
 
+// ====================================== FOLDER EXISTS
+func FilsExists(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 // ====================================== FIND WHICH PROJECT IS CALLING GOKU
 func CalledFromLocation() string {
 	wd, _ := os.Getwd()
@@ -163,24 +201,25 @@ func CalledFromLocation() string {
 }
 
 // ====================================== SPINNER
-func Spinner(delay time.Duration, done chan bool, message string) {
+func Spinner(done chan bool, message string) {
+	spinChars := `-\|/`
+	i := 0
 	for {
-		for _, r := range `-\|/` {
-			select {
-			case <-done:
-				return
-			default:
-				fmt.Printf("\r%s %c", message, r)
-				time.Sleep(delay)
-			}
+		select {
+		case <-done:
+			return
+		default:
+			fmt.Printf("\r%s %c", message, spinChars[i%len(spinChars)])
+			time.Sleep(100 * time.Millisecond)
+			i++
 		}
 	}
 }
 
 // ====================================== INIT SPINNER
-func InitSpinner(message string) {
-	done := make(chan bool)
-	go Spinner(100*time.Millisecond, done, message)
-	time.Sleep(1 * time.Second)
-	done <- true
-}
+// func InitSpinner(message string) {
+// 	done := make(chan bool)
+// 	go Spinner(done, message)
+// 	time.Sleep(1 * time.Second)
+// 	done <- true
+// }
