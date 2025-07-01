@@ -1,1 +1,1 @@
-![GoKu logo transparent](https://github.com/user-attachments/assets/31aa511f-d9bc-4cb8-94eb-357ffb6825b9)
+![GokuGit-Photoroom](https://github.com/user-attachments/assets/9221087c-86e0-471f-90bf-75f1223e59a8)
