@@ -446,7 +446,7 @@ func DELETE_%[2]v(id string) string {
 
 	utils.UpdatingMain(crudName)
 
-	fmt.Printf("\rAdding \"%v\" CRUD ✅ \n", crudName)
+	fmt.Printf("\rAdding \"%v\" CRUD \n", crudName)
 
 	utils.InstallDependencies()
 }

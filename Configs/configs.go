@@ -55,7 +55,7 @@ func CreateBuild() {
 		}
 
 		close(done)
-		fmt.Print("\rBuilding your app ✅ \n")
+		fmt.Print("\rBuilding your app \n")
 
 	} else {
 		go utils.Spinner(done, "Building your app")
@@ -69,7 +69,7 @@ func CreateBuild() {
 		}
 
 		close(done)
-		fmt.Print("\rBuilding your app ✅ \n")
+		fmt.Print("\rBuilding your app \n")
 	}
 }
 
@@ -120,7 +120,7 @@ func CreateDockerImage(dockerImageName string) {
 		return
 	}
 
-	fmt.Printf("\nDocker build completed successfully ✅ \n")
+	fmt.Printf("\nDocker build completed successfully \n")
 }
 
 func ListDockerImage(dockerImageName string) {

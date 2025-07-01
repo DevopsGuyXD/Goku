@@ -85,5 +85,5 @@ WORKDIR /app
 	}
 	utils.WriteFile(file, data)
 
-	fmt.Println("\nAdded dockerfile ✅ ")
+	fmt.Println("\nAdded dockerfile ")
 }
