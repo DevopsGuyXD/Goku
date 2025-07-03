@@ -173,7 +173,9 @@ func crudModel(crudName string) {
 	databaseFolder := "Sqlite"
 	databaseFile := "./Sqlite/app.db"
 
-	utils.CreateSingleFolder(databaseFolder)
+	if !utils.FolderExists(databaseFolder) {
+		utils.CreateSingleFolder(databaseFolder)
+	}
 	utils.CreateFile(databaseFile)
 
 	file, err := os.Create(fmt.Sprintf("./Models/%v.go", crudName))
