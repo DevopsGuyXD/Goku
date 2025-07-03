@@ -24,6 +24,11 @@ func Version() {
    \____|  \___/  |_|\_\   \___/  v1.0.0`)
 }
 
+// ====================================== CREATOR
+func Creator() {
+	fmt.Printf("\n%v\n%v\n", "With love ❤️", "Bharath Dundi 🤘")
+}
+
 // ====================================== ERROR HANDLING
 func CheckForNil(err error) {
 	if err != nil {

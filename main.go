@@ -29,6 +29,9 @@ func main() {
 		case os.Args[1] == "--help" || os.Args[1] == "-h":
 			utils.AllOptions()
 
+		case os.Args[1] == "--creator" || os.Args[1] == "-c":
+			utils.Creator()
+
 		case os.Args[1] == "add-docker":
 			templates.DockerFile()
 
