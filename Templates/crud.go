@@ -81,10 +81,10 @@ import (
 func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	results := models.GET_%[1]v_all()
+	response := models.GET_%[1]v_all()
 	
-	if results != nil {
-		json.NewEncoder(w).Encode(results)
+	if response != nil {
+		json.NewEncoder(w).Encode(response)
 	} else {
 		json.NewEncoder(w).Encode("No records found")
 	}
@@ -186,6 +186,7 @@ func crudModel(crudName string) {
 		`package models
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -196,20 +197,27 @@ import (
 	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 )
 
+// -------------------------- INIT DB
+func initDB() *sql.DB {
+	var database = config.InitDatabase()
+	return database
+}
+
 // -------------------------- CREATE %[2]v TABLE
 func %[2]v() {
 
-	database := config.InitDatabase()
-	defer database.Close()
+	db := initDB()
+	defer db.Close()
 
+	// Creating %[2]v table with PRIMARY KEY and DATE TIME
 	table := "CREATE TABLE IF NOT EXISTS %[2]v(id INTEGER PRIMARY KEY AUTOINCREMENT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
 
-	createDomainsTable, err := database.Prepare(table)
+	createDomainsTable, err := db.Prepare(table)
 	utils.CheckForNil(err)
 	createDomainsTable.Exec()
 
 	columnsToAdd := []string{
-		// ADD COLUMNS HERE. Example,
+		// Add columns here. Example,
 		// "title VARCHAR(25)",
 		// "author VARCHAR(25)",
 		// "language VARCHAR(25)",
@@ -218,7 +226,7 @@ func %[2]v() {
 
 	for _, col := range columnsToAdd {
 		stmt := "ALTER TABLE %[2]v ADD COLUMN " + col + ";"
-		_, err := database.Exec(stmt)
+		_, err := db.Exec(stmt)
 		if err != nil {
 			if strings.Contains(err.Error(), "SQL logic error: duplicate column name") {
 				continue
@@ -228,15 +236,15 @@ func %[2]v() {
 	}
 }
 
-// // -------------------------- GET %[2]v ALL
+// -------------------------- GET %[2]v ALL
 func GET_%[2]v_all() []map[string]interface{} {
 
-	var results []map[string]interface{}
+	db := initDB()
+	defer db.Close()
 
-	var database = config.InitDatabase()
-	defer database.Close()
+	var response []map[string]interface{}
 
-	data, err := database.Query("SELECT * FROM %[2]v")
+	data, err := db.Query("SELECT * FROM %[2]v")
 	utils.CheckForNil(err)
 	defer data.Close()
 
@@ -266,20 +274,20 @@ func GET_%[2]v_all() []map[string]interface{} {
 			}
 		}
 
-		results = append(results, rowMap)
+		response = append(response, rowMap)
 	}
 
-	return results
+	return response
 }
 
-// // -------------------------- CREATE %[2]v RECORD
+// -------------------------- CREATE %[2]v RECORD
 func CREATE_%[2]v(request io.ReadCloser) string {
+
+	db := initDB()
+	defer db.Close()
 
 	var response string
 	var data map[string]interface{}
-
-	var database = config.InitDatabase()
-	defer database.Close()
 
 	err := json.NewDecoder(request).Decode(&data)
 	utils.CheckForNil(err)
@@ -298,7 +306,7 @@ func CREATE_%[2]v(request io.ReadCloser) string {
 		strings.Join(columns, ", "),
 		strings.Join(placeholders, ", "))
 
-	res, err := database.Exec(query, values...)
+	res, err := db.Exec(query, values...)
 	if err != nil {
 		response = "DB insert error"
 
@@ -318,12 +326,13 @@ func CREATE_%[2]v(request io.ReadCloser) string {
 
 // -------------------------- GET %[2]v by ID
 func GET_%[2]v_by_id(id string) []map[string]interface{} {
-	var results []map[string]interface{}
+	
+	db := initDB()
+	defer db.Close()
 
-	var database = config.InitDatabase()
-	defer database.Close()
+	var response []map[string]interface{}
 
-	data, err := database.Query("SELECT * FROM %[2]v WHERE id = ?", id)
+	data, err := db.Query("SELECT * FROM %[2]v WHERE id = ?", id)
 	utils.CheckForNil(err)
 	defer data.Close()
 
@@ -353,27 +362,27 @@ func GET_%[2]v_by_id(id string) []map[string]interface{} {
 			}
 		}
 
-		results = append(results, rowMap)
+		response = append(response, rowMap)
 	}
 
 	if err = data.Err(); err != nil {
 		utils.CheckForNil(err)
 	}
 
-	return results
+	return response
 }
 
 // -------------------------- UPDATE %[2]v
 func UPDATE_%[2]v(id string, request io.ReadCloser) string {
+
+	db := initDB()
+	defer db.Close()
 
 	var response string
 	var data map[string]interface{}
 
 	setParts := []string{}
 	setValues := []interface{}{}
-
-	var database = config.InitDatabase()
-	defer database.Close()
 
 	err := json.NewDecoder(request).Decode(&data)
 	utils.CheckForNil(err)
@@ -392,7 +401,7 @@ func UPDATE_%[2]v(id string, request io.ReadCloser) string {
 
 	values := append(setValues, id)
 
-	res, err := database.Exec(query, values...)
+	res, err := db.Exec(query, values...)
 	if err != nil {
 		response = "DB update error"
 	} else {
@@ -412,14 +421,14 @@ func UPDATE_%[2]v(id string, request io.ReadCloser) string {
 // -------------------------- DELETE %[2]v
 func DELETE_%[2]v(id string) string {
 
-	var response string
+	db := initDB()
+	defer db.Close()
 
-	var database = config.InitDatabase()
-	defer database.Close()
+	var response string
 
 	query := fmt.Sprintf("DELETE FROM %[2]v WHERE id=%%s", id)
 
-	res, err := database.Exec(query)
+	res, err := db.Exec(query)
 	if err != nil {
 		response = "DB delete error"
 
