@@ -11,13 +11,21 @@ import (
 
 // ====================================== CRUD TEMPLATE
 func CRUD_Template(crudName string) {
+
+	filePath := "./Models/models.go"
+
 	crud_Route(crudName)
 	crud_Controller(crudName)
 	crud_Sqlite()
 	crud_Model(crudName)
-	crud_Model_Handlers(crudName)
 	updating_Config_Main(crudName)
+
+	if !utils.Check_If_Lines_Exist(filePath) {
+		crud_Model_Handlers(crudName)
+	}
+
 	utils.Install_Dependencies()
+
 	fmt.Printf("\rAdding \"%v\" CRUD ✔\n\n", crudName)
 }
 
@@ -94,19 +102,6 @@ func crud_Model(crudName string) {
 
 }
 
-// ====================================== CRUD ADD MODEL HANDLERS
-func crud_Model_Handlers(crudName string) {
-
-	file := "./Models/models.go"
-
-	modelFile := utils.Open_File(file)
-	defer modelFile.Close()
-
-	data := modelHandlers(crudName)
-
-	utils.AppendToLastLine(file, data)
-}
-
 // ====================================== UPDATING CONFIG MAIN
 func updating_Config_Main(crudName string) {
 
@@ -133,12 +128,38 @@ func updating_Config_Main(crudName string) {
 
 	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
 	utils.Check_For_Nil(err)
+}
 
-	update_Config_Main_Packages(filePath, modelImports())
+// ====================================== CRUD ADD MODEL HANDLERS
+func crud_Model_Handlers(crudName string) {
+
+	filePath := "./Models/models.go"
+
+	modelFile := utils.Open_File(filePath)
+	defer modelFile.Close()
+
+	data := modelHandlers(crudName)
+
+	utils.AppendToLastLine(filePath, data)
+
+	update_Config_Main_Packages(filePath)
 }
 
 // ====================================== UPDATE PACKAGES
-func update_Config_Main_Packages(filePath, packages string) {
+func update_Config_Main_Packages(filePath string) {
+
+	packages := `
+import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"io"
+	"strings"
+
+	config "github.com/DevopsGuyXD/myapp/Config"
+	utils "github.com/DevopsGuyXD/myapp/Utils"
+)`
+
 	data, err := os.ReadFile(filePath)
 	utils.Check_For_Nil(err)
 

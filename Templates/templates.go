@@ -133,13 +133,10 @@ func models(projectName, crudName string) string {
 		`package models
 
 import (
-	"database/sql"
 	"fmt"
 	"io"
 	"strings"
 
-
-	config "github.com/DevopsGuyXD/%[1]v/Config"
 	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 )
 
@@ -174,12 +171,6 @@ func %[2]v() {
 			utils.Check_For_Nil(err)
 		}
 	}
-}
-
-// -------------------------- INIT DB
-func initDB() *sql.DB {
-	var database = config.InitDatabase()
-	return database
 }
 
 // -------------------------- GET %[2]v ALL
@@ -218,6 +209,12 @@ func DELETE_%[2]v(id string) string {
 // ====================================== MODELS HANDLERS
 func modelHandlers(crudName string) string {
 	data := fmt.Sprintf(`
+
+// -------------------------- INIT DB
+func initDB() *sql.DB {
+	var database = config.InitDatabase()
+	return database
+}
 
 // -------------------------- GET HANDLER
 func get_Handler(query string) []map[string]interface{} {
@@ -468,6 +465,7 @@ WORKDIR /app
 	fmt.Println("\nAdded dockerfile ")
 }
 
+// ====================================== MODEL IMPORTS
 func modelImports() string {
 	data := fmt.Sprintln(`
 	

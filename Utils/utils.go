@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -75,7 +76,9 @@ func init_Swagger() {
 		return
 	}
 
+
 	close(done)
+
 	fmt.Print("\rUpdating Swagger ✔\n\n")
 }
 
@@ -212,4 +215,34 @@ func AppendToLastLine(file, data string) {
 	if _, err := f.WriteString(data); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// ====================================== CHECK IF LINES EXIST IN FILE
+func Check_If_Lines_Exist(filePath string) bool {
+
+	file, err := os.Open(filePath)
+	Check_For_Nil(err)
+	defer file.Close()
+
+	targets := map[string]bool{
+		"// -------------------------- GET HANDLER":    false,
+		"// -------------------------- CREATE HANDLER": false,
+		"// -------------------------- UPDATE HANDLER": false,
+		"// -------------------------- DELETE HANDLER": false,
+	}
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if _, ok := targets[scanner.Text()]; ok {
+			targets[scanner.Text()] = true
+		}
+	}
+
+	for _, found := range targets {
+		if !found {
+			return false
+		}
+	}
+
+	return true
 }
