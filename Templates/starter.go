@@ -184,7 +184,6 @@ import (
 
 // -------------------------- HOME CONTROLLER
 // @Description Home
-// @Tags Home
 // @Produce json
 // @Success 200 {array} map[string]interface{}
 // @Router / [get]
@@ -200,7 +199,6 @@ func GET_home(w http.ResponseWriter, r *http.Request) {
 
 // -------------------------- HEALTH CONTROLLER
 // @Description Health
-// @Tags Health
 // @Produce json
 // @Success 200 {array} map[string]interface{}
 // @Router /health [get]
