@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"golang.org/x/text/cases"
@@ -29,7 +28,7 @@ func Creator() {
 }
 
 // ====================================== ERROR HANDLING
-func CheckForNil(err error) {
+func Check_For_Nil(err error) {
 	if err != nil {
 		log.Println(err)
 		return
@@ -37,9 +36,9 @@ func CheckForNil(err error) {
 }
 
 // ====================================== INSTALL DEPENDENCIES
-func InstallDependencies() {
+func Install_Dependencies() {
 
-	initSwagger()
+	init_Swagger()
 
 	done := make(chan bool)
 	go Spinner(done, "Installing Dependencies")
@@ -52,21 +51,21 @@ func InstallDependencies() {
 		return
 	}
 
-	if !FilsExists(".air.toml") {
-		initair()
+	if !Fils_Exists(".air.toml") {
+		init_air()
 	}
 
 	close(done)
-	fmt.Printf("\rInstalling Dependencies \n")
+	fmt.Printf("\rInstalling Dependencies ✔\n\n")
 }
 
 // ====================================== INIT SWAGGER
-func initSwagger() {
+func init_Swagger() {
 
 	done := make(chan bool)
 	go Spinner(done, "Updating Swagger")
 
-	calledFrom := CalledFromLocation()
+	calledFrom := Called_From_Location()
 
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/swaggo/swag/cmd/swag@v1.8.12 init --dir \"%s\"", calledFrom))
 	err := cmd.Run()
@@ -77,20 +76,20 @@ func initSwagger() {
 	}
 
 	close(done)
-	fmt.Print("\rUpdating Swagger\n")
+	fmt.Print("\rUpdating Swagger ✔\n\n")
 }
 
 // ====================================== INIT Air
-func initair() {
+func init_air() {
 
-	calledFrom := CalledFromLocation()
+	calledFrom := Called_From_Location()
 
 	_, err := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/air-verse/air@latest init --dir \"%s\"", calledFrom)).Output()
-	CheckForNil(err)
+	Check_For_Nil(err)
 }
 
 // ====================================== ERROR HANDLING
-func AllOptions() {
+func All_Options() {
 	fmt.Printf(`  
   Options:
 
@@ -110,38 +109,38 @@ func AllOptions() {
 }
 
 // ====================================== OPEN FILE
-func OpenFile(filePath string) *os.File {
+func Open_File(filePath string) *os.File {
 
 	file, err := os.Open(filePath)
-	CheckForNil(err)
+	Check_For_Nil(err)
 
 	return file
 }
 
 // ====================================== CREATE FOLDER
-func CreateSingleFolder(project string) {
+func Create_Single_Folder(project string) {
 	err := os.Mkdir(project, 0755)
-	CheckForNil(err)
+	Check_For_Nil(err)
 }
 
 // ====================================== CREATE FOLDER
-func CreateFile(fileName string) *os.File {
+func Create_File(fileName string) *os.File {
 	file, err := os.Create(fileName)
-	CheckForNil(err)
+	Check_For_Nil(err)
 
 	return file
 }
 
 // ====================================== WRITE TO FILE
-func WriteFile(file *os.File, data string) {
+func Write_File(file *os.File, data string) {
 	_, err := file.WriteString(data)
-	CheckForNil(err)
+	Check_For_Nil(err)
 }
 
 // ====================================== GET PROJECT NAME
-func GetProjectName() string {
+func Get_Project_Name() string {
 	dir, err := os.Getwd()
-	CheckForNil(err)
+	Check_For_Nil(err)
 
 	project := filepath.Base(dir)
 
@@ -156,7 +155,7 @@ func Capitalize(word string) string {
 }
 
 // ====================================== FOLDER EXISTS
-func FolderExists(path string) bool {
+func Folder_Exists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
 		return false
@@ -170,7 +169,7 @@ func FolderExists(path string) bool {
 }
 
 // ====================================== FOLDER EXISTS
-func FilsExists(path string) bool {
+func Fils_Exists(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
 		return false
@@ -180,7 +179,7 @@ func FilsExists(path string) bool {
 }
 
 // ====================================== FIND WHICH PROJECT IS CALLING GOKU
-func CalledFromLocation() string {
+func Called_From_Location() string {
 	wd, _ := os.Getwd()
 	return wd
 }
@@ -213,23 +212,4 @@ func AppendToLastLine(file, data string) {
 	if _, err := f.WriteString(data); err != nil {
 		log.Fatal(err)
 	}
-}
-
-// ====================================== UPDATE PACKAGES
-func UpdatePackages(filePath, packages string) {
-	data, err := os.ReadFile(filePath)
-	CheckForNil(err)
-
-	content := string(data)
-	lines := strings.Split(content, "\n")
-
-	for i, line := range lines {
-		if line == "package models" {
-			lines = append(lines[:i+1], append([]string{packages}, lines[i+1:]...)...)
-			break
-		}
-	}
-
-	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	CheckForNil(err)
 }

@@ -15,7 +15,7 @@ func main() {
 	switch {
 	// ====================================== -o
 	case len(os.Args) == 1:
-		utils.AllOptions()
+		utils.All_Options()
 
 	// ====================================== -v | -i | -o
 	case len(os.Args) == 2:
@@ -24,10 +24,10 @@ func main() {
 			utils.Version()
 
 		case os.Args[1] == "--install" || os.Args[1] == "-i":
-			utils.InstallDependencies()
+			utils.Install_Dependencies()
 
 		case os.Args[1] == "--help" || os.Args[1] == "-h":
-			utils.AllOptions()
+			utils.All_Options()
 
 		case os.Args[1] == "--creator" || os.Args[1] == "-c":
 			utils.Creator()
@@ -43,10 +43,10 @@ func main() {
 	case len(os.Args) == 3:
 		switch {
 		case os.Args[1] == "run" && os.Args[2] == "dev":
-			configs.RunDev()
+			configs.Run_Dev()
 
 		case os.Args[1] == "run" && os.Args[2] == "build":
-			configs.CreateBuild()
+			configs.Create_Build()
 
 		case os.Args[1] == "run" && os.Args[2] == "start":
 			_, err := os.Stat("./dist")
@@ -55,32 +55,32 @@ func main() {
 				os.Exit(0)
 			}
 
-			configs.RunProd()
+			configs.Run_Prod()
 
 		case os.Args[1] == "docker" && os.Args[2] != "":
 			dockerImageName := strings.ToLower(os.Args[2])
-			configs.ListDockerImage(dockerImageName)
+			configs.List_Docker_Image(dockerImageName)
 
 		case os.Args[1] == "add-crud" && os.Args[2] != "":
 			crudName := os.Args[2]
-			templates.CRUDTemplate(crudName)
+			templates.CRUD_Template(crudName)
 
 		case os.Args[1] == "create-project" && os.Args[2] != "":
 			project := strings.ToLower(os.Args[2])
-			templates.StarterTemplate(project)
+			templates.Starter_Template(project)
 
 		case os.Args[1] == "build-docker" && os.Args[2] != "":
 			dockerImageName := strings.ToLower(os.Args[2])
-			configs.CreateDockerImage(dockerImageName)
+			configs.Create_Docker_Image(dockerImageName)
 
 		default:
 			fmt.Printf("Go1: Bad option\n")
-			utils.AllOptions()
+			utils.All_Options()
 		}
 
 	default:
 		fmt.Printf("Go1: Bad option\n")
-		utils.AllOptions()
+		utils.All_Options()
 	}
 
 }

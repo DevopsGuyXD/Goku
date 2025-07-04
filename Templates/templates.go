@@ -153,7 +153,7 @@ func %[2]v() {
 	table := "CREATE TABLE IF NOT EXISTS %[2]v(id INTEGER PRIMARY KEY AUTOINCREMENT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
 
 	createDomainsTable, err := db.Prepare(table)
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 	createDomainsTable.Exec()
 
 	columnsToAdd := []string{
@@ -171,7 +171,7 @@ func %[2]v() {
 			if strings.Contains(err.Error(), "SQL logic error: duplicate column name") {
 				continue
 			}
-			utils.CheckForNil(err)
+			utils.Check_For_Nil(err)
 		}
 	}
 }
@@ -228,11 +228,11 @@ func get_Handler(query string) []map[string]interface{} {
 	var response []map[string]interface{}
 
 	data, err := db.Query(query)
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 	defer data.Close()
 
 	columns, err := data.Columns()
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 
 	for data.Next() {
 
@@ -245,7 +245,7 @@ func get_Handler(query string) []map[string]interface{} {
 		}
 
 		err := data.Scan(valuePtrs...)
-		utils.CheckForNil(err)
+		utils.Check_For_Nil(err)
 
 		for i, col := range columns {
 			val := values[i]
@@ -273,7 +273,7 @@ func create_Handler(request io.ReadCloser) string {
 	var data map[string]interface{}
 
 	err := json.NewDecoder(request).Decode(&data)
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 
 	columns := []string{}
 	placeholders := []string{}
@@ -295,7 +295,7 @@ func create_Handler(request io.ReadCloser) string {
 
 	} else {
 		rowsAffected, err := res.RowsAffected()
-		utils.CheckForNil(err)
+		utils.Check_For_Nil(err)
 
 		if rowsAffected != 0 {
 			response = "Created successfully"
@@ -319,7 +319,7 @@ func update_Handler(id string, request io.ReadCloser) string {
 	setValues := []interface{}{}
 
 	err := json.NewDecoder(request).Decode(&data)
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 
 	for k, v := range data {
 		setParts = append(setParts, fmt.Sprintf("%%s = ?", k))
@@ -340,7 +340,7 @@ func update_Handler(id string, request io.ReadCloser) string {
 		response = "DB update error"
 	} else {
 		rowsAffected, err := res.RowsAffected()
-		utils.CheckForNil(err)
+		utils.Check_For_Nil(err)
 
 		if rowsAffected != 0 {
 			response = "Updated successfully"
@@ -368,7 +368,7 @@ func delete_Handler(id string) string {
 
 	} else {
 		rowsAffected, err := res.RowsAffected()
-		utils.CheckForNil(err)
+		utils.Check_For_Nil(err)
 
 		if rowsAffected != 0 {
 			response = "Deleted successfully"
@@ -392,12 +392,12 @@ func DockerFile() {
 
 	filePath := "./dockerfile"
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	folder := "Sqlite"
 
-	exists := utils.FolderExists(folder)
+	exists := utils.Folder_Exists(folder)
 
 	if exists {
 
@@ -463,7 +463,7 @@ WORKDIR /app
 
     CMD ["./app"]`
 	}
-	utils.WriteFile(file, data)
+	utils.Write_File(file, data)
 
 	fmt.Println("\nAdded dockerfile ")
 }

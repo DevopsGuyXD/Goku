@@ -7,14 +7,14 @@ import (
 )
 
 // ====================================== SIMPLE TEMPLATE
-func StarterTemplate(project string) {
+func Starter_Template(project string) {
 
-	utils.CreateSingleFolder(project)
+	utils.Create_Single_Folder(project)
 
 	createFolders(project)
 
 	fmt.Println()
-	fmt.Printf("\rCreating %v \n", project)
+	fmt.Printf("\rCreating %v ✔\n\n", project)
 }
 
 // ====================================== CREATE FOLDER
@@ -25,13 +25,13 @@ func createFolders(project string) {
 
 		folder := fmt.Sprintf("%v/%v", project, subFolder)
 
-		utils.CreateSingleFolder(folder)
-		createFiles(project, subFolder)
+		utils.Create_Single_Folder(folder)
+		Create_Files(project, subFolder)
 	}
 }
 
 // ====================================== CREATE FILES
-func createFiles(project, subFolder string) {
+func Create_Files(project, subFolder string) {
 
 	mainFile(project)
 	envFile(project)
@@ -60,7 +60,7 @@ func envFile(project string) {
 
 	filePath := fmt.Sprintf("%v/.env", project)
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -68,7 +68,7 @@ func envFile(project string) {
 			"GOKU_VERSION=v1.0.0\n",
 	)
 
-	utils.WriteFile(file, data)
+	utils.Write_File(file, data)
 }
 
 // ====================================== MOD FILE
@@ -76,7 +76,7 @@ func modFile(project string) {
 
 	filePath := fmt.Sprintf("%v/go.mod", project)
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -86,7 +86,7 @@ func modFile(project string) {
 
 		project)
 
-	utils.WriteFile(file, data)
+	utils.Write_File(file, data)
 }
 
 // ====================================== MAIN FILE
@@ -94,7 +94,7 @@ func mainFile(project string) {
 
 	filePath := fmt.Sprintf("%v/main.go", project)
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -119,7 +119,7 @@ func main() {
 
 	server := route.RouteCollection()
 	err := http.ListenAndServe(os.Getenv("PORT"), server)
-	util.CheckForNil(err)
+	util.Check_For_Nil(err)
 }
 
 // -------------------------- INIT
@@ -128,7 +128,7 @@ func init() {
 	models.AppModels()
 
 }`, project)
-	utils.WriteFile(file, data)
+	utils.Write_File(file, data)
 }
 
 // ====================================== ROUTES FILE
@@ -136,7 +136,7 @@ func routesFile(project, subFolder string) {
 
 	filePath := fmt.Sprintf("%v/%v/routes.go", project, subFolder)
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -160,7 +160,7 @@ func RouteCollection() chi.Router {
 
 	return router
 }`, project)
-	utils.WriteFile(file, data)
+	utils.Write_File(file, data)
 }
 
 // ====================================== CONTROLLER FILE
@@ -168,7 +168,7 @@ func controllerFile(project, subFolder string) {
 
 	filePath := fmt.Sprintf("%v/%v/home.go", project, subFolder)
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -215,7 +215,7 @@ func GET_health(w http.ResponseWriter, r *http.Request) {
 }
 
 	`, project)
-	utils.WriteFile(file, data)
+	utils.Write_File(file, data)
 }
 
 // ====================================== CONFIG FILE
@@ -223,7 +223,7 @@ func configFile(project, subFolder string) {
 
 	filePath := fmt.Sprintf("%v/%v/config.go", project, subFolder)
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	data :=
@@ -238,11 +238,11 @@ import (
 // -------------------------- INIT DB
 func InitDatabase() *sql.DB {
 	database, err := sql.Open("sqlite", "./Sqlite/app.db")
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 
 	return database
 }`
-	utils.WriteFile(file, data)
+	utils.Write_File(file, data)
 }
 
 // ====================================== MODEL FILE
@@ -250,7 +250,7 @@ func modelFile(project, subFolder string) {
 
 	filePath := fmt.Sprintf("%v/%v/models.go", project, subFolder)
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	data :=
@@ -260,7 +260,7 @@ func modelFile(project, subFolder string) {
 func AppModels(){
 
 }`
-	utils.WriteFile(file, data)
+	utils.Write_File(file, data)
 }
 
 // ====================================== UTIL FILE
@@ -268,7 +268,7 @@ func utilFile(project, subFolder string) {
 
 	filePath := fmt.Sprintf("%v/%v/utils.go", project, subFolder)
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	data :=
@@ -280,7 +280,7 @@ import (
 )
 
 // -------------------------- Error Handling
-func CheckForNil(err error) {
+func Check_For_Nil(err error) {
 	if err != nil {
 		log.Println(err)
 		return
@@ -290,17 +290,17 @@ func CheckForNil(err error) {
 // -------------------------- .env Init
 func InitEnvFile() {
 	err := godotenv.Load(".env")
-	CheckForNil(err)
+	Check_For_Nil(err)
 }`
-	utils.WriteFile(file, data)
+	utils.Write_File(file, data)
 }
 
 // // ====================================== SWAGGER FILES
 // func swagger() {
-// 	calledFrom := utils.CalledFromLocation()
+// 	calledFrom := utils.Called_From_Location()
 
 // 	fmt.Println("Called from:", calledFrom)
 
 // 	_, err := exec.Command("sh", "-c", fmt.Sprintf("swag init --dir %s", calledFrom)).Output()
-// 	utils.CheckForNil(err)
+// 	utils.Check_For_Nil(err)
 // }

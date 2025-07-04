@@ -12,10 +12,10 @@ import (
 )
 
 // ====================================== RUN DEV
-func RunDev() {
+func Run_Dev() {
 
 	var shell, flag string
-	calledFrom := utils.CalledFromLocation()
+	calledFrom := utils.Called_From_Location()
 
 	if runtime.GOOS == "windows" {
 		shell = "cmd.exe"
@@ -33,13 +33,13 @@ func RunDev() {
 	cmd.Stdin = os.Stdin
 
 	err := cmd.Run()
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 
 	os.Exit(0)
 }
 
 // ====================================== CREATE BUILD
-func CreateBuild() {
+func Create_Build() {
 
 	done := make(chan bool)
 
@@ -55,7 +55,7 @@ func CreateBuild() {
 		}
 
 		close(done)
-		fmt.Print("\rBuilding your app \n")
+		fmt.Print("\rBuilding your app ✔\n")
 
 	} else {
 		go utils.Spinner(done, "Building your app")
@@ -69,12 +69,12 @@ func CreateBuild() {
 		}
 
 		close(done)
-		fmt.Print("\rBuilding your app \n")
+		fmt.Print("\rBuilding your app ✔\n")
 	}
 }
 
 // ====================================== DOCKER BUILD
-func CreateDockerImage(dockerImageName string) {
+func Create_Docker_Image(dockerImageName string) {
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build -t %s .", dockerImageName))
 
 	stdout, err := cmd.StdoutPipe()
@@ -123,15 +123,15 @@ func CreateDockerImage(dockerImageName string) {
 	fmt.Printf("\nDocker build completed successfully \n")
 }
 
-func ListDockerImage(dockerImageName string) {
+func List_Docker_Image(dockerImageName string) {
 	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", dockerImageName)).Output()
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 
 	fmt.Printf("\n%v", string(res))
 }
 
 // ====================================== RUN PRODUCTION
-func RunProd() {
+func Run_Prod() {
 
 	var shell, flag string
 
@@ -147,7 +147,7 @@ func RunProd() {
 		cmd.Stdin = os.Stdin
 
 		err := cmd.Run()
-		utils.CheckForNil(err)
+		utils.Check_For_Nil(err)
 
 		os.Exit(0)
 	} else {
@@ -162,7 +162,7 @@ func RunProd() {
 		cmd.Stdin = os.Stdin
 
 		err := cmd.Run()
-		utils.CheckForNil(err)
+		utils.Check_For_Nil(err)
 
 		os.Exit(0)
 	}

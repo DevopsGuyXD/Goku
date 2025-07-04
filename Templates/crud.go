@@ -10,26 +10,26 @@ import (
 )
 
 // ====================================== CRUD TEMPLATE
-func CRUDTemplate(crudName string) {
-	crudRoute(crudName)
-	crudController(crudName)
-	crudSqlite()
-	crudModel(crudName)
-	crudModelHandlers(crudName)
-	updatingConfigMain(crudName)
-	utils.InstallDependencies()
-	fmt.Printf("\rAdding \"%v\" CRUD \n", crudName)
+func CRUD_Template(crudName string) {
+	crud_Route(crudName)
+	crud_Controller(crudName)
+	crud_Sqlite()
+	crud_Model(crudName)
+	crud_Model_Handlers(crudName)
+	updating_Config_Main(crudName)
+	utils.Install_Dependencies()
+	fmt.Printf("\rAdding \"%v\" CRUD ✔\n\n", crudName)
 }
 
 // ====================================== CRUD ADD ROUTE
-func crudRoute(crudName string) {
+func crud_Route(crudName string) {
 
 	var lines []string
 
 	filePath := "./Routes/routes.go"
 	data := routes(crudName)
 
-	file := utils.OpenFile(filePath)
+	file := utils.Open_File(filePath)
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -43,63 +43,63 @@ func crudRoute(crudName string) {
 	}
 
 	err := scanner.Err()
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 
 	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 }
 
 // ====================================== CRUD ADD CONTROLLER
-func crudController(crudName string) {
+func crud_Controller(crudName string) {
 
-	project := utils.GetProjectName()
+	project := utils.Get_Project_Name()
 
 	filePath := fmt.Sprintf("./Controller/%v.go", crudName)
 	data := controllers(crudName, project)
 
-	file := utils.CreateFile(filePath)
+	file := utils.Create_File(filePath)
 	defer file.Close()
 
 	_, err := file.WriteString(data)
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 }
 
 // ====================================== CRUD SQLITE
-func crudSqlite() {
+func crud_Sqlite() {
 	databaseFolder := "Sqlite"
 	fileName := "./" + databaseFolder + "/app.db"
 
-	if !utils.FolderExists(databaseFolder) {
-		utils.CreateSingleFolder(databaseFolder)
+	if !utils.Folder_Exists(databaseFolder) {
+		utils.Create_Single_Folder(databaseFolder)
 
-		dbFile := utils.CreateFile(fileName)
+		dbFile := utils.Create_File(fileName)
 		defer dbFile.Close()
 	}
 }
 
 // ====================================== CRUD ADD MODEL
-func crudModel(crudName string) {
+func crud_Model(crudName string) {
 
-	projectName := utils.GetProjectName()
+	projectName := utils.Get_Project_Name()
 
 	file := fmt.Sprintf("./Models/%v.go", crudName)
 
-	modelFile := utils.CreateFile(file)
+	modelFile := utils.Create_File(file)
 	defer modelFile.Close()
 
 	data := models(projectName, crudName)
 
 	_, err := modelFile.WriteString(data)
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 
 }
 
 // ====================================== CRUD ADD MODEL HANDLERS
-func crudModelHandlers(crudName string) {
+func crud_Model_Handlers(crudName string) {
 
 	file := "./Models/models.go"
 
-	modelFile := utils.OpenFile(file)
+	modelFile := utils.Open_File(file)
 	defer modelFile.Close()
 
 	data := modelHandlers(crudName)
@@ -108,14 +108,14 @@ func crudModelHandlers(crudName string) {
 }
 
 // ====================================== UPDATING CONFIG MAIN
-func updatingConfigMain(crudName string) {
+func updating_Config_Main(crudName string) {
 
 	var lines []string
 	filePath := "./Models/models.go"
 
 	data := fmt.Sprintf("%v()", crudName)
 
-	file := utils.OpenFile(filePath)
+	file := utils.Open_File(filePath)
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -129,10 +129,29 @@ func updatingConfigMain(crudName string) {
 		}
 	}
 
-	utils.CheckForNil(scanner.Err())
+	utils.Check_For_Nil(scanner.Err())
 
 	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	utils.CheckForNil(err)
+	utils.Check_For_Nil(err)
 
-	utils.UpdatePackages(filePath, modelImports())
+	update_Config_Main_Packages(filePath, modelImports())
+}
+
+// ====================================== UPDATE PACKAGES
+func update_Config_Main_Packages(filePath, packages string) {
+	data, err := os.ReadFile(filePath)
+	utils.Check_For_Nil(err)
+
+	content := string(data)
+	lines := strings.Split(content, "\n")
+
+	for i, line := range lines {
+		if line == "package models" {
+			lines = append(lines[:i+1], append([]string{packages}, lines[i+1:]...)...)
+			break
+		}
+	}
+
+	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+	utils.Check_For_Nil(err)
 }
