@@ -110,6 +110,15 @@ func AllOptions() {
 `)
 }
 
+// ====================================== OPEN FILE
+func OpenFile(filePath string) *os.File {
+
+	file, err := os.Open(filePath)
+	CheckForNil(err)
+
+	return file
+}
+
 // ====================================== CREATE FOLDER
 func CreateSingleFolder(folderName string) {
 	err := os.Mkdir(folderName, 0755)
@@ -117,10 +126,11 @@ func CreateSingleFolder(folderName string) {
 }
 
 // ====================================== CREATE FOLDER
-func CreateFile(fileName string) {
+func CreateFile(fileName string) *os.File {
 	file, err := os.Create(fileName)
 	CheckForNil(err)
-	defer file.Close()
+
+	return file
 }
 
 // ====================================== WRITE TO FILE
@@ -147,15 +157,14 @@ func Capitalize(word string) string {
 }
 
 // ====================================== UPDATING MAIN WITH DATABASE
-func UpdatingMain(crudName string) {
+func UpdatingConfigMain(crudName string) {
 
 	var lines []string
 	filePath := "./Models/models.go"
 
 	data := fmt.Sprintf("%v()", crudName)
 
-	file, err := os.Open(filePath)
-	CheckForNil(err)
+	file := OpenFile(filePath)
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -171,7 +180,7 @@ func UpdatingMain(crudName string) {
 
 	CheckForNil(scanner.Err())
 
-	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
 	CheckForNil(err)
 }
 
@@ -221,10 +230,16 @@ func Spinner(done chan bool, message string) {
 	}
 }
 
-// ====================================== INIT SPINNER
-// func InitSpinner(message string) {
-// 	done := make(chan bool)
-// 	go Spinner(done, message)
-// 	time.Sleep(1 * time.Second)
-// 	done <- true
-// }
+// ====================================== APPEND TO LAST LINE
+func AppendToLastLine(file, data string) {
+
+	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	if _, err := f.WriteString(data); err != nil {
+		log.Fatal(err)
+	}
+}

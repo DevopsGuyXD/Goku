@@ -2,7 +2,6 @@ package templates
 
 import (
 	"fmt"
-	"os"
 
 	utils "github.com/DevopsGuyXD/Goku/Utils"
 )
@@ -60,8 +59,10 @@ func createFiles(folderName, subFolder string) {
 
 // ====================================== .ENV FILE
 func envFile(folderName string) {
-	file, err := os.Create(fmt.Sprintf("%v/.env", folderName))
-	utils.CheckForNil(err)
+
+	filePath := fmt.Sprintf("%v/.env", folderName)
+
+	file := utils.CreateFile(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -74,8 +75,10 @@ func envFile(folderName string) {
 
 // ====================================== MOD FILE
 func modFile(folderName string) {
-	file, err := os.Create(fmt.Sprintf("%v/go.mod", folderName))
-	utils.CheckForNil(err)
+
+	filePath := fmt.Sprintf("%v/go.mod", folderName)
+
+	file := utils.CreateFile(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -91,8 +94,9 @@ func modFile(folderName string) {
 // ====================================== MAIN FILE
 func mainFile(folderName string) {
 
-	file, err := os.Create(fmt.Sprintf("%v/main.go", folderName))
-	utils.CheckForNil(err)
+	filePath := fmt.Sprintf("%v/main.go", folderName)
+
+	file := utils.CreateFile(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -131,8 +135,10 @@ func init() {
 
 // ====================================== ROUTES FILE
 func routesFile(folderName, subFolder string) {
-	file, err := os.Create(fmt.Sprintf("%v/%v/routes.go", folderName, subFolder))
-	utils.CheckForNil(err)
+
+	filePath := fmt.Sprintf("%v/%v/routes.go", folderName, subFolder)
+
+	file := utils.CreateFile(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -161,8 +167,10 @@ func RouteCollection() chi.Router {
 
 // ====================================== CONTROLLER FILE
 func controllerFile(folderName, subFolder string) {
-	file, err := os.Create(fmt.Sprintf("%v/%v/home.go", folderName, subFolder))
-	utils.CheckForNil(err)
+
+	filePath := fmt.Sprintf("%v/%v/home.go", folderName, subFolder)
+
+	file := utils.CreateFile(filePath)
 	defer file.Close()
 
 	data := fmt.Sprintf(
@@ -215,8 +223,9 @@ func GET_health(w http.ResponseWriter, r *http.Request) {
 // ====================================== CONFIG FILE
 func configFile(folderName, subFolder string) {
 
-	file, err := os.Create(fmt.Sprintf("%v/%v/config.go", folderName, subFolder))
-	utils.CheckForNil(err)
+	filePath := fmt.Sprintf("%v/%v/config.go", folderName, subFolder)
+
+	file := utils.CreateFile(filePath)
 	defer file.Close()
 
 	data :=
@@ -241,8 +250,9 @@ func InitDatabase() *sql.DB {
 // ====================================== MODEL FILE
 func modelFile(folderName, subFolder string) {
 
-	file, err := os.Create(fmt.Sprintf("%v/%v/models.go", folderName, subFolder))
-	utils.CheckForNil(err)
+	filePath := fmt.Sprintf("%v/%v/models.go", folderName, subFolder)
+
+	file := utils.CreateFile(filePath)
 	defer file.Close()
 
 	data :=
@@ -257,8 +267,10 @@ func AppModels(){
 
 // ====================================== UTIL FILE
 func utilFile(folderName, subFolder string) {
-	file, err := os.Create(fmt.Sprintf("%v/%v/utils.go", folderName, subFolder))
-	utils.CheckForNil(err)
+
+	filePath := fmt.Sprintf("%v/%v/utils.go", folderName, subFolder)
+
+	file := utils.CreateFile(filePath)
 	defer file.Close()
 
 	data :=
