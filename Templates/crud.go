@@ -134,5 +134,5 @@ func updatingConfigMain(crudName string) {
 	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
 	utils.CheckForNil(err)
 
-	utils.UpdatePackages(filePath, tester())
+	utils.UpdatePackages(filePath, modelImports())
 }

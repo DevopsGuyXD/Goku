@@ -66,8 +66,8 @@ func main() {
 			templates.CRUDTemplate(crudName)
 
 		case os.Args[1] == "create-project" && os.Args[2] != "":
-			projectName := strings.ToLower(os.Args[2])
-			templates.StarterTemplate(projectName)
+			project := strings.ToLower(os.Args[2])
+			templates.StarterTemplate(project)
 
 		case os.Args[1] == "build-docker" && os.Args[2] != "":
 			dockerImageName := strings.ToLower(os.Args[2])

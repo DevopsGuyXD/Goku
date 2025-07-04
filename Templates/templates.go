@@ -9,7 +9,7 @@ import (
 // ====================================== ROUTES
 func routes(crudName string) string {
 	data := fmt.Sprintf(
-		`	//-------------------------- %[1]v
+		`	// -------------------------- %[1]v
 	router.Route("/%[1]v", func(r chi.Router) {
 		r.Get("/", controller.GET_%[1]v)
 		r.Post("/", controller.POST_%[1]v)
@@ -37,7 +37,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-//-------------------------- %[1]v GET ALL
+// -------------------------- %[1]v GET ALL
 // @Description All %[1]v
 // @Tags %[1]v
 // @Produce json
@@ -55,7 +55,7 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//-------------------------- %[1]v GET BY ID
+// -------------------------- %[1]v GET BY ID
 // @Description Single %[1]v
 // @Tags %[1]v
 // @Produce json
@@ -75,7 +75,7 @@ func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//-------------------------- %[1]v CREATE
+// -------------------------- %[1]v CREATE
 // @Description Create a %[1]v
 // @Tags %[1]v
 // @Accept json
@@ -92,7 +92,7 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-//-------------------------- %[1]v UPDATE BY ID
+// -------------------------- %[1]v UPDATE BY ID
 // @Description Update %[1]v
 // @Tags %[1]v
 // @Produce json
@@ -109,7 +109,7 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-//-------------------------- %[1]v DELETE
+// -------------------------- %[1]v DELETE
 // @Description Delete %[1]v
 // @Tags %[1]v
 // @Produce json
@@ -468,7 +468,7 @@ WORKDIR /app
 	fmt.Println("\nAdded dockerfile ")
 }
 
-func tester() string {
+func modelImports() string {
 	data := fmt.Sprintln(`
 	
 import (

@@ -7,60 +7,58 @@ import (
 )
 
 // ====================================== SIMPLE TEMPLATE
-func StarterTemplate(projectName string) {
+func StarterTemplate(project string) {
 
-	folderName := projectName
+	utils.CreateSingleFolder(project)
 
-	utils.CreateSingleFolder(folderName)
-
-	createFolders(folderName)
+	createFolders(project)
 
 	fmt.Println()
-	fmt.Printf("\rCreating %v \n", projectName)
+	fmt.Printf("\rCreating %v \n", project)
 }
 
 // ====================================== CREATE FOLDER
-func createFolders(folderName string) {
+func createFolders(project string) {
 	subFolders := []string{"Routes", "Controller", "Config", "Models", "Utils"}
 
 	for _, subFolder := range subFolders {
 
-		folder := fmt.Sprintf("%v/%v", folderName, subFolder)
+		folder := fmt.Sprintf("%v/%v", project, subFolder)
 
 		utils.CreateSingleFolder(folder)
-		createFiles(folderName, subFolder)
+		createFiles(project, subFolder)
 	}
 }
 
 // ====================================== CREATE FILES
-func createFiles(folderName, subFolder string) {
+func createFiles(project, subFolder string) {
 
-	mainFile(folderName)
-	envFile(folderName)
-	modFile(folderName)
+	mainFile(project)
+	envFile(project)
+	modFile(project)
 
 	switch {
 	case subFolder == "Routes":
-		routesFile(folderName, subFolder)
+		routesFile(project, subFolder)
 
 	case subFolder == "Controller":
-		controllerFile(folderName, subFolder)
+		controllerFile(project, subFolder)
 
 	case subFolder == "Config":
-		configFile(folderName, subFolder)
+		configFile(project, subFolder)
 
 	case subFolder == "Models":
-		modelFile(folderName, subFolder)
+		modelFile(project, subFolder)
 
 	case subFolder == "Utils":
-		utilFile(folderName, subFolder)
+		utilFile(project, subFolder)
 	}
 }
 
 // ====================================== .ENV FILE
-func envFile(folderName string) {
+func envFile(project string) {
 
-	filePath := fmt.Sprintf("%v/.env", folderName)
+	filePath := fmt.Sprintf("%v/.env", project)
 
 	file := utils.CreateFile(filePath)
 	defer file.Close()
@@ -74,9 +72,9 @@ func envFile(folderName string) {
 }
 
 // ====================================== MOD FILE
-func modFile(folderName string) {
+func modFile(project string) {
 
-	filePath := fmt.Sprintf("%v/go.mod", folderName)
+	filePath := fmt.Sprintf("%v/go.mod", project)
 
 	file := utils.CreateFile(filePath)
 	defer file.Close()
@@ -86,15 +84,15 @@ func modFile(folderName string) {
 
 			"go 1.23.5",
 
-		folderName)
+		project)
 
 	utils.WriteFile(file, data)
 }
 
 // ====================================== MAIN FILE
-func mainFile(folderName string) {
+func mainFile(project string) {
 
-	filePath := fmt.Sprintf("%v/main.go", folderName)
+	filePath := fmt.Sprintf("%v/main.go", project)
 
 	file := utils.CreateFile(filePath)
 	defer file.Close()
@@ -112,7 +110,7 @@ import (
 	util "github.com/DevopsGuyXD/%[1]v/Utils"
 )
 
-//-------------------------- Main
+// -------------------------- Main
 func main() {
 	util.InitEnvFile()
 
@@ -124,19 +122,19 @@ func main() {
 	util.CheckForNil(err)
 }
 
-//-------------------------- INIT
+// -------------------------- INIT
 func init() {
 
 	models.AppModels()
 
-}`, folderName)
+}`, project)
 	utils.WriteFile(file, data)
 }
 
 // ====================================== ROUTES FILE
-func routesFile(folderName, subFolder string) {
+func routesFile(project, subFolder string) {
 
-	filePath := fmt.Sprintf("%v/%v/routes.go", folderName, subFolder)
+	filePath := fmt.Sprintf("%v/%v/routes.go", project, subFolder)
 
 	file := utils.CreateFile(filePath)
 	defer file.Close()
@@ -151,7 +149,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-//-------------------------- Routes
+// -------------------------- Routes
 func RouteCollection() chi.Router {
 
 	router := chi.NewRouter()
@@ -161,14 +159,14 @@ func RouteCollection() chi.Router {
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	return router
-}`, folderName)
+}`, project)
 	utils.WriteFile(file, data)
 }
 
 // ====================================== CONTROLLER FILE
-func controllerFile(folderName, subFolder string) {
+func controllerFile(project, subFolder string) {
 
-	filePath := fmt.Sprintf("%v/%v/home.go", folderName, subFolder)
+	filePath := fmt.Sprintf("%v/%v/home.go", project, subFolder)
 
 	file := utils.CreateFile(filePath)
 	defer file.Close()
@@ -184,7 +182,7 @@ import (
 	util "github.com/DevopsGuyXD/%[1]v/Utils"
 )
 
-// // -------------------------- HOME CONTROLLER
+// -------------------------- HOME CONTROLLER
 // @Description Home
 // @Tags Home
 // @Produce json
@@ -200,7 +198,7 @@ func GET_home(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(message)
 }
 
-// //-------------------------- HEALTH CONTROLLER
+// -------------------------- HEALTH CONTROLLER
 // @Description Health
 // @Tags Health
 // @Produce json
@@ -216,14 +214,14 @@ func GET_health(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(message)
 }
 
-	`, folderName)
+	`, project)
 	utils.WriteFile(file, data)
 }
 
 // ====================================== CONFIG FILE
-func configFile(folderName, subFolder string) {
+func configFile(project, subFolder string) {
 
-	filePath := fmt.Sprintf("%v/%v/config.go", folderName, subFolder)
+	filePath := fmt.Sprintf("%v/%v/config.go", project, subFolder)
 
 	file := utils.CreateFile(filePath)
 	defer file.Close()
@@ -248,9 +246,9 @@ func InitDatabase() *sql.DB {
 }
 
 // ====================================== MODEL FILE
-func modelFile(folderName, subFolder string) {
+func modelFile(project, subFolder string) {
 
-	filePath := fmt.Sprintf("%v/%v/models.go", folderName, subFolder)
+	filePath := fmt.Sprintf("%v/%v/models.go", project, subFolder)
 
 	file := utils.CreateFile(filePath)
 	defer file.Close()
@@ -258,7 +256,7 @@ func modelFile(folderName, subFolder string) {
 	data :=
 		`package models
 
-//-------------------------- MODELS
+// -------------------------- MODELS
 func AppModels(){
 
 }`
@@ -266,9 +264,9 @@ func AppModels(){
 }
 
 // ====================================== UTIL FILE
-func utilFile(folderName, subFolder string) {
+func utilFile(project, subFolder string) {
 
-	filePath := fmt.Sprintf("%v/%v/utils.go", folderName, subFolder)
+	filePath := fmt.Sprintf("%v/%v/utils.go", project, subFolder)
 
 	file := utils.CreateFile(filePath)
 	defer file.Close()
@@ -281,7 +279,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//-------------------------- Error Handling
+// -------------------------- Error Handling
 func CheckForNil(err error) {
 	if err != nil {
 		log.Println(err)
@@ -289,7 +287,7 @@ func CheckForNil(err error) {
 	}
 }
 
-//-------------------------- .env Init
+// -------------------------- .env Init
 func InitEnvFile() {
 	err := godotenv.Load(".env")
 	CheckForNil(err)

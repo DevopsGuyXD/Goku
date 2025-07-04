@@ -119,8 +119,8 @@ func OpenFile(filePath string) *os.File {
 }
 
 // ====================================== CREATE FOLDER
-func CreateSingleFolder(folderName string) {
-	err := os.Mkdir(folderName, 0755)
+func CreateSingleFolder(project string) {
+	err := os.Mkdir(project, 0755)
 	CheckForNil(err)
 }
 
@@ -143,9 +143,9 @@ func GetProjectName() string {
 	dir, err := os.Getwd()
 	CheckForNil(err)
 
-	folderName := filepath.Base(dir)
+	project := filepath.Base(dir)
 
-	return folderName
+	return project
 }
 
 // ====================================== CAPITALIZE
