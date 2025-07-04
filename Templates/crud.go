@@ -16,7 +16,7 @@ func CRUDTemplate(crudName string) {
 	crudSqlite()
 	crudModel(crudName)
 	crudModelHandlers(crudName)
-	utils.UpdatingConfigMain(crudName)
+	updatingConfigMain(crudName)
 	utils.InstallDependencies()
 	fmt.Printf("\rAdding \"%v\" CRUD \n", crudName)
 }
@@ -105,4 +105,34 @@ func crudModelHandlers(crudName string) {
 	data := modelHandlers(crudName)
 
 	utils.AppendToLastLine(file, data)
+}
+
+// ====================================== UPDATING CONFIG MAIN
+func updatingConfigMain(crudName string) {
+
+	var lines []string
+	filePath := "./Models/models.go"
+
+	data := fmt.Sprintf("%v()", crudName)
+
+	file := utils.OpenFile(filePath)
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		lines = append(lines, line)
+
+		if strings.Contains(line, "func AppModels(){") {
+			lines = append(lines, "\t"+data)
+		}
+	}
+
+	utils.CheckForNil(scanner.Err())
+
+	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+	utils.CheckForNil(err)
+
+	utils.UpdatePackages(filePath, tester())
 }

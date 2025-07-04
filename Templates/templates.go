@@ -467,3 +467,18 @@ WORKDIR /app
 
 	fmt.Println("\nAdded dockerfile ")
 }
+
+func tester() string {
+	data := fmt.Sprintln(`
+	
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"strings"
+
+	utils "github.com/DevopsGuyXD/myapp/Utils"
+)`)
+
+	return data
+}

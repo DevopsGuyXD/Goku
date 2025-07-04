@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -156,34 +155,6 @@ func Capitalize(word string) string {
 	return caser.String(word)
 }
 
-// ====================================== UPDATING MAIN WITH DATABASE
-func UpdatingConfigMain(crudName string) {
-
-	var lines []string
-	filePath := "./Models/models.go"
-
-	data := fmt.Sprintf("%v()", crudName)
-
-	file := OpenFile(filePath)
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		lines = append(lines, line)
-
-		if strings.Contains(line, "func AppModels(){") {
-			lines = append(lines, "\t"+data)
-		}
-	}
-
-	CheckForNil(scanner.Err())
-
-	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	CheckForNil(err)
-}
-
 // ====================================== FOLDER EXISTS
 func FolderExists(path string) bool {
 	info, err := os.Stat(path)
@@ -242,4 +213,23 @@ func AppendToLastLine(file, data string) {
 	if _, err := f.WriteString(data); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// ====================================== UPDATE PACKAGES
+func UpdatePackages(filePath, packages string) {
+	data, err := os.ReadFile(filePath)
+	CheckForNil(err)
+
+	content := string(data)
+	lines := strings.Split(content, "\n")
+
+	for i, line := range lines {
+		if line == "package models" {
+			lines = append(lines[:i+1], append([]string{packages}, lines[i+1:]...)...)
+			break
+		}
+	}
+
+	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+	CheckForNil(err)
 }
