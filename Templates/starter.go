@@ -236,26 +236,16 @@ func configFile(project, subFolder string) {
 
 import (
 	"database/sql"
-	"strings"
 	
 	utils "github.com/DevopsGuyXD/myapp/Utils"
 	_ "modernc.org/sqlite"
 )
 
 // -------------------------- INIT DB
-func InitDatabase(env string) *sql.DB {
+func InitDatabase() *sql.DB {
 
-	var database *sql.DB
-	var err error
-
-	if strings.ToLower(env) == "prod" {
-		database, err = sql.Open("sqlite", "./Sqlite/app.db")
-		utils.Check_For_Nil(err)
-		
-	} else if strings.ToLower(env) == "dev" {
-		database, err = sql.Open("sqlite", "./Sqlite/test.db")
-		utils.Check_For_Nil(err)
-	}
+	database, err := sql.Open("sqlite", "./Sqlite/app.db")
+	utils.Check_For_Nil(err)
 
 	return database
 }`

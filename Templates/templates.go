@@ -11,17 +11,11 @@ func routes(crudName string) string {
 	data := fmt.Sprintf(
 		`	// -------------------------- %[1]v
 	router.Route("/%[1]v", func(r chi.Router) {
-		r.Get("/", controller.GET_%[1]v)
-		r.Post("/", controller.POST_%[1]v)
-		r.Get("/{id}", controller.GET_%[1]v_id)
-		r.Put("/{id}", controller.UPDATE_%[1]v)
-		r.Delete("/{id}", controller.DELETE_%[1]v)
-
-		// if os.Getenv("APP_ENV") == "test" {
-		// 	r.Get("/t", controller.GetBooks)
-		// } else {
-		// 	r.Get("/t*", controller.GET_NotAllowed)
-		// }
+		r.Get("/", %[1]v_c.GET_%[1]v)
+		r.Post("/", %[1]v_c.POST_%[1]v)
+		r.Get("/{id}", %[1]v_c.GET_%[1]v_id)
+		r.Put("/{id}", %[1]v_c.UPDATE_%[1]v)
+		r.Delete("/{id}", %[1]v_c.DELETE_%[1]v)
 	})
 		`, crudName)
 
@@ -32,7 +26,7 @@ func routes(crudName string) string {
 func controllers(crudName, project string) string {
 	data := fmt.Sprintf(
 
-		`package controller
+		`package books_c
 
 import (
 	"encoding/json"
@@ -149,7 +143,7 @@ import (
 // -------------------------- CREATE %[2]v TABLE
 func %[2]v() {
 
-	db := initDB("prod")
+	db := initDB()
 	defer db.Close()
 
 	// Creating %[2]v table with PRIMARY KEY and DATE TIME
@@ -217,15 +211,15 @@ func modelHandlers(crudName string) string {
 	data := fmt.Sprintf(`
 
 // -------------------------- INIT DB
-func initDB(env string) *sql.DB {
-	var database = config.InitDatabase(env)
+func initDB() *sql.DB {
+	var database = config.InitDatabase()
 	return database
 }
 
 // -------------------------- GET HANDLER
 func get_Handler(query string) []map[string]interface{} {
 
-	db := initDB("prod")
+	db := initDB()
 	defer db.Close()
 
 	var response []map[string]interface{}
@@ -269,7 +263,7 @@ func get_Handler(query string) []map[string]interface{} {
 // -------------------------- CREATE HANDLER
 func create_Handler(request io.ReadCloser) string {
 
-	db := initDB("prod")
+	db := initDB()
 	defer db.Close()
 
 	var response string
@@ -312,7 +306,7 @@ func create_Handler(request io.ReadCloser) string {
 
 // -------------------------- UPDATE HANDLER
 func update_Handler(id string, request io.ReadCloser) string {
-	db := initDB("prod")
+	db := initDB()
 	defer db.Close()
 
 	var response string
@@ -358,7 +352,7 @@ func update_Handler(id string, request io.ReadCloser) string {
 // -------------------------- DELETE HANDLER
 func delete_Handler(id string) string {
 
-	db := initDB("prod")
+	db := initDB()
 	defer db.Close()
 
 	var response string

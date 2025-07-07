@@ -80,10 +80,10 @@ func crud_Controller(crudName string) {
 
 	project := utils.Get_Project_Name()
 
-	// folder := fmt.Sprintf("./Controller/%v", crudName)
-	// utils.Create_Single_Folder(folder)
+	folder := fmt.Sprintf("./Controller/%v", crudName)
+	utils.Create_Single_Folder(folder)
 
-	filePath := fmt.Sprintf("./Controller/%v.go", crudName)
+	filePath := fmt.Sprintf("./Controller/%[1]v/%[1]v.go", crudName)
 	data := controllers(crudName, project)
 
 	file := utils.Create_File(filePath)
@@ -92,15 +92,15 @@ func crud_Controller(crudName string) {
 	_, err := file.WriteString(data)
 	utils.Check_For_Nil(err)
 
-	// utils.InsertIntoFileAfter("import (", "./Routes/routes.go", fmt.Sprintf("%[1]v_c \"github.com/DevopsGuyXD/myapp/Controller/%[1]v\"", crudName))
-	// testData := Test()
+	utils.InsertIntoFileAfter("import (", "./Routes/routes.go", fmt.Sprintf("%[1]v_c \"github.com/DevopsGuyXD/myapp/Controller/%[1]v\"", crudName))
+	testData := Test()
 
-	// filePath = fmt.Sprintf("./Controller/%[1]v/%[1]v_test.go", crudName)
+	filePath = fmt.Sprintf("./Controller/%[1]v/%[1]v_test.go", crudName)
 
-	// file = utils.Create_File(filePath)
-	// defer file.Close()
+	file = utils.Create_File(filePath)
+	defer file.Close()
 
-	// utils.Write_File(file, testData)
+	utils.Write_File(file, testData)
 }
 
 // ====================================== CRUD SQLITE
