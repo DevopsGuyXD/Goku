@@ -12,7 +12,7 @@ import (
 )
 
 // ====================================== RUN DEV
-func Run_Dev() {
+func Run_Dev(env string) {
 
 	var shell, flag string
 	calledFrom := utils.Called_From_Location()
@@ -27,7 +27,7 @@ func Run_Dev() {
 
 	fmt.Printf("\n🔧 Running in Dev mode\n\n")
 
-	cmd := exec.Command(shell, flag, fmt.Sprintf("go run github.com/air-verse/air@latest air --dir \"%s\"", calledFrom))
+	cmd := exec.Command(shell, flag, fmt.Sprintf("go run github.com/air-verse/air@latest air --dir \"%s\" %v", calledFrom, env))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin

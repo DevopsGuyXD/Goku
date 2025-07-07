@@ -17,10 +17,12 @@ func routes(crudName string) string {
 		r.Put("/{id}", controller.UPDATE_%[1]v)
 		r.Delete("/{id}", controller.DELETE_%[1]v)
 
-		if os.Getenv("APP_ENV") == "dev" {
-			r.Get("/test", controller.GET_health)
+		argLen := len(os.Args)
+
+		if os.Args[argLen-1] == "dev" {
+			r.Get("/t", controller.GET_health)
 		} else {
-			r.Get("/test*", controller.GET_NotAllowed)
+			r.Get("/t*", controller.GET_NotAllowed)
 		}
 	})
 		`, crudName)

@@ -65,8 +65,7 @@ func envFile(project string) {
 
 	data :=
 		`PORT=":8000"
-GOKU_VERSION="v1.0.0"
-APP_ENV="dev"`
+GOKU_VERSION="v1.0.0"`
 	utils.Write_File(file, data)
 }
 

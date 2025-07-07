@@ -70,8 +70,6 @@ func crud_Route(crudName string) {
 		"\t\"os\"": false,
 	}
 
-	fmt.Println(utils.Check_If_Lines_Exist(filePath, targets))
-
 	if !utils.Check_If_Lines_Exist(filePath, targets) {
 		utils.InsertIntoFileAfter(topLine, filePath, data)
 	}

@@ -43,7 +43,7 @@ func main() {
 	case len(os.Args) == 3:
 		switch {
 		case os.Args[1] == "run" && os.Args[2] == "dev":
-			configs.Run_Dev()
+			configs.Run_Dev(os.Args[2])
 
 		case os.Args[1] == "run" && os.Args[2] == "build":
 			configs.Create_Build()
