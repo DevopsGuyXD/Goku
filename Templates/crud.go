@@ -33,7 +33,7 @@ func CRUD_Template(crudName string) {
 
 	utils.Install_Dependencies()
 
-	fmt.Printf("\rAdding \"%v\" CRUD ✔\n\n", crudName)
+	fmt.Printf("\rAdding \"%v\" ✔\n\n", crudName)
 }
 
 // ====================================== CRUD ADD ROUTE
@@ -63,22 +63,25 @@ func crud_Route(crudName string) {
 	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
 	utils.Check_For_Nil(err)
 
-	topLine := "import ("
-	data = "\"os\""
+	// topLine := "import ("
+	// data = "\"os\""
 
-	targets := map[string]bool{
-		"\t\"os\"": false,
-	}
+	// targets := map[string]bool{
+	// 	"\t\"os\"": false,
+	// }
 
-	if !utils.Check_If_Lines_Exist(filePath, targets) {
-		utils.InsertIntoFileAfter(topLine, filePath, data)
-	}
+	// if !utils.Check_If_Lines_Exist(filePath, targets) {
+	// 	utils.InsertIntoFileAfter(topLine, filePath, data)
+	// }
 }
 
 // ====================================== CRUD ADD CONTROLLER
 func crud_Controller(crudName string) {
 
 	project := utils.Get_Project_Name()
+
+	// folder := fmt.Sprintf("./Controller/%v", crudName)
+	// utils.Create_Single_Folder(folder)
 
 	filePath := fmt.Sprintf("./Controller/%v.go", crudName)
 	data := controllers(crudName, project)
@@ -88,6 +91,16 @@ func crud_Controller(crudName string) {
 
 	_, err := file.WriteString(data)
 	utils.Check_For_Nil(err)
+
+	// utils.InsertIntoFileAfter("import (", "./Routes/routes.go", fmt.Sprintf("%[1]v_c \"github.com/DevopsGuyXD/myapp/Controller/%[1]v\"", crudName))
+	// testData := Test()
+
+	// filePath = fmt.Sprintf("./Controller/%[1]v/%[1]v_test.go", crudName)
+
+	// file = utils.Create_File(filePath)
+	// defer file.Close()
+
+	// utils.Write_File(file, testData)
 }
 
 // ====================================== CRUD SQLITE

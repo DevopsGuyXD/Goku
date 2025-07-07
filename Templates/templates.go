@@ -17,13 +17,11 @@ func routes(crudName string) string {
 		r.Put("/{id}", controller.UPDATE_%[1]v)
 		r.Delete("/{id}", controller.DELETE_%[1]v)
 
-		argLen := len(os.Args)
-
-		if os.Args[argLen-1] == "dev" {
-			r.Get("/t", controller.GET_health)
-		} else {
-			r.Get("/t*", controller.GET_NotAllowed)
-		}
+		// if os.Getenv("APP_ENV") == "test" {
+		// 	r.Get("/t", controller.GetBooks)
+		// } else {
+		// 	r.Get("/t*", controller.GET_NotAllowed)
+		// }
 	})
 		`, crudName)
 
@@ -474,17 +472,43 @@ WORKDIR /app
 }
 
 // ====================================== MODEL IMPORTS
-func modelImports() string {
-	data := fmt.Sprintln(`
-	
+// func modelImports() string {
+// 	data := fmt.Sprintln(`
+
+// import (
+// 	"encoding/json"
+// 	"fmt"
+// 	"io"
+// 	"strings"
+
+// 	utils "github.com/DevopsGuyXD/myapp/Utils"
+// )`)
+
+// 	return data
+// }
+
+// ====================================== TEST
+func Test() string {
+	data := fmt.Sprintf(
+		`package books_c
+
 import (
 	"encoding/json"
-	"fmt"
-	"io"
-	"strings"
+	"net/http"
+)
 
-	utils "github.com/DevopsGuyXD/myapp/Utils"
-)`)
+func GetBooks(w http.ResponseWriter, r *http.Request) {
+
+	books := []map[string]interface{}{
+		{"ID": 1, "Title": "Go Basics", "Author": "Alice", "Language": "English", "Pages": 200},
+		{"ID": 2, "Title": "Go Advanced", "Author": "Bob", "Language": "English", "Pages": 350},
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(books)
+}		
+`,
+	)
 
 	return data
 }
