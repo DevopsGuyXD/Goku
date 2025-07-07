@@ -63,11 +63,10 @@ func envFile(project string) {
 	file := utils.Create_File(filePath)
 	defer file.Close()
 
-	data := fmt.Sprintf(
-		"PORT=:8000\n" +
-			"GOKU_VERSION=v1.0.0\n",
-	)
-
+	data :=
+		`PORT=":8000"
+GOKU_VERSION="v1.0.0"
+APP_ENV="dev"`
 	utils.Write_File(file, data)
 }
 
@@ -212,7 +211,16 @@ func GET_health(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(message)
 }
 
-	`, project)
+// -------------------------- NOT ALLOWED CONTROLLER
+func GET_NotAllowed(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotFound)
+
+	message := "NA"
+
+	json.NewEncoder(w).Encode(message)
+
+}`, project)
 	utils.Write_File(file, data)
 }
 
@@ -229,14 +237,26 @@ func configFile(project, subFolder string) {
 
 import (
 	"database/sql"
+	"strings"
+	
 	utils "github.com/DevopsGuyXD/myapp/Utils"
 	_ "modernc.org/sqlite"
 )
 
 // -------------------------- INIT DB
-func InitDatabase() *sql.DB {
-	database, err := sql.Open("sqlite", "./Sqlite/app.db")
-	utils.Check_For_Nil(err)
+func InitDatabase(env string) *sql.DB {
+
+	var database *sql.DB
+	var err error
+
+	if strings.ToLower(env) == "prod" {
+		database, err = sql.Open("sqlite", "./Sqlite/app.db")
+		utils.Check_For_Nil(err)
+		
+	} else if strings.ToLower(env) == "dev" {
+		database, err = sql.Open("sqlite", "./Sqlite/test.db")
+		utils.Check_For_Nil(err)
+	}
 
 	return database
 }`

@@ -20,7 +20,14 @@ func CRUD_Template(crudName string) {
 	crud_Model(crudName)
 	updating_Config_Main(crudName)
 
-	if !utils.Check_If_Lines_Exist(filePath) {
+	targets := map[string]bool{
+		"// -------------------------- GET HANDLER":    false,
+		"// -------------------------- CREATE HANDLER": false,
+		"// -------------------------- UPDATE HANDLER": false,
+		"// -------------------------- DELETE HANDLER": false,
+	}
+
+	if !utils.Check_If_Lines_Exist(filePath, targets) {
 		crud_Model_Handlers(crudName)
 	}
 
@@ -55,6 +62,19 @@ func crud_Route(crudName string) {
 
 	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
 	utils.Check_For_Nil(err)
+
+	topLine := "import ("
+	data = "\"os\""
+
+	targets := map[string]bool{
+		"\t\"os\"": false,
+	}
+
+	fmt.Println(utils.Check_If_Lines_Exist(filePath, targets))
+
+	if !utils.Check_If_Lines_Exist(filePath, targets) {
+		utils.InsertIntoFileAfter(topLine, filePath, data)
+	}
 }
 
 // ====================================== CRUD ADD CONTROLLER
@@ -75,13 +95,18 @@ func crud_Controller(crudName string) {
 // ====================================== CRUD SQLITE
 func crud_Sqlite() {
 	databaseFolder := "Sqlite"
-	fileName := "./" + databaseFolder + "/app.db"
+	files := []string{
+		"./" + databaseFolder + "/app.db",
+		"./" + databaseFolder + "/test.db",
+	}
 
 	if !utils.Folder_Exists(databaseFolder) {
 		utils.Create_Single_Folder(databaseFolder)
 
-		dbFile := utils.Create_File(fileName)
-		defer dbFile.Close()
+		for _, file := range files {
+			dbFile := utils.Create_File(file)
+			defer dbFile.Close()
+		}
 	}
 }
 
@@ -105,29 +130,11 @@ func crud_Model(crudName string) {
 // ====================================== UPDATING CONFIG MAIN
 func updating_Config_Main(crudName string) {
 
-	var lines []string
+	topLine := "func AppModels(){"
 	filePath := "./Models/models.go"
-
 	data := fmt.Sprintf("%v()", crudName)
 
-	file := utils.Open_File(filePath)
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		lines = append(lines, line)
-
-		if strings.Contains(line, "func AppModels(){") {
-			lines = append(lines, "\t"+data)
-		}
-	}
-
-	utils.Check_For_Nil(scanner.Err())
-
-	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	utils.Check_For_Nil(err)
+	utils.InsertIntoFileAfter(topLine, filePath, data)
 }
 
 // ====================================== CRUD ADD MODEL HANDLERS

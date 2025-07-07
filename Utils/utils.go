@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"golang.org/x/text/cases"
@@ -75,7 +76,6 @@ func init_Swagger() {
 		close(done)
 		return
 	}
-
 
 	close(done)
 
@@ -218,18 +218,11 @@ func AppendToLastLine(file, data string) {
 }
 
 // ====================================== CHECK IF LINES EXIST IN FILE
-func Check_If_Lines_Exist(filePath string) bool {
+func Check_If_Lines_Exist(filePath string, targets map[string]bool) bool {
 
 	file, err := os.Open(filePath)
 	Check_For_Nil(err)
 	defer file.Close()
-
-	targets := map[string]bool{
-		"// -------------------------- GET HANDLER":    false,
-		"// -------------------------- CREATE HANDLER": false,
-		"// -------------------------- UPDATE HANDLER": false,
-		"// -------------------------- DELETE HANDLER": false,
-	}
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -245,4 +238,28 @@ func Check_If_Lines_Exist(filePath string) bool {
 	}
 
 	return true
+}
+
+// ====================================== INSERT INTO FILE
+func InsertIntoFileAfter(topLine, filePath, data string) {
+	var lines []string
+
+	file := Open_File(filePath)
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		lines = append(lines, line)
+
+		if strings.Contains(line, topLine) {
+			lines = append(lines, "\t"+data)
+		}
+	}
+
+	Check_For_Nil(scanner.Err())
+
+	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+	Check_For_Nil(err)
 }
