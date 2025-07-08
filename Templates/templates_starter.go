@@ -53,15 +53,15 @@ func fileController(project, folder string) (*os.File, string) {
 }
 
 // ============================================================================ CREATE AND OPEN FOLDER
-func create_open_file(folder string) *os.File {
+func create_open_file(folder_or_File string) *os.File {
 
 	var filePath string
 
-	if utils.Folder_Exists(folder) {
-		folderParsed := strings.Split(folder, "\\")
-		filePath = folder + "/" + strings.ToLower(folderParsed[1]) + ".go"
+	if utils.Folder_Exists(folder_or_File) {
+		folderParsed := strings.Split(folder_or_File, "\\")
+		filePath = folder_or_File + "/" + strings.ToLower(folderParsed[1]) + ".go"
 	} else {
-		filePath = folder
+		filePath = folder_or_File
 	}
 
 	utils.Create_File([]string{filePath})

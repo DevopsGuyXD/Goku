@@ -24,7 +24,7 @@ func Starter_Project(project string) {
 	// -------------------- CREATE FOLDERS
 	utils.Create_Folder(folders)
 
-	// -------------------- CREATE OTHER FILES
+	// -------------------- CREATE FILES
 	for _, folder := range folders {
 		file, data := fileController(project, folder)
 

@@ -8,7 +8,7 @@ import (
 // ============================================================================ CREATE FOLDER
 func Create_Folder(folders []string) {
 	for _, folder := range folders {
-		if !strings.Contains(folder, ".") {
+		if !strings.Contains(folder, ".") && !Folder_Exists(folder) {
 			err := os.Mkdir(folder, 0755)
 			Check_For_Nil(err)
 		}
