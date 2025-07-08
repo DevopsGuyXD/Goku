@@ -50,3 +50,13 @@ func Folder_Exists(path string) bool {
 
 	return false
 }
+
+// ============================================================================ FOLDER EXISTS
+func Files_Exists(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return true
+}

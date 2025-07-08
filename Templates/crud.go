@@ -70,7 +70,7 @@ package templates
 // // ============================================================================ CRUD ADD CONTROLLER
 // func crud_Controller(crudName string) {
 
-// 	project := utils.Get_Project_Name()
+// 	project := utils.Project_Name()
 
 // 	folder := fmt.Sprintf("./Controller/%v", crudName)
 // 	utils.Create_Folder(folder)
@@ -115,7 +115,7 @@ package templates
 // // ============================================================================ CRUD ADD MODEL
 // func crud_Model(crudName string) {
 
-// 	projectName := utils.Get_Project_Name()
+// 	projectName := utils.Project_Name()
 
 // 	file := fmt.Sprintf("./Models/%v.go", crudName)
 

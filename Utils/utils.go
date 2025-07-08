@@ -24,6 +24,11 @@ func Version() {
    \____|  \___/  |_|\_\   \___/  v1.0.0`)
 }
 
+// ============================================================================ CREATOR
+func Creator() {
+	fmt.Printf("\n%v\n%v\n", "With love ❤️", "Bharath Dundi 🤘")
+}
+
 // ============================================================================ ERROR HANDLING
 func All_Options() {
 	fmt.Printf(`  
@@ -43,11 +48,6 @@ func All_Options() {
     goku swag
     goku docker <NAME>
 `)
-}
-
-// ============================================================================ CREATOR
-func Creator() {
-	fmt.Printf("\n%v\n%v\n", "With love ❤️", "Bharath Dundi 🤘")
 }
 
 // ============================================================================ ERROR HANDLING
@@ -74,7 +74,7 @@ func Install_Dependencies() {
 		return
 	}
 
-	if !Fils_Exists(".air.toml") {
+	if !Files_Exists(".air.toml") {
 		init_air()
 	}
 
@@ -119,7 +119,7 @@ func init_air() {
 // }
 
 // ============================================================================ GET PROJECT NAME
-func Get_Project_Name() string {
+func Project_Name() string {
 	dir, err := os.Getwd()
 	Check_For_Nil(err)
 
@@ -133,16 +133,6 @@ func Capitalize(word string) string {
 	caser := cases.Title(language.English)
 
 	return caser.String(word)
-}
-
-// ============================================================================ FOLDER EXISTS
-func Fils_Exists(path string) bool {
-	_, err := os.Stat(path)
-	if err != nil {
-		return false
-	}
-
-	return true
 }
 
 // ============================================================================ FIND WHICH PROJECT IS CALLING GOKU
