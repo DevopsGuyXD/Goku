@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	configs "github.com/DevopsGuyXD/Goku/Configs"
-	templates "github.com/DevopsGuyXD/Goku/Templates"
+	templates_starter "github.com/DevopsGuyXD/Goku/Templates/starter"
 	utils "github.com/DevopsGuyXD/Goku/Utils"
 )
 
@@ -70,7 +70,7 @@ func main() {
 
 		case os.Args[1] == "create-project" && os.Args[2] != "":
 			project := strings.ToLower(os.Args[2])
-			templates.Starter_Project(project)
+			templates_starter.Starter_Project(project)
 
 		case os.Args[1] == "build-docker" && os.Args[2] != "":
 			dockerImageName := strings.ToLower(os.Args[2])
