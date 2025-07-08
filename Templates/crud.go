@@ -1,196 +1,201 @@
 package templates
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-	"strings"
+// // ============================================================================ CRUD TEMPLATE
+// func CRUD_Template(crudName string) {
 
-	utils "github.com/DevopsGuyXD/Goku/Utils"
-)
+// 	filePath := "./Models/models.go"
 
-// ====================================== CRUD TEMPLATE
-func CRUD_Template(crudName string) {
+// 	crud_Route(crudName)
+// 	crud_Controller(crudName)
+// 	crud_Sqlite()
+// 	crud_Model(crudName)
+// 	updating_Config_Main(crudName)
+// 	addingTest(crudName)
 
-	filePath := "./Models/models.go"
+// 	targets := map[string]bool{
+// 		"// -------------------------- GET HANDLER":    false,
+// 		"// -------------------------- CREATE HANDLER": false,
+// 		"// -------------------------- UPDATE HANDLER": false,
+// 		"// -------------------------- DELETE HANDLER": false,
+// 	}
 
-	crud_Route(crudName)
-	crud_Controller(crudName)
-	crud_Sqlite()
-	crud_Model(crudName)
-	updating_Config_Main(crudName)
+// 	if !utils.Check_If_Lines_Exist(filePath, targets) {
+// 		crud_Model_Handlers(crudName)
+// 	}
 
-	targets := map[string]bool{
-		"// -------------------------- GET HANDLER":    false,
-		"// -------------------------- CREATE HANDLER": false,
-		"// -------------------------- UPDATE HANDLER": false,
-		"// -------------------------- DELETE HANDLER": false,
-	}
+// 	utils.Install_Dependencies()
 
-	if !utils.Check_If_Lines_Exist(filePath, targets) {
-		crud_Model_Handlers(crudName)
-	}
+// 	fmt.Printf("\rAdding \"%v\" ✔\n\n", crudName)
+// }
 
-	utils.Install_Dependencies()
+// // ============================================================================ CRUD ADD ROUTE
+// func crud_Route(crudName string) {
 
-	fmt.Printf("\rAdding \"%v\" ✔\n\n", crudName)
-}
+// 	var lines []string
 
-// ====================================== CRUD ADD ROUTE
-func crud_Route(crudName string) {
+// 	filePath := "./Routes/routes.go"
+// 	data := routes(crudName)
 
-	var lines []string
+// 	file := utils.Open_File(filePath)
+// 	defer file.Close()
 
-	filePath := "./Routes/routes.go"
-	data := routes(crudName)
+// 	scanner := bufio.NewScanner(file)
 
-	file := utils.Open_File(filePath)
-	defer file.Close()
+// 	for scanner.Scan() {
+// 		line := scanner.Text()
+// 		if strings.Contains(line, "return router") {
+// 			lines = append(lines, data)
+// 		}
+// 		lines = append(lines, line)
+// 	}
 
-	scanner := bufio.NewScanner(file)
+// 	err := scanner.Err()
+// 	utils.Check_For_Nil(err)
 
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, "return router") {
-			lines = append(lines, data)
-		}
-		lines = append(lines, line)
-	}
+// 	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+// 	utils.Check_For_Nil(err)
 
-	err := scanner.Err()
-	utils.Check_For_Nil(err)
+// 	// topLine := "import ("
+// 	// data = "\"os\""
 
-	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	utils.Check_For_Nil(err)
+// 	// targets := map[string]bool{
+// 	// 	"\t\"os\"": false,
+// 	// }
 
-	// topLine := "import ("
-	// data = "\"os\""
+// 	// if !utils.Check_If_Lines_Exist(filePath, targets) {
+// 	// 	utils.InsertIntoFileAfter(topLine, filePath, data)
+// 	// }
+// }
 
-	// targets := map[string]bool{
-	// 	"\t\"os\"": false,
-	// }
+// // ============================================================================ CRUD ADD CONTROLLER
+// func crud_Controller(crudName string) {
 
-	// if !utils.Check_If_Lines_Exist(filePath, targets) {
-	// 	utils.InsertIntoFileAfter(topLine, filePath, data)
-	// }
-}
+// 	project := utils.Get_Project_Name()
 
-// ====================================== CRUD ADD CONTROLLER
-func crud_Controller(crudName string) {
+// 	folder := fmt.Sprintf("./Controller/%v", crudName)
+// 	utils.Create_Folder(folder)
 
-	project := utils.Get_Project_Name()
+// 	filePath := fmt.Sprintf("./Controller/%[1]v/%[1]v.go", crudName)
+// 	data := controllers(crudName, project)
 
-	folder := fmt.Sprintf("./Controller/%v", crudName)
-	utils.Create_Single_Folder(folder)
+// 	file := utils.Create_File(filePath)
+// 	defer file.Close()
 
-	filePath := fmt.Sprintf("./Controller/%[1]v/%[1]v.go", crudName)
-	data := controllers(crudName, project)
+// 	_, err := file.WriteString(data)
+// 	utils.Check_For_Nil(err)
 
-	file := utils.Create_File(filePath)
-	defer file.Close()
+// 	utils.InsertIntoFileAfter("import (", "./Routes/routes.go", fmt.Sprintf("%[1]v_c \"github.com/DevopsGuyXD/myapp/Controller/%[1]v\"", crudName))
 
-	_, err := file.WriteString(data)
-	utils.Check_For_Nil(err)
+// 	// filePath = fmt.Sprintf("./Controller/%[1]v/%[1]v_test.go", crudName)
 
-	utils.InsertIntoFileAfter("import (", "./Routes/routes.go", fmt.Sprintf("%[1]v_c \"github.com/DevopsGuyXD/myapp/Controller/%[1]v\"", crudName))
-	testData := Test()
+// 	// file = utils.Create_File(filePath)
+// 	// defer file.Close()
 
-	filePath = fmt.Sprintf("./Controller/%[1]v/%[1]v_test.go", crudName)
+// 	// utils.Write_File(file, testData)
+// }
 
-	file = utils.Create_File(filePath)
-	defer file.Close()
+// // ============================================================================ CRUD SQLITE
+// func crud_Sqlite() {
+// 	databaseFolder := "Sqlite"
+// 	files := []string{
+// 		"./" + databaseFolder + "/app.db",
+// 		"./" + databaseFolder + "/test.db",
+// 	}
 
-	utils.Write_File(file, testData)
-}
+// 	if !utils.Folder_Exists(databaseFolder) {
+// 		utils.Create_Folder(databaseFolder)
 
-// ====================================== CRUD SQLITE
-func crud_Sqlite() {
-	databaseFolder := "Sqlite"
-	files := []string{
-		"./" + databaseFolder + "/app.db",
-		"./" + databaseFolder + "/test.db",
-	}
+// 		for _, file := range files {
+// 			dbFile := utils.Create_File(file)
+// 			defer dbFile.Close()
+// 		}
+// 	}
+// }
 
-	if !utils.Folder_Exists(databaseFolder) {
-		utils.Create_Single_Folder(databaseFolder)
+// // ============================================================================ CRUD ADD MODEL
+// func crud_Model(crudName string) {
 
-		for _, file := range files {
-			dbFile := utils.Create_File(file)
-			defer dbFile.Close()
-		}
-	}
-}
+// 	projectName := utils.Get_Project_Name()
 
-// ====================================== CRUD ADD MODEL
-func crud_Model(crudName string) {
+// 	file := fmt.Sprintf("./Models/%v.go", crudName)
 
-	projectName := utils.Get_Project_Name()
+// 	modelFile := utils.Create_File(file)
+// 	defer modelFile.Close()
 
-	file := fmt.Sprintf("./Models/%v.go", crudName)
+// 	data := models(projectName, crudName)
 
-	modelFile := utils.Create_File(file)
-	defer modelFile.Close()
+// 	_, err := modelFile.WriteString(data)
+// 	utils.Check_For_Nil(err)
 
-	data := models(projectName, crudName)
+// }
 
-	_, err := modelFile.WriteString(data)
-	utils.Check_For_Nil(err)
+// // ============================================================================ UPDATING CONFIG MAIN
+// func updating_Config_Main(crudName string) {
 
-}
+// 	topLine := "func AppModels(){"
+// 	filePath := "./Models/models.go"
+// 	data := fmt.Sprintf("%v()", crudName)
 
-// ====================================== UPDATING CONFIG MAIN
-func updating_Config_Main(crudName string) {
+// 	utils.InsertIntoFileAfter(topLine, filePath, data)
+// }
 
-	topLine := "func AppModels(){"
-	filePath := "./Models/models.go"
-	data := fmt.Sprintf("%v()", crudName)
+// // ============================================================================ CRUD ADD MODEL HANDLERS
+// func crud_Model_Handlers(crudName string) {
 
-	utils.InsertIntoFileAfter(topLine, filePath, data)
-}
+// 	filePath := "./Models/models.go"
 
-// ====================================== CRUD ADD MODEL HANDLERS
-func crud_Model_Handlers(crudName string) {
+// 	modelFile := utils.Open_File(filePath)
+// 	defer modelFile.Close()
 
-	filePath := "./Models/models.go"
+// 	data := modelHandlers(crudName)
 
-	modelFile := utils.Open_File(filePath)
-	defer modelFile.Close()
+// 	utils.AppendToLastLine(filePath, data)
 
-	data := modelHandlers(crudName)
+// 	update_Config_Main_Packages(filePath)
+// }
 
-	utils.AppendToLastLine(filePath, data)
+// // ============================================================================ UPDATE PACKAGES
+// func update_Config_Main_Packages(filePath string) {
 
-	update_Config_Main_Packages(filePath)
-}
+// 	packages := `
+// import (
+// 	"database/sql"
+// 	"encoding/json"
+// 	"fmt"
+// 	"io"
+// 	"strings"
 
-// ====================================== UPDATE PACKAGES
-func update_Config_Main_Packages(filePath string) {
+// 	config "github.com/DevopsGuyXD/myapp/Config"
+// 	utils "github.com/DevopsGuyXD/myapp/Utils"
+// )`
 
-	packages := `
-import (
-	"database/sql"
-	"encoding/json"
-	"fmt"
-	"io"
-	"strings"
+// 	data, err := os.ReadFile(filePath)
+// 	utils.Check_For_Nil(err)
 
-	config "github.com/DevopsGuyXD/myapp/Config"
-	utils "github.com/DevopsGuyXD/myapp/Utils"
-)`
+// 	content := string(data)
+// 	lines := strings.Split(content, "\n")
 
-	data, err := os.ReadFile(filePath)
-	utils.Check_For_Nil(err)
+// 	for i, line := range lines {
+// 		if line == "package models" {
+// 			lines = append(lines[:i+1], append([]string{packages}, lines[i+1:]...)...)
+// 			break
+// 		}
+// 	}
 
-	content := string(data)
-	lines := strings.Split(content, "\n")
+// 	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+// 	utils.Check_For_Nil(err)
+// }
 
-	for i, line := range lines {
-		if line == "package models" {
-			lines = append(lines[:i+1], append([]string{packages}, lines[i+1:]...)...)
-			break
-		}
-	}
+// func addingTest(crudName string) {
 
-	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	utils.Check_For_Nil(err)
-}
+// 	folder := "./Test"
+// 	utils.Create_Folder(folder)
+
+// 	utils.Create_Folder(fmt.Sprintf("%v/%[1]v/%[1]v_test.go", folder, crudName))
+
+// 	// testData := Test(crudName)
+
+// 	//   = utils.Create_File(filePath)
+// 	// defer file.Close()
+
+// }

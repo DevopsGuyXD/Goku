@@ -14,7 +14,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-// ====================================== GOKU VERSION
+// ============================================================================ GOKU VERSION
 func Version() {
 	fmt.Println(
 		`    ____    ___    _  __   _   _ 
@@ -24,12 +24,12 @@ func Version() {
    \____|  \___/  |_|\_\   \___/  v1.0.0`)
 }
 
-// ====================================== CREATOR
+// ============================================================================ CREATOR
 func Creator() {
 	fmt.Printf("\n%v\n%v\n", "With love ❤️", "Bharath Dundi 🤘")
 }
 
-// ====================================== ERROR HANDLING
+// ============================================================================ ERROR HANDLING
 func Check_For_Nil(err error) {
 	if err != nil {
 		log.Println(err)
@@ -37,7 +37,7 @@ func Check_For_Nil(err error) {
 	}
 }
 
-// ====================================== INSTALL DEPENDENCIES
+// ============================================================================ INSTALL DEPENDENCIES
 func Install_Dependencies() {
 
 	init_Swagger()
@@ -61,7 +61,7 @@ func Install_Dependencies() {
 	fmt.Printf("\rInstalling Dependencies ✔\n\n")
 }
 
-// ====================================== INIT SWAGGER
+// ============================================================================ INIT SWAGGER
 func init_Swagger() {
 
 	done := make(chan bool)
@@ -82,7 +82,7 @@ func init_Swagger() {
 	fmt.Print("\rUpdating Swagger ✔\n\n")
 }
 
-// ====================================== INIT Air
+// ============================================================================ INIT Air
 func init_air() {
 
 	calledFrom := Called_From_Location()
@@ -91,7 +91,7 @@ func init_air() {
 	Check_For_Nil(err)
 }
 
-// ====================================== ERROR HANDLING
+// ============================================================================ ERROR HANDLING
 func All_Options() {
 	fmt.Printf(`  
   Options:
@@ -111,36 +111,13 @@ func All_Options() {
 `)
 }
 
-// ====================================== OPEN FILE
-func Open_File(filePath string) *os.File {
+// ============================================================================ CREATE FOLDER
+// func Create_Sub_Folder(project string) {
+// 	err := os.Mkdir(project, 0755)
+// 	Check_For_Nil(err)
+// }
 
-	file, err := os.Open(filePath)
-	Check_For_Nil(err)
-
-	return file
-}
-
-// ====================================== CREATE FOLDER
-func Create_Single_Folder(project string) {
-	err := os.Mkdir(project, 0755)
-	Check_For_Nil(err)
-}
-
-// ====================================== CREATE FOLDER
-func Create_File(fileName string) *os.File {
-	file, err := os.Create(fileName)
-	Check_For_Nil(err)
-
-	return file
-}
-
-// ====================================== WRITE TO FILE
-func Write_File(file *os.File, data string) {
-	_, err := file.WriteString(data)
-	Check_For_Nil(err)
-}
-
-// ====================================== GET PROJECT NAME
+// ============================================================================ GET PROJECT NAME
 func Get_Project_Name() string {
 	dir, err := os.Getwd()
 	Check_For_Nil(err)
@@ -150,14 +127,14 @@ func Get_Project_Name() string {
 	return project
 }
 
-// ====================================== CAPITALIZE
+// ============================================================================ CAPITALIZE
 func Capitalize(word string) string {
 	caser := cases.Title(language.English)
 
 	return caser.String(word)
 }
 
-// ====================================== FOLDER EXISTS
+// ============================================================================ FOLDER EXISTS
 func Folder_Exists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
@@ -171,7 +148,7 @@ func Folder_Exists(path string) bool {
 	return false
 }
 
-// ====================================== FOLDER EXISTS
+// ============================================================================ FOLDER EXISTS
 func Fils_Exists(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
@@ -181,13 +158,13 @@ func Fils_Exists(path string) bool {
 	return true
 }
 
-// ====================================== FIND WHICH PROJECT IS CALLING GOKU
+// ============================================================================ FIND WHICH PROJECT IS CALLING GOKU
 func Called_From_Location() string {
 	wd, _ := os.Getwd()
 	return wd
 }
 
-// ====================================== SPINNER
+// ============================================================================ SPINNER
 func Spinner(done chan bool, message string) {
 	spinChars := `-\|/`
 	i := 0
@@ -203,7 +180,7 @@ func Spinner(done chan bool, message string) {
 	}
 }
 
-// ====================================== APPEND TO LAST LINE
+// ============================================================================ APPEND TO LAST LINE
 func AppendToLastLine(file, data string) {
 
 	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -217,7 +194,7 @@ func AppendToLastLine(file, data string) {
 	}
 }
 
-// ====================================== CHECK IF LINES EXIST IN FILE
+// ============================================================================ CHECK IF LINES EXIST IN FILE
 func Check_If_Lines_Exist(filePath string, targets map[string]bool) bool {
 
 	file, err := os.Open(filePath)
@@ -240,7 +217,7 @@ func Check_If_Lines_Exist(filePath string, targets map[string]bool) bool {
 	return true
 }
 
-// ====================================== INSERT INTO FILE
+// ============================================================================ INSERT INTO FILE
 func InsertIntoFileAfter(topLine, filePath, data string) {
 	var lines []string
 

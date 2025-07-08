@@ -11,7 +11,7 @@ import (
 	utils "github.com/DevopsGuyXD/Goku/Utils"
 )
 
-// ====================================== RUN DEV
+// ============================================================================ RUN DEV
 func Run_Dev() {
 
 	var shell, flag string
@@ -38,7 +38,7 @@ func Run_Dev() {
 	os.Exit(0)
 }
 
-// ====================================== CREATE BUILD
+// ============================================================================ CREATE BUILD
 func Create_Build() {
 
 	done := make(chan bool)
@@ -73,7 +73,7 @@ func Create_Build() {
 	}
 }
 
-// ====================================== DOCKER BUILD
+// ============================================================================ DOCKER BUILD
 func Create_Docker_Image(dockerImageName string) {
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build -t %s .", dockerImageName))
 
@@ -130,7 +130,7 @@ func List_Docker_Image(dockerImageName string) {
 	fmt.Printf("\n%v", string(res))
 }
 
-// ====================================== RUN PRODUCTION
+// ============================================================================ RUN PRODUCTION
 func Run_Prod() {
 
 	var shell, flag string

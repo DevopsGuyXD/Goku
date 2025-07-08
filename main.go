@@ -13,11 +13,11 @@ import (
 func main() {
 
 	switch {
-	// ====================================== -o
+	// ============================================================================ -o
 	case len(os.Args) == 1:
 		utils.All_Options()
 
-	// ====================================== -v | -i | -o
+	// ============================================================================ -v | -i | -o
 	case len(os.Args) == 2:
 		switch {
 		case os.Args[1] == "--version" || os.Args[1] == "-v":
@@ -33,13 +33,13 @@ func main() {
 			utils.Creator()
 
 		case os.Args[1] == "add-docker":
-			templates.DockerFile()
+			// templates.DockerFile()
 
 		default:
 			fmt.Printf("Go1: Bad option\n")
 		}
 
-	// ====================================== create-project | dev | build | start
+	// ============================================================================ create-project | dev | build | start
 	case len(os.Args) == 3:
 		switch {
 		case os.Args[1] == "run" && os.Args[2] == "dev":
@@ -62,12 +62,12 @@ func main() {
 			configs.List_Docker_Image(dockerImageName)
 
 		case os.Args[1] == "add-crud" && os.Args[2] != "":
-			crudName := os.Args[2]
-			templates.CRUD_Template(crudName)
+			// crudName := os.Args[2]
+			// templates.CRUD_Template(crudName)
 
 		case os.Args[1] == "create-project" && os.Args[2] != "":
 			project := strings.ToLower(os.Args[2])
-			templates.Starter_Template(project)
+			templates.Starter_Project(project)
 
 		case os.Args[1] == "build-docker" && os.Args[2] != "":
 			dockerImageName := strings.ToLower(os.Args[2])
