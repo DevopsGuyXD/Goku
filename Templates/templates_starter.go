@@ -17,10 +17,16 @@ func fileController(project, folder string) (*os.File, string) {
 
 	switch {
 	case strings.Contains(folder, "main.go"):
+		data = main_Data(project)
+		file = create_open_file(folder)
 
 	case strings.Contains(folder, ".env"):
+		data = env_Data
+		file = create_open_file(folder)
 
 	case strings.Contains(folder, "go.mod"):
+		data = mod_Data(project)
+		file = create_open_file(folder)
 
 	case strings.Contains(folder, "Routes"):
 		data = routes_Data(project)
@@ -48,8 +54,16 @@ func fileController(project, folder string) (*os.File, string) {
 
 // ============================================================================ CREATE AND OPEN FOLDER
 func create_open_file(folder string) *os.File {
-	folderParsed := strings.Split(folder, "\\")
-	filePath := folder + "/" + strings.ToLower(folderParsed[1]) + ".go"
+
+	var filePath string
+
+	if utils.Folder_Exists(folder) {
+		folderParsed := strings.Split(folder, "\\")
+		filePath = folder + "/" + strings.ToLower(folderParsed[1]) + ".go"
+	} else {
+		filePath = folder
+	}
+
 	utils.Create_File([]string{filePath})
 	file := utils.Open_File(filePath)
 

@@ -36,3 +36,17 @@ func Write_File(file *os.File, data string) {
 	_, err := file.WriteString(data)
 	Check_For_Nil(err)
 }
+
+// ============================================================================ FOLDER EXISTS
+func Folder_Exists(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	if info.IsDir() {
+		return true
+	}
+
+	return false
+}

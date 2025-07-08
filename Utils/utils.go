@@ -135,20 +135,6 @@ func Capitalize(word string) string {
 }
 
 // ============================================================================ FOLDER EXISTS
-func Folder_Exists(path string) bool {
-	info, err := os.Stat(path)
-	if err != nil {
-		return false
-	}
-
-	if info.IsDir() {
-		return true
-	}
-
-	return false
-}
-
-// ============================================================================ FOLDER EXISTS
 func Fils_Exists(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
