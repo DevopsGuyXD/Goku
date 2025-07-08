@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -103,22 +102,6 @@ func Capitalize(word string) string {
 func Called_From_Location() string {
 	wd, _ := os.Getwd()
 	return wd
-}
-
-// ============================================================================ SPINNER
-func Spinner(done chan bool, message string) {
-	spinChars := `-\|/`
-	i := 0
-	for {
-		select {
-		case <-done:
-			return
-		default:
-			fmt.Printf("\r%s %c", message, spinChars[i%len(spinChars)])
-			time.Sleep(100 * time.Millisecond)
-			i++
-		}
-	}
 }
 
 // ============================================================================ APPEND TO LAST LINE

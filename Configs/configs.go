@@ -25,7 +25,7 @@ func Run_Dev() {
 		flag = "-c"
 	}
 
-	fmt.Printf("\n🔧 Running in Dev mode\n\n")
+	utils.Message("🔧 Running in Dev mode")
 
 	cmd := exec.Command(shell, flag, fmt.Sprintf("go run github.com/air-verse/air@latest air --dir \"%s\"", calledFrom))
 	cmd.Stdout = os.Stdout
@@ -139,7 +139,7 @@ func Run_Prod() {
 		shell = "cmd.exe"
 		flag = "/C"
 
-		fmt.Printf("\n🔥 Running in Production mode\n\n")
+		utils.Message("🔥 Running in Production mode")
 
 		cmd := exec.Command(shell, flag, "go run .")
 		cmd.Stdout = os.Stdout
@@ -154,7 +154,7 @@ func Run_Prod() {
 		shell = "sh"
 		flag = "-c"
 
-		fmt.Printf("\n🔥 Running in Production mode\n\n")
+		utils.Message("🔥 Running in Production mode")
 
 		cmd := exec.Command(shell, flag, "go run .")
 		cmd.Stdout = os.Stdout
