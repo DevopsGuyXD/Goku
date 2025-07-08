@@ -24,6 +24,27 @@ func Version() {
    \____|  \___/  |_|\_\   \___/  v1.0.0`)
 }
 
+// ============================================================================ ERROR HANDLING
+func All_Options() {
+	fmt.Printf(`  
+  Options:
+
+    -h | --help
+    -v | --version
+    -i | --install
+
+    goku create-project mytestapp
+    goku run dev
+    goku run build
+    goku run start
+    goku add-crud <NAME>
+    goku add-docker
+    goku build-docker <NAME:TAG> -> Note: TAG will be "latest" if not specified
+    goku swag
+    goku docker <NAME>
+`)
+}
+
 // ============================================================================ CREATOR
 func Creator() {
 	fmt.Printf("\n%v\n%v\n", "With love ❤️", "Bharath Dundi 🤘")
@@ -40,7 +61,7 @@ func Check_For_Nil(err error) {
 // ============================================================================ INSTALL DEPENDENCIES
 func Install_Dependencies() {
 
-	init_Swagger()
+	Init_Swagger()
 
 	done := make(chan bool)
 	go Spinner(done, "Installing Dependencies")
@@ -62,7 +83,7 @@ func Install_Dependencies() {
 }
 
 // ============================================================================ INIT SWAGGER
-func init_Swagger() {
+func Init_Swagger() {
 
 	done := make(chan bool)
 	go Spinner(done, "Updating Swagger")
@@ -89,26 +110,6 @@ func init_air() {
 
 	_, err := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/air-verse/air@latest init --dir \"%s\"", calledFrom)).Output()
 	Check_For_Nil(err)
-}
-
-// ============================================================================ ERROR HANDLING
-func All_Options() {
-	fmt.Printf(`  
-  Options:
-
-    -h | --help
-    -v | --version
-    -i | --install
-
-    goku create-project mytestapp
-    goku run dev
-    goku run build
-    goku run start
-    goku add-crud <NAME>
-    goku add-docker
-    goku build-docker <NAME:TAG> -> Note: TAG will be "latest" if not specified
-    goku docker <NAME>
-`)
 }
 
 // ============================================================================ CREATE FOLDER

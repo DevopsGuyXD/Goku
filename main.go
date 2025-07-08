@@ -35,6 +35,9 @@ func main() {
 		case os.Args[1] == "add-docker":
 			// templates.DockerFile()
 
+		case os.Args[1] == "swag":
+			utils.Init_Swagger()
+
 		default:
 			fmt.Printf("Go1: Bad option\n")
 		}
