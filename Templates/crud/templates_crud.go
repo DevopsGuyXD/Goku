@@ -4,11 +4,6 @@ import (
 	"fmt"
 )
 
-// ============================================================================ FILE CONTROLLER
-// func fileController(crudName string) (*os.File, string) {
-
-// }
-
 // ============================================================================ routes.go DATA
 func routes_Data(crudName string) string {
 	data := fmt.Sprintf(`	// -------------------------- %[1]v
@@ -201,8 +196,7 @@ func UPDATE_%[1]v(id string, request io.ReadCloser) string {
 // -------------------------- DELETE %[1]v
 func DELETE_%[1]v(id string) string {
 	return delete_Handler(id)
-}
-`, crudName, projectName)
+}`, crudName, projectName)
 
 	return data
 }
@@ -376,80 +370,79 @@ func delete_Handler(id string) string {
 	}
 
 	return response
-}
-`, crudName)
+}`, crudName)
 
 	return data
 }
 
+// ============================================================================ TEST
+func test_Data(crudName, projectName string) string {
+	data := fmt.Sprintf(
+		`package %[1]v_c
 
+import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
-// // ============================================================================ TEST
-// func Test(crudName string) string {
-// 	data := fmt.Sprintf(
-// 		`package %[1]v_c
+	utils "github.com/DevopsGuyXD/%[2]v/Utils"
+	"github.com/go-chi/chi/v5"
+)
 
-// import (
-// 	"encoding/json"
-// 	"net/http"
-// 	"net/http/httptest"
-// 	"testing"
+// -------------------------- CONTROLLER
+func get%[1]v(w http.ResponseWriter, r *http.Request) {
 
-// 	utils "github.com/DevopsGuyXD/myapp/Utils"
-// 	"github.com/go-chi/chi/v5"
-// )
+	%[1]v := []map[string]interface{}{
+		{"ID": 1, "Title": "Go Basics", "Author": "Alice", "Language": "English", "Pages": 200},
+		{"ID": 2, "Title": "Go Advanced", "Author": "Bob", "Language": "English", "Pages": 350},
+	}
 
-// func Get%[1]v(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(%[1]v)
+}
 
-// 	%[1]v := []map[string]interface{}{
-// 		{"ID": 1, "Title": "Go Basics", "Author": "Alice", "Language": "English", "Pages": 200},
-// 		{"ID": 2, "Title": "Go Advanced", "Author": "Bob", "Language": "English", "Pages": 350},
-// 	}
+// -------------------------- ROUTER
+func test_Route() *chi.Mux {
 
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(%[1]v)
-// }
+	router := chi.NewRouter()
 
-// func route() *chi.Mux {
+	router.Route("/%[1]v", func(r chi.Router) {
+		r.Get("/t", get%[1]v)
+	})
 
-// 	router := chi.NewRouter()
+	return router
+}
 
-// 	router.Route("/%[1]v", func(r chi.Router) {
-// 		r.Get("/t", Get%[1]v)
-// 	})
+// -------------------------- GET
+func Test_%[1]v_GET(t *testing.T) {
 
-// 	return router
-// }
+	// var %[1]v []controller.Book
 
-// func TestGet%[1]v(t *testing.T) {
+	req, err := http.NewRequest("GET", "/%[1]v/t", nil)
+	utils.Check_For_Nil(err)
 
-// 	// var %[1]v []controller.Book
+	rr := httptest.NewRecorder()
+	router := test_Route()
+	router.ServeHTTP(rr, req)
 
-// 	req, err := http.NewRequest("GET", "/%[1]v/t", nil)
-// 	utils.Check_For_Nil(err)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("Handler returned wrong status code: got %%v want %%v", status, http.StatusOK)
+	}
 
-// 	rr := httptest.NewRecorder()
-// 	router := route()
-// 	router.ServeHTTP(rr, req)
+	// err = json.Unmarshal(rr.Body.Bytes(), &%[1]v)
+	// if err != nil {
+	// 	t.Errorf("Failed to parse response body: %%v", err)
+	// }
 
-// 	if status := rr.Code; status != http.StatusOK {
-// 		t.Errorf("Handler returned wrong status code: got %%v want %%v", status, http.StatusOK)
-// 	}
+	// if len(%[1]v) != 2 {
+	// 	t.Errorf("expected 2 %[1]v, got %%d", len(%[1]v))
+	// }
 
-// 	// err = json.Unmarshal(rr.Body.Bytes(), &%[1]v)
-// 	// if err != nil {
-// 	// 	t.Errorf("Failed to parse response body: %%v", err)
-// 	// }
+	// if %[1]v[0].Title != "Go Basics" {
+	// 	t.Errorf("expected first book title to be 'Go Basics', got %%s", %[1]v[0].Title)
+	// }
+}`, crudName, projectName)
 
-// 	// if len(%[1]v) != 2 {
-// 	// 	t.Errorf("expected 2 %[1]v, got %%d", len(%[1]v))
-// 	// }
-
-// 	// if %[1]v[0].Title != "Go Basics" {
-// 	// 	t.Errorf("expected first book title to be 'Go Basics', got %%s", %[1]v[0].Title)
-// 	// }
-// }
-// `, crudName)
-
-// 	return data
-// }
+	return data
+}

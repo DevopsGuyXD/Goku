@@ -15,6 +15,7 @@ func CRUD_Project(crudName string) {
 	model(crudName)
 	model_Handlers(crudName)
 	model_Imports()
+	integration_Test(crudName)
 	utils.Install_Dependencies()
 
 	// -------------------- DONE STATUS
@@ -61,6 +62,7 @@ func sqlite() {
 		utils.Create_Folder([]string{databaseFolder})
 
 		utils.Create_File([]string{"./" + databaseFolder + "/app.db"})
+		// utils.Create_File([]string{"./" + databaseFolder + "/test.db"})
 	}
 }
 
@@ -109,9 +111,25 @@ func model_Imports() {
 		`"io"`,
 		`"strings"`,
 
-		`config "github.com/DevopsGuyXD/myapp/Config"`,
-		`utils "github.com/DevopsGuyXD/myapp/Utils"`,
+		fmt.Sprintf(`config "github.com/DevopsGuyXD/%v/Config"`, utils.Project_Name()),
+		fmt.Sprintf(`utils "github.com/DevopsGuyXD/%v/Utils"`, utils.Project_Name()),
 	}
 
 	utils.UpdateImport(filePath, imports)
+}
+
+// ============================================================================ INTEGRATION TEST
+func integration_Test(crudName string) {
+	folder := "Tests"
+	newFile := []string{folder + "/" + crudName + "_test.go"}
+
+	if !utils.Folder_Exists(folder) {
+		utils.Create_Folder([]string{folder})
+		utils.Create_File(newFile)
+
+		file := utils.Open_File(newFile[0])
+		defer file.Close()
+
+		utils.Write_File(file, test_Data(crudName, utils.Project_Name()))
+	}
 }
