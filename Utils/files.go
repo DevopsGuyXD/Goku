@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -157,4 +158,13 @@ func UpdateImport(filePath string, imports []string) {
 	for _, importData := range imports {
 		InsertIntoFileAfter("import (", filePath, importData)
 	}
+}
+
+// ============================================================================ UPDATE IMPORT
+func UpdateAppConfig(crudName string) {
+	topLine := "func AppModels(){"
+	filePath := "./Models/models.go"
+	data := fmt.Sprintf("%v()", crudName)
+
+	InsertIntoFileAfter(topLine, filePath, data)
 }
