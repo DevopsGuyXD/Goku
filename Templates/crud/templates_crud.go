@@ -400,14 +400,14 @@ func Test_%[1]v_GET(t *testing.T) {
 	router := routes.RouteCollection()
 	rr := httptest.NewRecorder()
 	models.AppModels()
-	
+
 	req, err := http.NewRequest("GET", "/books", nil)
 	utils.Check_For_Nil(err)
 
 	router.ServeHTTP(rr, req)
 
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code: got %%v want %%v", status, http.StatusOK)
+	if rr.Code != 200 {
+		t.Errorf("Handler returned %%v", rr.Code)
 	}
 
 	// err = json.Unmarshal(rr.Body.Bytes(), &%[1]v)
