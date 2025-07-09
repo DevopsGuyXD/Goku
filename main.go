@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	configs "github.com/DevopsGuyXD/Goku/Configs"
+	templates_curd "github.com/DevopsGuyXD/Goku/Templates/crud"
 	templates_starter "github.com/DevopsGuyXD/Goku/Templates/starter"
 	utils "github.com/DevopsGuyXD/Goku/Utils"
 )
@@ -65,8 +66,8 @@ func main() {
 			configs.List_Docker_Image(dockerImageName)
 
 		case os.Args[1] == "add-crud" && os.Args[2] != "":
-			// crudName := os.Args[2]
-			// templates.CRUD_Template(crudName)
+			crudName := os.Args[2]
+			templates_curd.CRUD_Project(crudName)
 
 		case os.Args[1] == "create-project" && os.Args[2] != "":
 			project := strings.ToLower(os.Args[2])

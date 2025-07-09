@@ -125,8 +125,7 @@ func init() {
 // ============================================================================ routes.go DATA
 func routes_Data(project string) string {
 
-	data := fmt.Sprintf(`
-package routes
+	data := fmt.Sprintf(`package routes
 
 import (
 	controller "github.com/DevopsGuyXD/%[1]v/Controller"
@@ -229,8 +228,7 @@ func InitDatabase() *sql.DB {
 }`
 
 // ============================================================================ models.go DATA
-var model_Data = `
-package models
+var model_Data = `package models
 
 // -------------------------- MODELS
 func AppModels(){

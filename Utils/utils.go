@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -104,20 +103,6 @@ func Called_From_Location() string {
 	return wd
 }
 
-// ============================================================================ APPEND TO LAST LINE
-func AppendToLastLine(file, data string) {
-
-	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	if _, err := f.WriteString(data); err != nil {
-		log.Fatal(err)
-	}
-}
-
 // ============================================================================ CHECK IF LINES EXIST IN FILE
 func Check_If_Lines_Exist(filePath string, targets map[string]bool) bool {
 
@@ -139,28 +124,4 @@ func Check_If_Lines_Exist(filePath string, targets map[string]bool) bool {
 	}
 
 	return true
-}
-
-// ============================================================================ INSERT INTO FILE
-func InsertIntoFileAfter(topLine, filePath, data string) {
-	var lines []string
-
-	file := Open_File(filePath)
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		lines = append(lines, line)
-
-		if strings.Contains(line, topLine) {
-			lines = append(lines, "\t"+data)
-		}
-	}
-
-	Check_For_Nil(scanner.Err())
-
-	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	Check_For_Nil(err)
 }
