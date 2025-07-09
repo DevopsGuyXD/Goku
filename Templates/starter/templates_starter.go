@@ -225,7 +225,7 @@ func InitDatabase() *sql.DB {
 	var err error
 
 	if os.Getenv("APP_ENV") == "test" {
-		database, err = sql.Open("sqlite", "./Sqlite/test.db")
+		database, err = sql.Open("sqlite", "../Sqlite/test.db")
 		utils.Check_For_Nil(err)
 		
 	} else {

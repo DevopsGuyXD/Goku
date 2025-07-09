@@ -62,7 +62,7 @@ func sqlite() {
 		utils.Create_Folder([]string{databaseFolder})
 
 		utils.Create_File([]string{"./" + databaseFolder + "/app.db"})
-		// utils.Create_File([]string{"./" + databaseFolder + "/test.db"})
+		utils.Create_File([]string{"./" + databaseFolder + "/test.db"})
 	}
 }
 

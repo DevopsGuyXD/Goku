@@ -378,52 +378,32 @@ func delete_Handler(id string) string {
 // ============================================================================ TEST
 func test_Data(crudName, projectName string) string {
 	data := fmt.Sprintf(
-		`package %[1]v_c
+		`package tests
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"os"
 
+	models "github.com/DevopsGuyXD/%[2]v/Models"
+	routes "github.com/DevopsGuyXD/%[2]v/Routes"
 	utils "github.com/DevopsGuyXD/%[2]v/Utils"
-	"github.com/go-chi/chi/v5"
 )
 
-// -------------------------- CONTROLLER
-func get%[1]v(w http.ResponseWriter, r *http.Request) {
-
-	%[1]v := []map[string]interface{}{
-		{"ID": 1, "Title": "Go Basics", "Author": "Alice", "Language": "English", "Pages": 200},
-		{"ID": 2, "Title": "Go Advanced", "Author": "Bob", "Language": "English", "Pages": 350},
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(%[1]v)
-}
-
-// -------------------------- ROUTER
-func test_Route() *chi.Mux {
-
-	router := chi.NewRouter()
-
-	router.Route("/%[1]v", func(r chi.Router) {
-		r.Get("/t", get%[1]v)
-	})
-
-	return router
-}
 
 // -------------------------- GET
 func Test_%[1]v_GET(t *testing.T) {
 
-	// var %[1]v []controller.Book
+	os.Setenv("APP_ENV", "test")
 
-	req, err := http.NewRequest("GET", "/%[1]v/t", nil)
+	router := routes.RouteCollection()
+	rr := httptest.NewRecorder()
+	models.AppModels()
+	
+	req, err := http.NewRequest("GET", "/books", nil)
 	utils.Check_For_Nil(err)
 
-	rr := httptest.NewRecorder()
-	router := test_Route()
 	router.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
