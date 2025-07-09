@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/DevopsGuyXD/Goku/Templates/common"
 )
 
 // ============================================================================ CREATE FOLDER
@@ -31,6 +33,14 @@ func Open_File(filePath string) *os.File {
 	Check_For_Nil(err)
 
 	return file
+}
+
+// ============================================================================ READ FILE
+func Read_File(filePath string) []byte {
+	data, err := os.ReadFile(filePath)
+	Check_For_Nil(err)
+
+	return data
 }
 
 // ============================================================================ WRITE TO FILE
@@ -112,7 +122,6 @@ func InsertIntoFileAfter(topLine, filePath, data string) {
 
 // ============================================================================ APPEND TO LAST LINE
 func AppendToFileBottom(file, data string) {
-
 	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
@@ -125,6 +134,35 @@ func AppendToFileBottom(file, data string) {
 }
 
 // ============================================================================ UPDATE IMPORT
-func UpdateImport() {
+func UpdateImport(filePath string, imports []string) {
 
+	var import_Block_Exists bool
+	file := Read_File(filePath)
+	lines := strings.Split(string(file), "\n")
+
+	//============================================================================
+	for _, line := range lines {
+		if line == "import" {
+			import_Block_Exists = true
+			break
+			// 		lines = append(lines[:i+1], append([]string{packages}, lines[i+1:]...)...)
+			// 		break
+		} else {
+			import_Block_Exists = false
+			break
+		}
+	}
+
+	if import_Block_Exists {
+
+	} else {
+		InsertIntoFileAfter("package", filePath, common.Import_Data())
+	}
+
+	for _, importData := range imports {
+		InsertIntoFileAfter("import (", filePath, importData)
+	}
+
+	// err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+	// Check_For_Nil(err)
 }

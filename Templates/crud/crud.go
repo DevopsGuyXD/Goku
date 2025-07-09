@@ -2,7 +2,6 @@ package templates_curd
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	utils "github.com/DevopsGuyXD/Goku/Utils"
@@ -19,6 +18,7 @@ func CRUD_Project(crudName string) {
 	crud_Model(crudName)
 	crud_Model_Handlers(crudName)
 	updating_Config_Main(crudName)
+	update_Config_Main_Packages()
 	// addingTest(crudName)
 
 	// utils.Install_Dependencies()
@@ -147,47 +147,62 @@ func crud_Model_Handlers(crudName string) {
 }
 
 // ============================================================================ UPDATE PACKAGES
-func update_Config_Main_Packages(filePath string) {
+func update_Config_Main_Packages() {
 
-	packages := `
-import (
-	"database/sql"
-	"encoding/json"
-	"fmt"
-	"io"
-	"strings"
+	filePath := "./Models/models.go"
+	imports := []string{
+		`"database/sql"`,
+		`"encoding/json"`,
+		`"fmt"`,
+		`"io"`,
+		`"strings"`,
 
-	config "github.com/DevopsGuyXD/myapp/Config"
-	utils "github.com/DevopsGuyXD/myapp/Utils"
-)`
-
-	data, err := os.ReadFile(filePath)
-	utils.Check_For_Nil(err)
-
-	content := string(data)
-	lines := strings.Split(content, "\n")
-
-	for i, line := range lines {
-		if line == "package models" {
-			lines = append(lines[:i+1], append([]string{packages}, lines[i+1:]...)...)
-			break
-		}
+		`config "github.com/DevopsGuyXD/myapp/Config"`,
+		`utils "github.com/DevopsGuyXD/myapp/Utils"`,
 	}
 
-	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	utils.Check_For_Nil(err)
+	utils.UpdateImport(filePath, imports)
+
+	// 	packages := `
+	// import (
+	// 	"database/sql"
+	// 	"encoding/json"
+	// 	"fmt"
+	// 	"io"
+	// 	"strings"
+
+	// 	config "github.com/DevopsGuyXD/myapp/Config"
+	// 	utils "github.com/DevopsGuyXD/myapp/Utils"
+	// )`
+
+	// 	data, err := os.ReadFile(filePath)
+	// 	utils.Check_For_Nil(err)
+
+	// 	content := string(data)
+	// 	lines := strings.Split(content, "\n")
+
+	// 	for i, line := range lines {
+	// 		if line == "package models" {
+	// 			lines = append(lines[:i+1], append([]string{packages}, lines[i+1:]...)...)
+	// 			break
+	// 		}
+	// 	}
+
+	// 	err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+	// 	utils.Check_For_Nil(err)
 }
 
-func addingTest(crudName string) {
+// ============================================================================
+// func addingTest(crudName string) {
 
-	folder := "./Test"
-	utils.Create_Folder(folder)
+// 	folder := "./Test"
+// 	utils.Create_Folder(folder)
 
-	utils.Create_Folder(fmt.Sprintf("%v/%[1]v/%[1]v_test.go", folder, crudName))
+// 	utils.Create_Folder(fmt.Sprintf("%v/%[1]v/%[1]v_test.go", folder, crudName))
 
-	// testData := Test(crudName)
+// 	// testData := Test(crudName)
 
-	//   = utils.Create_File(filePath)
-	// defer file.Close()
+// 	//   = utils.Create_File(filePath)
+// 	// defer file.Close()
 
-}
+// }
