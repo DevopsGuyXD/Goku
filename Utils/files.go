@@ -140,29 +140,21 @@ func UpdateImport(filePath string, imports []string) {
 	file := Read_File(filePath)
 	lines := strings.Split(string(file), "\n")
 
-	//============================================================================
+	//--------------------------------------
 	for _, line := range lines {
-		if line == "import" {
+		if line == "import (" {
 			import_Block_Exists = true
-			break
-			// 		lines = append(lines[:i+1], append([]string{packages}, lines[i+1:]...)...)
-			// 		break
-		} else {
-			import_Block_Exists = false
 			break
 		}
 	}
 
-	if import_Block_Exists {
-
-	} else {
+	//--------------------------------------
+	if !import_Block_Exists {
 		InsertIntoFileAfter("package", filePath, common.Import_Data())
 	}
 
+	//--------------------------------------
 	for _, importData := range imports {
 		InsertIntoFileAfter("import (", filePath, importData)
 	}
-
-	// err = os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	// Check_For_Nil(err)
 }

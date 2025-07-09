@@ -23,8 +23,6 @@ func CRUD_Project(crudName string) {
 
 	// utils.Install_Dependencies()
 
-	// file, data := fileController(crudName)
-
 	// -------------------- DONE STATUS
 	fmt.Printf("\rAdding \"%v\" ✔\n\n", crudName)
 }
@@ -32,14 +30,20 @@ func CRUD_Project(crudName string) {
 // ============================================================================ CRUD ADD ROUTE
 func crud_Route(crudName string) {
 
+	filePath := "./Routes/routes.go"
 	data := routes_Data(crudName)
+	imports := []string{
+		`books_c "github.com/DevopsGuyXD/myapp/Controller/books"`,
+	}
 
-	file := utils.Open_File("./Routes/routes.go")
+	file := utils.Open_File(filePath)
 	defer file.Close()
 
 	lines := utils.InsertIntoFileBefore(data, file)
 
 	utils.Write_File(file, strings.Join(lines, "\n"))
+
+	utils.UpdateImport(filePath, imports)
 
 	// =================================================
 	// topLine := "import ("
@@ -163,6 +167,7 @@ func update_Config_Main_Packages() {
 
 	utils.UpdateImport(filePath, imports)
 
+	//===========================================================
 	// 	packages := `
 	// import (
 	// 	"database/sql"
