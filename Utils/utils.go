@@ -48,21 +48,21 @@ func Install_Dependencies() {
 func Init_Swagger() {
 
 	done := make(chan bool)
-	go Spinner(done, "Updating Swagger")
+	go Spinner(done, "Updating")
 
 	calledFrom := Called_From_Location()
 
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/swaggo/swag/cmd/swag@v1.8.12 init --dir \"%s\"", calledFrom))
 	err := cmd.Run()
 	if err != nil {
-		fmt.Printf("\rUpdating Swagger ❌\n")
+		fmt.Printf("\rUpdating ❌\n")
 		close(done)
 		return
 	}
 
 	close(done)
 
-	fmt.Print("\rUpdating Swagger ✔\n\n")
+	fmt.Print("\rUpdating ✔\n\n")
 }
 
 // ============================================================================ INIT Air

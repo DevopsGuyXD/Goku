@@ -2,6 +2,8 @@ package templates_curd
 
 import (
 	"fmt"
+
+	utils "github.com/DevopsGuyXD/Goku/Utils"
 )
 
 // ============================================================================ routes.go DATA
@@ -28,8 +30,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	models "github.com/DevopsGuyXD/%[2]v/Models"
+	utils "github.com/DevopsGuyXD/%[2]v/Utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -41,6 +45,7 @@ import (
 // @Router /%[1]v [get]
 func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 
 	response := models.GET_%[1]v_all()
 
@@ -59,14 +64,16 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 // @Router /%[1]v/{id} [get]
 func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 
-	id := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	utils.Check_For_Nil(err)
 	response := models.GET_%[1]v_by_id(id)
 
 	if response != nil {
 		json.NewEncoder(w).Encode(response)
 	} else {
-		response := fmt.Sprintf("No record with ID: %%s", id)
+		response := fmt.Sprintf("No record with ID: %%d", id)
 		json.NewEncoder(w).Encode(response)
 	}
 }
@@ -76,7 +83,7 @@ func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 // @Tags %[1]v
 // @Accept json
 // @Produce json
-// @Param data body object true "Add a new %[1]v"
+// @Param data body object true "Add new record"
 // @Success 200 {array} map[string]interface{}
 // @Router /%[1]v [post]
 func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
@@ -85,13 +92,21 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	response := models.CREATE_%[1]v(request)
 
-	json.NewEncoder(w).Encode(response)
+	if response == "Created successfully" {
+		json.NewEncoder(w).Encode(response)
+		w.WriteHeader(http.StatusCreated)
+	} else{
+		json.NewEncoder(w).Encode(response)
+		w.WriteHeader(http.StatusInternalServerError)
+	} 
 }
 
 // -------------------------- %[1]v UPDATE BY ID
 // @Description Update %[1]v
 // @Tags %[1]v
+// @Accept json
 // @Produce json
+// @Param data body object true "Update record"
 // @Success 200 {array} map[string]interface{}
 // @Router /%[1]v/{id} [put]
 func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
@@ -131,10 +146,19 @@ func model_Data(crudName, projectName string) string {
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	utils "github.com/DevopsGuyXD/%[2]v/Utils"
 )
+
+// -------------------------- %[1]v STRUCT
+type %[3]v struct {
+	Title string
+	Author   string
+	Language string
+	Pages    int
+}
 
 // -------------------------- CREATE %[1]v TABLE
 func %[1]v() {
@@ -171,21 +195,31 @@ func %[1]v() {
 
 // -------------------------- GET %[1]v ALL
 func GET_%[1]v_all() []map[string]interface{} {
-
-	query := "SELECT * FROM %[1]v"
-	return get_Handler(query)
+	if os.Getenv("TEST_MODE") != "Y" {
+		query := "SELECT * FROM %[1]v"
+		return get_Handler(query)
+	} else {
+		return getAll()
+	}
 }
 
 // -------------------------- GET %[1]v by ID
-func GET_%[1]v_by_id(id string) []map[string]interface{} {
-
-	query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%s", id)
-	return get_Handler(query)
+func GET_%[1]v_by_id(id int) []map[string]interface{} {
+	if os.Getenv("TEST_MODE") != "Y" {
+		query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %v", id)
+		return get_Handler(query)
+	} else {
+		return byId(id)
+	}
 }
 
 // -------------------------- CREATE %[1]v RECORD
 func CREATE_%[1]v(request io.ReadCloser) string {
-	return create_Handler(request)
+	if os.Getenv("TEST_MODE") != "Y" {
+		return create_Handler(request)
+	} else {
+		return create(request)
+	}
 }
 
 // -------------------------- UPDATE %[1]v
@@ -196,7 +230,7 @@ func UPDATE_%[1]v(id string, request io.ReadCloser) string {
 // -------------------------- DELETE %[1]v
 func DELETE_%[1]v(id string) string {
 	return delete_Handler(id)
-}`, crudName, projectName)
+}`, crudName, projectName, utils.Capitalize(crudName))
 
 	return data
 }
@@ -282,7 +316,7 @@ func create_Handler(request io.ReadCloser) string {
 
 	res, err := db.Exec(query, values...)
 	if err != nil {
-		response = "DB insert error"
+		response = "DB error"
 
 	} else {
 		rowsAffected, err := res.RowsAffected()
@@ -378,51 +412,159 @@ func delete_Handler(id string) string {
 // ============================================================================ TEST
 func test_Data(crudName, projectName string) string {
 	data := fmt.Sprintf(
-		`package tests
+		`package app_tests
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"os"
+	"testing"
 
 	models "github.com/DevopsGuyXD/%[2]v/Models"
 	routes "github.com/DevopsGuyXD/%[2]v/Routes"
 	utils "github.com/DevopsGuyXD/%[2]v/Utils"
+	"github.com/stretchr/testify/assert"
 )
 
+// -------------------------- GET TESTS COMMON
+func test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, allRecords bool) {
+	switch {
+	case opertaion == "GET":
+		var book []models.Books
+		err := json.Unmarshal(rr.Body.Bytes(), &book)
+		assert.NoError(t, err, "Expected valid JSON object")
 
-// -------------------------- GET
-func Test_%[1]v_GET(t *testing.T) {
+		assert.Contains(t, rr.Header().Get("Content-Type"), "application/json")
 
-	os.Setenv("APP_ENV", "test")
+		assert.Equal(t, http.StatusOK, rr.Code)
 
-	router := routes.RouteCollection()
+		switch {
+		case allRecords:
+			assert.GreaterOrEqual(t, len(book), 2, "Expected more than one book record")
+		default:
+			assert.Equal(t, len(book), 1, "Expected book with ID 1")
+		}
+
+	case opertaion == "POST":
+		assert.Equal(t, http.StatusCreated, rr.Code)
+	}
+}
+
+// -------------------------- POST TEST COMMON
+
+// -------------------------- TEST INIT
+func setup(opertaion, route string, payload []byte) *httptest.ResponseRecorder {
+	os.Setenv("TEST_MODE", "Y")
+
 	rr := httptest.NewRecorder()
-	models.AppModels()
+	router := routes.RouteCollection()
 
-	req, err := http.NewRequest("GET", "/books", nil)
+	req, err := http.NewRequest(opertaion, route, bytes.NewBuffer(payload))
 	utils.Check_For_Nil(err)
-
 	router.ServeHTTP(rr, req)
 
-	if rr.Code != 200 {
-		t.Errorf("Handler returned %%v", rr.Code)
-	}
+	return rr
+}
 
-	// err = json.Unmarshal(rr.Body.Bytes(), &%[1]v)
-	// if err != nil {
-	// 	t.Errorf("Failed to parse response body: %%v", err)
-	// }
+// -------------------------- GET /%[1]v
+func Test_%[1]v_GET(t *testing.T) {
+	opertaion := "GET"
+	route := "/%[1]v"
+	allRecords := true
 
-	// if len(%[1]v) != 2 {
-	// 	t.Errorf("expected 2 %[1]v, got %%d", len(%[1]v))
-	// }
+	rr := setup(opertaion, route, nil)
+	test_cases(rr, t, opertaion, allRecords)
+}
 
-	// if %[1]v[0].Title != "Go Basics" {
-	// 	t.Errorf("expected first book title to be 'Go Basics', got %%s", %[1]v[0].Title)
-	// }
-}`, crudName, projectName)
+// -------------------------- GET /%[1]v/{id}
+func Test_%[1]v_GET_ID(t *testing.T) {
+	opertaion := "GET"
+	route := "/%[1]v/1"
+	allRecords := false
+
+	rr := setup(opertaion, route, nil)
+	test_cases(rr, t, opertaion, allRecords)
+}
+
+// -------------------------- POST /%[1]v
+func Test_%[1]v_POST(t *testing.T) {
+	opertaion := "POST"
+	route := "/%[1]v"
+	allRecords := false
+	newBook := models.Books{Title: "New Book", Author: "New Author", Language: "English", Pages: 200}
+	payload, _ := json.Marshal(newBook)
+
+	rr := setup(opertaion, route, payload)
+	test_cases(rr, t, opertaion, allRecords)
+}
+
+// // -------------------------- PUT /%[1]v/{id}
+// func Test_%[1]v_PUT(t *testing.T) {
+
+// 	os.Setenv("TEST_MODE", "Y")
+// 	rr := httptest.NewRecorder()
+// 	router := routes.RouteCollection()
+
+// 	updatedBook := Book{
+// 		Title:    "Updated Book",
+// 		Author:   "Updated Author",
+// 		Language: "Hindi",
+// 		Pages:    300,
+// 	}
+// 	payload, _ := json.Marshal(updatedBook)
+
+// 	req, err := http.NewRequest("PUT", "/%[1]v/1", bytes.NewBuffer(payload))
+// 	req.Header.Set("Content-Type", "application/json")
+// 	utils.Check_For_Nil(err)
+// 	router.ServeHTTP(rr, req)
+
+// 	assert.Equal(t, http.StatusOK, rr.Code)
+// }
+
+// // -------------------------- DELETE /%[1]v/{id}
+// func Test_%[1]v_DELETE(t *testing.T) {
+
+// 	os.Setenv("TEST_MODE", "Y")
+// 	rr := httptest.NewRecorder()
+// 	router := routes.RouteCollection()
+
+// 	req, err := http.NewRequest("DELETE", "/%[1]v/1", nil)
+// 	utils.Check_For_Nil(err)
+// 	router.ServeHTTP(rr, req)
+
+// 	assert.Equal(t, http.StatusOK, rr.Code)
+// }
+
+// // -------------------------- Error Case: GET Nonexistent
+// func Test_%[1]v_GET_NotFound(t *testing.T) {
+
+// 	os.Setenv("TEST_MODE", "Y")
+// 	rr := httptest.NewRecorder()
+// 	router := routes.RouteCollection()
+
+// 	req, err := http.NewRequest("GET", "/%[1]v/9999", nil)
+// 	utils.Check_For_Nil(err)
+// 	router.ServeHTTP(rr, req)
+
+// 	assert.Equal(t, http.StatusNotFound, rr.Code)
+// }
+
+// // -------------------------- Error Case: DELETE Nonexistent
+// func Test_%[1]v_DELETE_NotFound(t *testing.T) {
+
+// 	os.Setenv("TEST_MODE", "Y")
+// 	rr := httptest.NewRecorder()
+// 	router := routes.RouteCollection()
+
+// 	req, err := http.NewRequest("DELETE", "/%[1]v/9999", nil)
+// 	utils.Check_For_Nil(err)
+// 	router.ServeHTTP(rr, req)
+
+// 	assert.Equal(t, http.StatusNotFound, rr.Code)
+// }
+`, crudName, projectName)
 
 	return data
 }

@@ -213,7 +213,6 @@ package config
 
 import (
 	"database/sql"
-	"os"
 	
 	utils "github.com/DevopsGuyXD/myapp/Utils"
 	_ "modernc.org/sqlite"
@@ -221,17 +220,8 @@ import (
 
 // -------------------------- INIT DB
 func InitDatabase() *sql.DB {
-	var database *sql.DB
-	var err error
-
-	if os.Getenv("APP_ENV") == "test" {
-		database, err = sql.Open("sqlite", "../Sqlite/test.db")
-		utils.Check_For_Nil(err)
-		
-	} else {
-		database, err = sql.Open("sqlite", "./Sqlite/app.db")
-		utils.Check_For_Nil(err)
-	}
+	database, err := sql.Open("sqlite", "./Sqlite/app.db")
+	utils.Check_For_Nil(err)
 
 	return database
 }`
