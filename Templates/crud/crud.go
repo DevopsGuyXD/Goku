@@ -15,7 +15,7 @@ func CRUD_Project(crudName string) {
 	model(crudName)
 	model_Handlers(crudName)
 	model_Imports()
-	integration_Test(crudName)
+	test_Handler(crudName)
 	utils.Install_Dependencies()
 
 	// -------------------- DONE STATUS
@@ -109,6 +109,7 @@ func model_Imports() {
 		`"fmt"`,
 		`"io"`,
 		`"strings"`,
+		`"reflect"`,
 
 		fmt.Sprintf(`config "github.com/DevopsGuyXD/%v/Config"`, utils.Project_Name()),
 		fmt.Sprintf(`utils "github.com/DevopsGuyXD/%v/Utils"`, utils.Project_Name()),
@@ -118,7 +119,7 @@ func model_Imports() {
 }
 
 // ============================================================================ INTEGRATION TEST
-func integration_Test(crudName string) {
+func test_Handler(crudName string) {
 	folder := "Tests"
 	newFile := []string{folder + "/" + crudName + "_test.go"}
 

@@ -93,11 +93,11 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 	response := models.CREATE_%[1]v(request)
 
 	if response == "Created successfully" {
-		json.NewEncoder(w).Encode(response)
 		w.WriteHeader(http.StatusCreated)
-	} else{
 		json.NewEncoder(w).Encode(response)
+	} else{
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
 	} 
 }
 
@@ -144,6 +144,7 @@ func model_Data(crudName, projectName string) string {
 		`package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -154,10 +155,10 @@ import (
 
 // -------------------------- %[1]v STRUCT
 type %[3]v struct {
-	Title string
-	Author   string
-	Language string
-	Pages    int
+	Title    string `+"`json:\"title\"`"+`
+	Author   string `+"`json:\"author\"`"+`
+	Language string `+"`json:\"language\"`"+`
+	Pages    int    `+"`json:\"pages\"`"+`
 }
 
 // -------------------------- CREATE %[1]v TABLE
@@ -195,30 +196,44 @@ func %[1]v() {
 
 // -------------------------- GET %[1]v ALL
 func GET_%[1]v_all() []map[string]interface{} {
-	if os.Getenv("TEST_MODE") != "Y" {
+	switch {
+	case os.Getenv("TEST_MODE") == "Y":
+		// return getAll()
+	default:
 		query := "SELECT * FROM %[1]v"
 		return get_Handler(query)
-	} else {
-		return getAll()
 	}
 }
 
 // -------------------------- GET %[1]v by ID
 func GET_%[1]v_by_id(id int) []map[string]interface{} {
-	if os.Getenv("TEST_MODE") != "Y" {
-		query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %v", id)
+	switch {
+	case os.Getenv("TEST_MODE") == "Y":
+		// return byId(id)
+	default:
+		query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
 		return get_Handler(query)
-	} else {
-		return byId(id)
 	}
 }
 
 // -------------------------- CREATE %[1]v RECORD
 func CREATE_%[1]v(request io.ReadCloser) string {
-	if os.Getenv("TEST_MODE") != "Y" {
-		return create_Handler(request)
-	} else {
-		return create(request)
+
+	var data %[3]v
+
+	switch {
+	case os.Getenv("TEST_MODE") == "Y":
+		if err := json.NewDecoder(request).Decode(&data); err != nil {
+			return "Invalid JSON"
+		} else {
+			return "Created successfully"
+		}
+		
+	default:
+		err := json.NewDecoder(request).Decode(&data)
+		utils.Check_For_Nil(err)
+
+		return create_Handler(data)
 	}
 }
 
@@ -289,47 +304,36 @@ func get_Handler(query string) []map[string]interface{} {
 }
 
 // -------------------------- CREATE HANDLER
-func create_Handler(request io.ReadCloser) string {
+func create_Handler(data Books) string {
 
 	db := initDB()
 	defer db.Close()
 
-	var response string
-	var data map[string]interface{}
+	var cols, vals []string
+	args := []interface{}{}
 
-	err := json.NewDecoder(request).Decode(&data)
-	utils.Check_For_Nil(err)
+	for i := 0; i < reflect.TypeOf(data).NumField(); i++ {
+		field := reflect.TypeOf(data).Field(i)
+		val := reflect.ValueOf(data).Field(i)
 
-	columns := []string{}
-	placeholders := []string{}
-	values := []interface{}{}
-
-	for k, v := range data {
-		columns = append(columns, k)
-		placeholders = append(placeholders, "?")
-		values = append(values, v)
-	}
-
-	query := fmt.Sprintf("INSERT INTO %[1]v (%%s) VALUES (%%s)",
-		strings.Join(columns, ", "),
-		strings.Join(placeholders, ", "))
-
-	res, err := db.Exec(query, values...)
-	if err != nil {
-		response = "DB error"
-
-	} else {
-		rowsAffected, err := res.RowsAffected()
-		utils.Check_For_Nil(err)
-
-		if rowsAffected != 0 {
-			response = "Created successfully"
-		} else {
-			response = "No records created"
+		tag := field.Tag.Get("json")
+		if tag != "" {
+			cols = append(cols, tag)
+			vals = append(vals, "?")
+			args = append(args, val.Interface())
 		}
 	}
 
-	return response
+	query := fmt.Sprintf("INSERT INTO %[1]v (%%s) VALUES (%%s)",
+		strings.Join(cols, ", "), strings.Join(vals, ", "))
+
+	if res, err := db.Exec(query, args...); err != nil {
+		return "DB error"
+	} else if rows, _ := res.RowsAffected(); rows > 0 {
+		return "Created successfully"
+	}
+
+	return "No records created"
 }
 
 // -------------------------- UPDATE HANDLER
@@ -468,6 +472,18 @@ func setup(opertaion, route string, payload []byte) *httptest.ResponseRecorder {
 	return rr
 }
 
+// -------------------------- POST /%[1]v
+func Test_%[1]v_POST(t *testing.T) {
+	opertaion := "POST"
+	route := "/%[1]v"
+	allRecords := false
+	newBook := models.Books{Title: "New Book", Author: "New Author", Language: "English", Pages: 200}
+	payload, _ := json.Marshal(newBook)
+
+	rr := setup(opertaion, route, payload)
+	test_cases(rr, t, opertaion, allRecords)
+}
+
 // -------------------------- GET /%[1]v
 func Test_%[1]v_GET(t *testing.T) {
 	opertaion := "GET"
@@ -485,18 +501,6 @@ func Test_%[1]v_GET_ID(t *testing.T) {
 	allRecords := false
 
 	rr := setup(opertaion, route, nil)
-	test_cases(rr, t, opertaion, allRecords)
-}
-
-// -------------------------- POST /%[1]v
-func Test_%[1]v_POST(t *testing.T) {
-	opertaion := "POST"
-	route := "/%[1]v"
-	allRecords := false
-	newBook := models.Books{Title: "New Book", Author: "New Author", Language: "English", Pages: 200}
-	payload, _ := json.Marshal(newBook)
-
-	rr := setup(opertaion, route, payload)
 	test_cases(rr, t, opertaion, allRecords)
 }
 
