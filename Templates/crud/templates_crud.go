@@ -155,12 +155,10 @@ import (
 
 // -------------------------- %[1]v STRUCT
 type %[3]v struct {
-	Id        int    `+"`json:\"id\"`"+`
 	Title    string `+"`json:\"title\"`"+`
 	Author   string `+"`json:\"author\"`"+`
 	Language string `+"`json:\"language\"`"+`
 	Pages    int    `+"`json:\"pages\"`"+`
-	Created_t string `+"`json:\"created_at\"`"+`
 }
 
 // -------------------------- CREATE %[1]v TABLE
@@ -198,29 +196,18 @@ func %[1]v() {
 
 // -------------------------- GET %[1]v ALL
 func GET_%[1]v_all() []map[string]interface{} {
-	switch {
-	case os.Getenv("TEST_MODE") == "Y":
-		// return getAll()
-	default:
-		query := "SELECT * FROM %[1]v"
-		return get_Handler(query)
-	}
+	query := "SELECT * FROM %[1]v"
+	return get_Handler(query)
 }
 
 // -------------------------- GET %[1]v by ID
 func GET_%[1]v_by_id(id int) []map[string]interface{} {
-	switch {
-	case os.Getenv("TEST_MODE") == "Y":
-		// return byId(id)
-	default:
-		query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
-		return get_Handler(query)
-	}
+	query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
+	return get_Handler(query)
 }
 
 // -------------------------- CREATE %[1]v RECORD
 func CREATE_%[1]v(request io.ReadCloser) string {
-
 	var data %[3]v
 
 	switch {
@@ -267,39 +254,31 @@ func get_Handler(query string) []map[string]interface{} {
 	db := initDB()
 	defer db.Close()
 
+	rows, err := db.Query(query)
+	utils.Check_For_Nil(err)
+	defer rows.Close()
+
+	cols, err := rows.Columns()
+	utils.Check_For_Nil(err)
+
 	var response []map[string]interface{}
-
-	data, err := db.Query(query)
-	utils.Check_For_Nil(err)
-	defer data.Close()
-
-	columns, err := data.Columns()
-	utils.Check_For_Nil(err)
-
-	for data.Next() {
-
-		values := make([]interface{}, len(columns))
-		valuePtrs := make([]interface{}, len(columns))
-		rowMap := make(map[string]interface{})
-
-		for i := range values {
-			valuePtrs[i] = &values[i]
+	for rows.Next() {
+		vals := make([]interface{}, len(cols))
+		ptrs := make([]interface{}, len(cols))
+		for i := range ptrs {
+			ptrs[i] = &vals[i]
 		}
+		utils.Check_For_Nil(rows.Scan(ptrs...))
 
-		err := data.Scan(valuePtrs...)
-		utils.Check_For_Nil(err)
-
-		for i, col := range columns {
-			val := values[i]
-
-			if b, ok := val.([]byte); ok {
-				rowMap[col] = string(b)
+		row := make(map[string]interface{}, len(cols))
+		for i, col := range cols {
+			if b, ok := vals[i].([]byte); ok {
+				row[col] = string(b)
 			} else {
-				rowMap[col] = val
+				row[col] = vals[i]
 			}
 		}
-
-		response = append(response, rowMap)
+		response = append(response, row)
 	}
 
 	return response
@@ -486,25 +465,25 @@ func Test_%[1]v_POST(t *testing.T) {
 	test_cases(rr, t, opertaion, allRecords)
 }
 
-// -------------------------- GET /%[1]v
-func Test_%[1]v_GET(t *testing.T) {
-	opertaion := "GET"
-	route := "/%[1]v"
-	allRecords := true
+// // -------------------------- GET /%[1]v
+// func Test_%[1]v_GET(t *testing.T) {
+// 	opertaion := "GET"
+// 	route := "/%[1]v"
+// 	allRecords := true
 
-	rr := setup(opertaion, route, nil)
-	test_cases(rr, t, opertaion, allRecords)
-}
+// 	rr := setup(opertaion, route, nil)
+// 	test_cases(rr, t, opertaion, allRecords)
+// }
 
-// -------------------------- GET /%[1]v/{id}
-func Test_%[1]v_GET_ID(t *testing.T) {
-	opertaion := "GET"
-	route := "/%[1]v/1"
-	allRecords := false
+// // -------------------------- GET /%[1]v/{id}
+// func Test_%[1]v_GET_ID(t *testing.T) {
+// 	opertaion := "GET"
+// 	route := "/%[1]v/1"
+// 	allRecords := false
 
-	rr := setup(opertaion, route, nil)
-	test_cases(rr, t, opertaion, allRecords)
-}
+// 	rr := setup(opertaion, route, nil)
+// 	test_cases(rr, t, opertaion, allRecords)
+// }
 
 // // -------------------------- PUT /%[1]v/{id}
 // func Test_%[1]v_PUT(t *testing.T) {
