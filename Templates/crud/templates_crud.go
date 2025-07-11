@@ -155,10 +155,12 @@ import (
 
 // -------------------------- %[1]v STRUCT
 type %[3]v struct {
+	Id        int    `+"`json:\"id\"`"+`
 	Title    string `+"`json:\"title\"`"+`
 	Author   string `+"`json:\"author\"`"+`
 	Language string `+"`json:\"language\"`"+`
 	Pages    int    `+"`json:\"pages\"`"+`
+	Created_t string `+"`json:\"created_at\"`"+`
 }
 
 // -------------------------- CREATE %[1]v TABLE
