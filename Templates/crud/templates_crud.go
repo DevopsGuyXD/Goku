@@ -194,7 +194,18 @@ func %[1]v() {
 
 // -------------------------- GET %[1]v ALL
 func GET_%[1]v_all() []map[string]interface{} {
+	var %[1]v []%[3]v
 	query := "SELECT * FROM %[1]v"
+
+	jsonData, err := json.Marshal(get_Handler(query))
+	utils.Check_For_Err(err)
+
+	if err = json.Unmarshal(jsonData, &%[1]v); err != nil {
+		return []map[string]interface{}{
+			{"message": "Type error"},
+		}
+	}
+
 	return get_Handler(query)
 }
 
@@ -282,7 +293,7 @@ func get_Handler(query string) []map[string]interface{} {
 }
 
 // -------------------------- CREATE HANDLER
-func create_Handler(data Books) string {
+func create_Handler(data interface{}) string {
 
 	db := initDB()
 	defer db.Close()
