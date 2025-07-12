@@ -10,11 +10,11 @@ import (
 func routes_Data(crudName string) string {
 	data := fmt.Sprintf(`	// -------------------------- %[1]v
 	router.Route("/%[1]v", func(r chi.Router) {
-		r.Get("/", %[1]v_c.GET_%[1]v)
-		r.Post("/", %[1]v_c.POST_%[1]v)
-		r.Get("/{id}", %[1]v_c.GET_%[1]v_id)
-		r.Put("/{id}", %[1]v_c.UPDATE_%[1]v)
-		r.Delete("/{id}", %[1]v_c.DELETE_%[1]v)
+		r.Get("/", controller.GET_%[1]v)
+		r.Post("/", controller.POST_%[1]v)
+		r.Get("/{id}", controller.GET_%[1]v_id)
+		r.Put("/{id}", controller.UPDATE_%[1]v)
+		r.Delete("/{id}", controller.DELETE_%[1]v)
 	})
 		`, crudName)
 
@@ -24,7 +24,7 @@ func routes_Data(crudName string) string {
 // ============================================================================ CONTROLLER
 func controller_Data(crudName, project string) string {
 	data := fmt.Sprintf(
-		`package %[1]v_c
+		`package controller
 
 import (
 	"encoding/json"
@@ -67,7 +67,7 @@ func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	utils.Check_For_Nil(err)
+	utils.Check_For_Err(err)
 	response := models.GET_%[1]v_by_id(id)
 
 	if response != nil {
@@ -167,15 +167,13 @@ func %[1]v() {
 	db := initDB()
 	defer db.Close()
 
-	// Creating %[1]v table with PRIMARY KEY and DATE TIME
 	table := "CREATE TABLE IF NOT EXISTS %[1]v(id INTEGER PRIMARY KEY AUTOINCREMENT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
 
 	createDomainsTable, err := db.Prepare(table)
-	utils.Check_For_Nil(err)
+	utils.Check_For_Err(err)
 	createDomainsTable.Exec()
 
 	columnsToAdd := []string{
-		// Add columns here. Example,
 		// "title VARCHAR(25)",
 		// "author VARCHAR(25)",
 		// "language VARCHAR(25)",
@@ -189,7 +187,7 @@ func %[1]v() {
 			if strings.Contains(err.Error(), "SQL logic error: duplicate column name") {
 				continue
 			}
-			utils.Check_For_Nil(err)
+			utils.Check_For_Err(err)
 		}
 	}
 }
@@ -220,7 +218,7 @@ func CREATE_%[1]v(request io.ReadCloser) string {
 		
 	default:
 		err := json.NewDecoder(request).Decode(&data)
-		utils.Check_For_Nil(err)
+		utils.Check_For_Err(err)
 
 		return create_Handler(data)
 	}
@@ -251,32 +249,31 @@ func initDB() *sql.DB {
 // -------------------------- GET HANDLER
 func get_Handler(query string) []map[string]interface{} {
 
+	var response []map[string]interface{}
+
 	db := initDB()
 	defer db.Close()
 
 	rows, err := db.Query(query)
-	utils.Check_For_Nil(err)
+	utils.Check_For_Err(err)
 	defer rows.Close()
 
 	cols, err := rows.Columns()
-	utils.Check_For_Nil(err)
+	utils.Check_For_Err(err)
 
-	var response []map[string]interface{}
+	vals := make([]interface{}, len(cols))
+
 	for rows.Next() {
-		vals := make([]interface{}, len(cols))
-		ptrs := make([]interface{}, len(cols))
-		for i := range ptrs {
-			ptrs[i] = &vals[i]
-		}
-		utils.Check_For_Nil(rows.Scan(ptrs...))
-
 		row := make(map[string]interface{}, len(cols))
+
+		for i := range vals {
+			vals[i] = new(interface{})
+		}
+		err := rows.Scan(vals...)
+		utils.Check_For_Err(err)
+
 		for i, col := range cols {
-			if b, ok := vals[i].([]byte); ok {
-				row[col] = string(b)
-			} else {
-				row[col] = vals[i]
-			}
+			row[col] = vals[i]
 		}
 		response = append(response, row)
 	}
@@ -329,7 +326,7 @@ func update_Handler(id string, request io.ReadCloser) string {
 	setValues := []interface{}{}
 
 	err := json.NewDecoder(request).Decode(&data)
-	utils.Check_For_Nil(err)
+	utils.Check_For_Err(err)
 
 	for k, v := range data {
 		setParts = append(setParts, fmt.Sprintf("%%s = ?", k))
@@ -350,7 +347,7 @@ func update_Handler(id string, request io.ReadCloser) string {
 		response = "DB update error"
 	} else {
 		rowsAffected, err := res.RowsAffected()
-		utils.Check_For_Nil(err)
+		utils.Check_For_Err(err)
 
 		if rowsAffected != 0 {
 			response = "Updated successfully"
@@ -378,7 +375,7 @@ func delete_Handler(id string) string {
 
 	} else {
 		rowsAffected, err := res.RowsAffected()
-		utils.Check_For_Nil(err)
+		utils.Check_For_Err(err)
 
 		if rowsAffected != 0 {
 			response = "Deleted successfully"
@@ -447,7 +444,7 @@ func setup(opertaion, route string, payload []byte) *httptest.ResponseRecorder {
 	router := routes.RouteCollection()
 
 	req, err := http.NewRequest(opertaion, route, bytes.NewBuffer(payload))
-	utils.Check_For_Nil(err)
+	utils.Check_For_Err(err)
 	router.ServeHTTP(rr, req)
 
 	return rr
@@ -502,7 +499,7 @@ func Test_%[1]v_POST(t *testing.T) {
 
 // 	req, err := http.NewRequest("PUT", "/%[1]v/1", bytes.NewBuffer(payload))
 // 	req.Header.Set("Content-Type", "application/json")
-// 	utils.Check_For_Nil(err)
+// 	utils.Check_For_Err(err)
 // 	router.ServeHTTP(rr, req)
 
 // 	assert.Equal(t, http.StatusOK, rr.Code)
@@ -516,7 +513,7 @@ func Test_%[1]v_POST(t *testing.T) {
 // 	router := routes.RouteCollection()
 
 // 	req, err := http.NewRequest("DELETE", "/%[1]v/1", nil)
-// 	utils.Check_For_Nil(err)
+// 	utils.Check_For_Err(err)
 // 	router.ServeHTTP(rr, req)
 
 // 	assert.Equal(t, http.StatusOK, rr.Code)
@@ -530,7 +527,7 @@ func Test_%[1]v_POST(t *testing.T) {
 // 	router := routes.RouteCollection()
 
 // 	req, err := http.NewRequest("GET", "/%[1]v/9999", nil)
-// 	utils.Check_For_Nil(err)
+// 	utils.Check_For_Err(err)
 // 	router.ServeHTTP(rr, req)
 
 // 	assert.Equal(t, http.StatusNotFound, rr.Code)
@@ -544,7 +541,7 @@ func Test_%[1]v_POST(t *testing.T) {
 // 	router := routes.RouteCollection()
 
 // 	req, err := http.NewRequest("DELETE", "/%[1]v/9999", nil)
-// 	utils.Check_For_Nil(err)
+// 	utils.Check_For_Err(err)
 // 	router.ServeHTTP(rr, req)
 
 // 	assert.Equal(t, http.StatusNotFound, rr.Code)

@@ -111,7 +111,7 @@ func main() {
 
 	server := route.RouteCollection()
 	err := http.ListenAndServe(os.Getenv("PORT"), server)
-	util.Check_For_Nil(err)
+	util.Check_For_Err(err)
 }
 
 // -------------------------- INIT
@@ -221,7 +221,7 @@ import (
 // -------------------------- INIT DB
 func InitDatabase() *sql.DB {
 	database, err := sql.Open("sqlite", "./Sqlite/app.db")
-	utils.Check_For_Nil(err)
+	utils.Check_For_Err(err)
 
 	return database
 }`
@@ -244,7 +244,7 @@ import (
 )
 
 // -------------------------- Error Handling
-func Check_For_Nil(err error) {
+func Check_For_Err(err error) {
 	if err != nil {
 		log.Println(err)
 		return
@@ -254,5 +254,5 @@ func Check_For_Nil(err error) {
 // -------------------------- .env Init
 func InitEnvFile() {
 	err := godotenv.Load(".env")
-	Check_For_Nil(err)
+	Check_For_Err(err)
 }`

@@ -33,7 +33,7 @@ func Run_Dev() {
 	cmd.Stdin = os.Stdin
 
 	err := cmd.Run()
-	utils.Check_For_Nil(err)
+	utils.Check_For_Err(err)
 
 	os.Exit(0)
 }
@@ -125,7 +125,7 @@ func Create_Docker_Image(dockerImageName string) {
 
 func List_Docker_Image(dockerImageName string) {
 	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", dockerImageName)).Output()
-	utils.Check_For_Nil(err)
+	utils.Check_For_Err(err)
 
 	fmt.Printf("\n%v", string(res))
 }
@@ -147,7 +147,7 @@ func Run_Prod() {
 		cmd.Stdin = os.Stdin
 
 		err := cmd.Run()
-		utils.Check_For_Nil(err)
+		utils.Check_For_Err(err)
 
 		os.Exit(0)
 	} else {
@@ -162,7 +162,7 @@ func Run_Prod() {
 		cmd.Stdin = os.Stdin
 
 		err := cmd.Run()
-		utils.Check_For_Nil(err)
+		utils.Check_For_Err(err)
 
 		os.Exit(0)
 	}

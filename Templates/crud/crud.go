@@ -25,9 +25,6 @@ func CRUD_Project(crudName string) {
 // ============================================================================ CRUD ADD ROUTE
 func route(crudName string) {
 	filePath := "./Routes/routes.go"
-	imports := []string{
-		`books_c "github.com/DevopsGuyXD/myapp/Controller/books"`,
-	}
 
 	file := utils.Open_File(filePath)
 	defer file.Close()
@@ -35,23 +32,19 @@ func route(crudName string) {
 	lines := utils.InsertIntoFileBefore(routes_Data(crudName), file)
 
 	utils.Write_File(file, strings.Join(lines, "\n"))
-	utils.UpdateImport(filePath, imports)
 }
 
 // ============================================================================ CRUD ADD CONTROLLER
 func controller(crudName string) {
-	folder := "Controller/" + crudName
-	newFile := []string{folder + "/" + crudName + ".go"}
+	newFile := []string{"Controller/" + crudName + ".go"}
 
-	if !utils.Folder_Exists(folder) {
-		utils.Create_Folder([]string{folder})
-		utils.Create_File(newFile)
+	utils.Create_File(newFile)
 
-		file := utils.Open_File(newFile[0])
-		defer file.Close()
+	file := utils.Open_File(newFile[0])
+	defer file.Close()
 
-		utils.Write_File(file, controller_Data(crudName, utils.Project_Name()))
-	}
+	utils.Write_File(file, controller_Data(crudName, utils.Project_Name()))
+
 }
 
 // ============================================================================ CRUD SQLITE

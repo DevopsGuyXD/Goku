@@ -13,7 +13,7 @@ import (
 )
 
 // ============================================================================ ERROR HANDLING
-func Check_For_Nil(err error) {
+func Check_For_Err(err error) {
 	if err != nil {
 		log.Println(err)
 		return
@@ -71,19 +71,19 @@ func init_air() {
 	calledFrom := Called_From_Location()
 
 	_, err := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/air-verse/air@latest init --dir \"%s\"", calledFrom)).Output()
-	Check_For_Nil(err)
+	Check_For_Err(err)
 }
 
 // ============================================================================ CREATE FOLDER
 // func Create_Sub_Folder(project string) {
 // 	err := os.Mkdir(project, 0755)
-// 	Check_For_Nil(err)
+// 	Check_For_Err(err)
 // }
 
 // ============================================================================ GET PROJECT NAME
 func Project_Name() string {
 	dir, err := os.Getwd()
-	Check_For_Nil(err)
+	Check_For_Err(err)
 
 	project := filepath.Base(dir)
 
@@ -107,7 +107,7 @@ func Called_From_Location() string {
 func Check_If_Lines_Exist(filePath string, targets map[string]bool) bool {
 
 	file, err := os.Open(filePath)
-	Check_For_Nil(err)
+	Check_For_Err(err)
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)

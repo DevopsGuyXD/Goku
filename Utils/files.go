@@ -15,7 +15,7 @@ func Create_Folder(folders []string) {
 	for _, folder := range folders {
 		if !strings.Contains(folder, ".") && !Folder_Exists(folder) {
 			err := os.Mkdir(folder, 0755)
-			Check_For_Nil(err)
+			Check_For_Err(err)
 		}
 	}
 }
@@ -24,14 +24,14 @@ func Create_Folder(folders []string) {
 func Create_File(files []string) {
 	for _, file := range files {
 		_, err := os.Create(file)
-		Check_For_Nil(err)
+		Check_For_Err(err)
 	}
 }
 
 // ============================================================================ OPEN FILE
 func Open_File(filePath string) *os.File {
 	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
-	Check_For_Nil(err)
+	Check_For_Err(err)
 
 	return file
 }
@@ -39,7 +39,7 @@ func Open_File(filePath string) *os.File {
 // ============================================================================ READ FILE
 func Read_File(filePath string) []byte {
 	data, err := os.ReadFile(filePath)
-	Check_For_Nil(err)
+	Check_For_Err(err)
 
 	return data
 }
@@ -47,10 +47,10 @@ func Read_File(filePath string) []byte {
 // ============================================================================ WRITE TO FILE
 func Write_File(file *os.File, data string) {
 	_, err := file.Seek(0, 0)
-	Check_For_Nil(err)
+	Check_For_Err(err)
 
 	_, err = file.WriteString(data)
-	Check_For_Nil(err)
+	Check_For_Err(err)
 }
 
 // ============================================================================ FOLDER EXISTS
@@ -92,7 +92,7 @@ func InsertIntoFileBefore(data string, file *os.File) []string {
 	}
 
 	err := scanner.Err()
-	Check_For_Nil(err)
+	Check_For_Err(err)
 
 	return lines
 }
@@ -115,10 +115,10 @@ func InsertIntoFileAfter(topLine, filePath, data string) {
 		}
 	}
 
-	Check_For_Nil(scanner.Err())
+	Check_For_Err(scanner.Err())
 
 	err := os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
-	Check_For_Nil(err)
+	Check_For_Err(err)
 }
 
 // ============================================================================ APPEND TO LAST LINE
