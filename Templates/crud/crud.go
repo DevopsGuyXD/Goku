@@ -98,9 +98,7 @@ func model_Imports() {
 	filePath := "./Models/models.go"
 	imports := []string{
 		`"database/sql"`,
-		`"encoding/json"`,
 		`"fmt"`,
-		`"io"`,
 		`"strings"`,
 		`"reflect"`,
 

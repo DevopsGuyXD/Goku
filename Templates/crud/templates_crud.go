@@ -248,12 +248,12 @@ func CREATE_%[1]v(request io.ReadCloser) string {
 
 // -------------------------- UPDATE %[1]v
 func UPDATE_%[1]v(id string, request io.ReadCloser) string {
-	var data Books
+	var data %[3]v
 
 	err := json.NewDecoder(request).Decode(&data)
 	utils.Check_For_Err(err)
 
-	return update_Handler(id, request)
+	return update_Handler(id, data)
 }
 
 // -------------------------- DELETE %[1]v
