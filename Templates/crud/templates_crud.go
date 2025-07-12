@@ -248,6 +248,11 @@ func CREATE_%[1]v(request io.ReadCloser) string {
 
 // -------------------------- UPDATE %[1]v
 func UPDATE_%[1]v(id string, request io.ReadCloser) string {
+	var data Books
+
+	err := json.NewDecoder(request).Decode(&data)
+	utils.Check_For_Err(err)
+
 	return update_Handler(id, request)
 }
 
@@ -335,7 +340,7 @@ func post_Handler(data interface{}) string {
 }
 
 // -------------------------- UPDATE HANDLER
-func update_Handler(id string, request io.ReadCloser) string {
+func update_Handler(id string, data interface{}) string {
 	db := initDB()
 	defer db.Close()
 
