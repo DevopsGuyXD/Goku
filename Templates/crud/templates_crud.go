@@ -210,9 +210,20 @@ func GET_%[1]v_all() []map[string]interface{} {
 }
 
 // -------------------------- GET %[1]v by ID
-func GET_%[1]v_by_id(id int) []map[string]interface{} {
+func GET_%[1]v_by_id(id int) map[string]interface{} {
+	var %[1]v %[3]v
 	query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
-	return get_Handler(query)
+
+	jsonData, err := json.Marshal(get_Handler(query)[0])
+	utils.Check_For_Err(err)
+
+	if err = json.Unmarshal(jsonData, &%[1]v); err != nil {
+		return map[string]interface{}{
+			"message": "Type error",
+		}
+	}
+
+	return get_Handler(query)[0]
 }
 
 // -------------------------- CREATE %[1]v RECORD
@@ -231,7 +242,7 @@ func CREATE_%[1]v(request io.ReadCloser) string {
 		err := json.NewDecoder(request).Decode(&data)
 		utils.Check_For_Err(err)
 
-		return create_Handler(data)
+		return post_Handler(data)
 	}
 }
 
@@ -293,35 +304,33 @@ func get_Handler(query string) []map[string]interface{} {
 }
 
 // -------------------------- CREATE HANDLER
-func create_Handler(data interface{}) string {
+func post_Handler(data interface{}) string {
 
 	db := initDB()
 	defer db.Close()
 
 	var cols, vals []string
-	args := []interface{}{}
+	val := reflect.ValueOf(data)
+	typ := reflect.TypeOf(data)
+	args := make([]interface{}, 0, typ.NumField())
 
-	for i := 0; i < reflect.TypeOf(data).NumField(); i++ {
-		field := reflect.TypeOf(data).Field(i)
-		val := reflect.ValueOf(data).Field(i)
+	for i := 0; i < typ.NumField(); i++ {
+		tag := typ.Field(i).Tag.Get("json")
 
-		tag := field.Tag.Get("json")
 		if tag != "" {
 			cols = append(cols, tag)
 			vals = append(vals, "?")
-			args = append(args, val.Interface())
+			args = append(args, val.Field(i).Interface())
 		}
 	}
 
-	query := fmt.Sprintf("INSERT INTO %[1]v (%%s) VALUES (%%s)",
-		strings.Join(cols, ", "), strings.Join(vals, ", "))
+	query := fmt.Sprintf("INSERT INTO %[1]v (%%s) VALUES (%%s)", strings.Join(cols, ", "), strings.Join(vals, ", "))
 
 	if res, err := db.Exec(query, args...); err != nil {
 		return "DB error"
 	} else if rows, _ := res.RowsAffected(); rows > 0 {
 		return "Created successfully"
 	}
-
 	return "No records created"
 }
 
@@ -330,44 +339,30 @@ func update_Handler(id string, request io.ReadCloser) string {
 	db := initDB()
 	defer db.Close()
 
-	var response string
-	var data map[string]interface{}
+	var vals []string
+	val := reflect.ValueOf(data)
+	typ := reflect.TypeOf(data)
+	args := make([]interface{}, 0, typ.NumField())
 
-	setParts := []string{}
-	setValues := []interface{}{}
+	for i := 0; i < typ.NumField(); i++ {
+		field := val.Field(i)
+		tag := typ.Field(i).Tag.Get("json")
 
-	err := json.NewDecoder(request).Decode(&data)
-	utils.Check_For_Err(err)
-
-	for k, v := range data {
-		setParts = append(setParts, fmt.Sprintf("%%s = ?", k))
-		setValues = append(setValues, v)
-	}
-
-	if len(setParts) == 0 {
-		return "No fields provided for update"
-	}
-
-	query := fmt.Sprintf("UPDATE %[1]v SET %%s WHERE id = ?",
-		strings.Join(setParts, ", "))
-
-	values := append(setValues, id)
-
-	res, err := db.Exec(query, values...)
-	if err != nil {
-		response = "DB update error"
-	} else {
-		rowsAffected, err := res.RowsAffected()
-		utils.Check_For_Err(err)
-
-		if rowsAffected != 0 {
-			response = "Updated successfully"
-		} else {
-			response = "No records updated"
+		if tag != "" && !field.IsZero() {
+			vals = append(vals, fmt.Sprintf("%%s = ?", tag))
+			args = append(args, field.Interface())
 		}
 	}
 
-	return response
+	args = append(args, id)
+	query := fmt.Sprintf("UPDATE %[1]v SET %%s WHERE id = ?", strings.Join(vals, ", "))
+
+	if res, err := db.Exec(query, args...); err != nil {
+		return "DB update error"
+	} else if rows, _ := res.RowsAffected(); rows > 0 {
+		return "Updated successfully"
+	}
+	return "No records updated"
 }
 
 // -------------------------- DELETE HANDLER
