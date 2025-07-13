@@ -149,8 +149,8 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	response := models.UPDATE_%[1]v(id, request)
 
 	switch {
-		case response == http.StatusCreated:
-			w.WriteHeader(http.StatusCreated)
+		case response == http.StatusOK:
+			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode("Updated successfully")
 
 		case response == http.StatusNotModified:
@@ -181,12 +181,18 @@ func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
 
 	response := models.DELETE_%[1]v(id)
 
-	if response == "Deleted successfully" {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(response)
-	} else {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(response)
+	switch {
+		case response == http.StatusOK:
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode("Deleted successfully")
+
+		case response == http.StatusNotFound:
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode("Record not deleted")
+
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode("Internal server error")
 	}
 }`, crudName, project)
 
@@ -352,18 +358,18 @@ func UPDATE_%[1]v(id int, request io.ReadCloser) int {
 }
 
 // -------------------------- DELETE %[1]v
-func DELETE_%[1]v(id int) string {
+func DELETE_%[1]v(id int) int {
 	switch {
 		case os.Getenv("TEST_MODE") == "Y":
 			%[1]v_list = append(%[1]v_list[:id-1], %[1]v_list[id:]...)
 			if len(%[1]v_list) == 1 {
-				return "Deleted successfully"
+				return http.StatusOK
 			}
-			return "Error updating"
+			return http.StatusInternalServerError
 
 		default:
 			return delete_Handler(id)
-		}
+	}
 }`, crudName, projectName, utils.Capitalize(crudName))
 
 	return data
@@ -485,32 +491,28 @@ func update_Handler(id int, data interface{}) int {
 }
 
 // -------------------------- DELETE HANDLER
-func delete_Handler(id int) string {
+func delete_Handler(id int) int {
 
 	db := initDB()
 	defer db.Close()
-
-	var response string
 
 	query := fmt.Sprintf("DELETE FROM %[1]v WHERE id=%%d", id)
 
 	res, err := db.Exec(query)
 	if err != nil {
-		response = "DB delete error"
+		return http.StatusInternalServerError
 
 	} else {
 		rowsAffected, err := res.RowsAffected()
 		utils.Check_For_Err(err)
 
 		if rowsAffected != 0 {
-			response = "Deleted successfully"
+			return http.StatusOK
 		} else {
-			response = "No records deleted"
+			return http.StatusNotFound
 		}
-
 	}
 
-	return response
 }`, crudName, utils.Capitalize(crudName))
 
 	return data
