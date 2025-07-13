@@ -154,7 +154,7 @@ import (
 )
 
 // -------------------------- %[1]v STRUCT
-var %[1]v_single %[3]v
+var %[1]v %[3]v
 var %[1]v_list []%[3]v
 
 type %[3]v struct {
@@ -165,7 +165,7 @@ type %[3]v struct {
 }
 
 // -------------------------- CREATE %[1]v TABLE
-func %[1]v() {
+func %[1]v_ct() {
 
 	db := initDB()
 	defer db.Close()
@@ -245,7 +245,7 @@ func GET_%[1]v_by_id(id int) map[string]interface{} {
 		b, err := json.Marshal(result[0])
 		utils.Check_For_Err(err)
 
-		if err = json.Unmarshal(b, &%[1]v_single); err != nil {
+		if err = json.Unmarshal(b, &%[1]v); err != nil {
 			return map[string]interface{}{
 				"message": "Type error",
 			}
@@ -259,18 +259,19 @@ func GET_%[1]v_by_id(id int) map[string]interface{} {
 func POST_%[1]v(request io.ReadCloser) string {
 	switch {
 	case os.Getenv("TEST_MODE") == "Y":
-		if err := json.NewDecoder(request).Decode(&%[1]v_single); err != nil {
+		if err := json.NewDecoder(request).Decode(&%[1]v); err != nil {
 			return "Invalid JSON"
 		} else {
+		 	%[1]v_list = append(%[1]v_list, %[1]v)
 			return "Created successfully"
 		}
 
 	default:
-		err := json.NewDecoder(request).Decode(&%[1]v_single)
+		err := json.NewDecoder(request).Decode(&%[1]v)
 		utils.Check_For_Err(err)
 		defer request.Close()
 
-		return post_Handler(%[1]v_single)
+		return post_Handler(%[1]v)
 	}
 }
 
@@ -286,11 +287,11 @@ func UPDATE_%[1]v(id string, request io.ReadCloser) string {
 		}
 		return "Updated successfully"
 	default:
-		err := json.NewDecoder(request).Decode(&%[1]v_single)
+		err := json.NewDecoder(request).Decode(&%[1]v)
 		utils.Check_For_Err(err)
 		defer request.Close()
 
-		return update_Handler(id, %[1]v_single)
+		return update_Handler(id, %[1]v)
 	}
 }
 
@@ -347,7 +348,7 @@ func get_Handler(query string) []map[string]interface{} {
 }
 
 // -------------------------- CREATE HANDLER
-func post_Handler(data %[2]v) string {
+func post_Handler(data interface{}) string {
 
 	db := initDB()
 	defer db.Close()
@@ -378,7 +379,7 @@ func post_Handler(data %[2]v) string {
 }
 
 // -------------------------- UPDATE HANDLER
-func update_Handler(id string, data %[2]v) string {
+func update_Handler(id string, data interface{}) string {
 	db := initDB()
 	defer db.Close()
 
@@ -514,13 +515,16 @@ func Test_%[1]v_POST(t *testing.T) {
 	opertaion := "POST"
 	route := "/%[1]v"
 	allRecords := false
+	var rr *httptest.ResponseRecorder
 	%[1]v := []models.%[3]v{
 		{Title: "New %[1]v 1", Author: "New Author 1", Language: "English", Pages: 144},
 		{Title: "New %[1]v 2", Author: "New Author 2", Language: "French", Pages: 164},
 	}
-	payload, _ := json.Marshal(%[1]v)
 
-	rr := setup(opertaion, route, payload)
+	for _, data := range %[1]v {
+		payload, _ := json.Marshal(data)
+		rr = setup(opertaion, route, payload)
+	}
 	test_cases(rr, t, opertaion, allRecords)
 }
 
@@ -547,12 +551,12 @@ func Test_%[1]v_GET_ID(t *testing.T) {
 // -------------------------- PUT /%[1]v/{id}
 func Test_%[1]v_PUT(t *testing.T) {
 	opertaion := "PUT"
-	route := "/%[1]v"
+	route := "/%[1]v/1"
 	allRecords := false
-	updateBook := []models.%[3]v{
+	update%[1]v := []models.%[3]v{
 		{Title: "New %[1]v updated"},
 	}
-	payload, _ := json.Marshal(updateBook)
+	payload, _ := json.Marshal(update%[1]v)
 
 	rr := setup(opertaion, route, payload)
 	test_cases(rr, t, opertaion, allRecords)

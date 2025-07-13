@@ -69,7 +69,7 @@ func model(crudName string) {
 	defer file.Close()
 
 	utils.Write_File(file, model_Data(crudName, utils.Project_Name()))
-	utils.UpdateAppConfig(crudName)
+	utils.UpdateAppConfig(crudName+"_ct")
 }
 
 // ============================================================================ CRUD ADD MODEL HANDLERS
