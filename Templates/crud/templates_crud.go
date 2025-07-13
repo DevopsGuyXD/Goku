@@ -199,68 +199,68 @@ func GET_%[1]v_all() []map[string]interface{} {
 	var data []%[3]v
 	
 	switch {
-	case os.Getenv("TEST_MODE") == "Y":
-		return []map[string]interface{}{
-			{"title": "New Book 1"},
-			{"title": "New Book 2"},
-		}
-
-	default:
-		query := "SELECT * FROM %[1]v"
-
-		jsonData, err := json.Marshal(get_Handler(query))
-		utils.Check_For_Err(err)
-
-		if err = json.Unmarshal(jsonData, &data); err != nil {
+		case os.Getenv("TEST_MODE") == "Y":
 			return []map[string]interface{}{
-				{"message": "Type error"},
+				{"title": "New Book 1"},
+				{"title": "New Book 2"},
 			}
-		}
 
-		return get_Handler(query)
-	}
+		default:
+			query := "SELECT * FROM %[1]v"
+
+			jsonData, err := json.Marshal(get_Handler(query))
+			utils.Check_For_Err(err)
+
+			if err = json.Unmarshal(jsonData, &data); err != nil {
+				return []map[string]interface{}{
+					{"message": "Type error"},
+				}
+			}
+
+			return get_Handler(query)
+		}
 }
 
 // -------------------------- GET %[1]v by ID
 func GET_%[1]v_by_id(id int) map[string]interface{} {
 	switch {
-	case os.Getenv("TEST_MODE") == "Y":
-		return map[string]interface{}{
-			"title": "New Book",
-		}
-
-	default:
-		query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
-
-		jsonData, err := json.Marshal(get_Handler(query)[0])
-		utils.Check_For_Err(err)
-
-		if err = json.Unmarshal(jsonData, &data); err != nil {
+		case os.Getenv("TEST_MODE") == "Y":
 			return map[string]interface{}{
-				"message": "Type error",
+				"title": "New Book",
 			}
-		}
 
-		return get_Handler(query)[0]
-	}
+		default:
+			query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
+
+			jsonData, err := json.Marshal(get_Handler(query)[0])
+			utils.Check_For_Err(err)
+
+			if err = json.Unmarshal(jsonData, &data); err != nil {
+				return map[string]interface{}{
+					"message": "Type error",
+				}
+			}
+
+			return get_Handler(query)[0]
+		}
 }
 
 // -------------------------- CREATE %[1]v RECORD
 func POST_%[1]v(request io.ReadCloser) string {
 	switch {
-	case os.Getenv("TEST_MODE") == "Y":
-		if err := json.NewDecoder(request).Decode(&data); err != nil {
-			return "Invalid JSON"
-		} else {
-			return "Created successfully"
-		}
-		
-	default:
-		err := json.NewDecoder(request).Decode(&data)
-		utils.Check_For_Err(err)
+		case os.Getenv("TEST_MODE") == "Y":
+			if err := json.NewDecoder(request).Decode(&data); err != nil {
+				return "Invalid JSON"
+			} else {
+				return "Created successfully"
+			}
+			
+		default:
+			err := json.NewDecoder(request).Decode(&data)
+			utils.Check_For_Err(err)
 
-		return post_Handler(data)
-	}
+			return post_Handler(data)
+		}
 }
 
 // -------------------------- UPDATE %[1]v
