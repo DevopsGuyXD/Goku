@@ -78,7 +78,7 @@ func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// -------------------------- %[1]v CREATE
+// -------------------------- %[1]v POST
 // @Description Create a %[1]v
 // @Tags %[1]v
 // @Accept json
@@ -90,7 +90,7 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	request := r.Body
-	response := models.CREATE_%[1]v(request)
+	response := models.POST_%[1]v(request)
 
 	if response == "Created successfully" {
 		w.WriteHeader(http.StatusCreated)
@@ -154,6 +154,8 @@ import (
 )
 
 // -------------------------- %[1]v STRUCT
+var data %[3]v
+
 type %[3]v struct {
 	Title    string `+"`json:\"title\"`"+`
 	Author   string `+"`json:\"author\"`"+`
@@ -194,42 +196,56 @@ func %[1]v() {
 
 // -------------------------- GET %[1]v ALL
 func GET_%[1]v_all() []map[string]interface{} {
-	var %[1]v []%[3]v
-	query := "SELECT * FROM %[1]v"
+	var data []%[3]v
+	
+	switch {
+	case os.Getenv("TEST_MODE") == "Y":
+		return []map[string]interface{}{{
+			"message": "Created successfully",
+		}}
 
-	jsonData, err := json.Marshal(get_Handler(query))
-	utils.Check_For_Err(err)
+	default:
+		query := "SELECT * FROM %[1]v"
 
-	if err = json.Unmarshal(jsonData, &%[1]v); err != nil {
-		return []map[string]interface{}{
-			{"message": "Type error"},
+		jsonData, err := json.Marshal(get_Handler(query))
+		utils.Check_For_Err(err)
+
+		if err = json.Unmarshal(jsonData, &data); err != nil {
+			return []map[string]interface{}{
+				{"message": "Type error"},
+			}
 		}
-	}
 
-	return get_Handler(query)
+		return get_Handler(query)
+	}
 }
 
 // -------------------------- GET %[1]v by ID
 func GET_%[1]v_by_id(id int) map[string]interface{} {
-	var %[1]v %[3]v
-	query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
-
-	jsonData, err := json.Marshal(get_Handler(query)[0])
-	utils.Check_For_Err(err)
-
-	if err = json.Unmarshal(jsonData, &%[1]v); err != nil {
+	switch {
+	case os.Getenv("TEST_MODE") == "Y":
 		return map[string]interface{}{
-			"message": "Type error",
+			"message": "Created successfully",
 		}
-	}
 
-	return get_Handler(query)[0]
+	default:
+		query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
+
+		jsonData, err := json.Marshal(get_Handler(query)[0])
+		utils.Check_For_Err(err)
+
+		if err = json.Unmarshal(jsonData, &data); err != nil {
+			return map[string]interface{}{
+				"message": "Type error",
+			}
+		}
+
+		return get_Handler(query)[0]
+	}
 }
 
 // -------------------------- CREATE %[1]v RECORD
-func CREATE_%[1]v(request io.ReadCloser) string {
-	var data %[3]v
-
+func POST_%[1]v(request io.ReadCloser) string {
 	switch {
 	case os.Getenv("TEST_MODE") == "Y":
 		if err := json.NewDecoder(request).Decode(&data); err != nil {
@@ -248,8 +264,6 @@ func CREATE_%[1]v(request io.ReadCloser) string {
 
 // -------------------------- UPDATE %[1]v
 func UPDATE_%[1]v(id string, request io.ReadCloser) string {
-	var data %[3]v
-
 	err := json.NewDecoder(request).Decode(&data)
 	utils.Check_For_Err(err)
 
@@ -421,31 +435,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// -------------------------- GET TESTS COMMON
+// -------------------------- TEST CASES
 func test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, allRecords bool) {
 	switch {
+
 	case opertaion == "GET":
-		var book []models.Books
-		err := json.Unmarshal(rr.Body.Bytes(), &book)
-		assert.NoError(t, err, "Expected valid JSON object")
-
-		assert.Contains(t, rr.Header().Get("Content-Type"), "application/json")
-
-		assert.Equal(t, http.StatusOK, rr.Code)
+		common_cases := func(err error) {
+			assert.NoError(t, err, "Failed to unmarshal response")
+			assert.Contains(t, rr.Header().Get("Content-Type"), "application/json")
+			assert.Equal(t, http.StatusOK, rr.Code)
+		}
 
 		switch {
 		case allRecords:
-			assert.GreaterOrEqual(t, len(book), 2, "Expected more than one book record")
-		default:
-			assert.Equal(t, len(book), 1, "Expected book with ID 1")
+			var book []models.%[3]v
+			err := json.Unmarshal(rr.Body.Bytes(), &book)
+
+			assert.LessOrEqual(t, 2, len(book), "Expected records greater than 1")
+			common_cases(err)
+
+		case !allRecords:
+			var book models.%[3]v
+			err := json.Unmarshal(rr.Body.Bytes(), &book)
+
+			assert.Equal(t, "New Book", book.Title, "Expected Title to be 'New Book'")
+			common_cases(err)
 		}
 
 	case opertaion == "POST":
 		assert.Equal(t, http.StatusCreated, rr.Code)
 	}
 }
-
-// -------------------------- POST TEST COMMON
 
 // -------------------------- TEST INIT
 func setup(opertaion, route string, payload []byte) *httptest.ResponseRecorder {
@@ -466,7 +486,7 @@ func Test_%[1]v_POST(t *testing.T) {
 	opertaion := "POST"
 	route := "/%[1]v"
 	allRecords := false
-	newBook := models.Books{Title: "New Book", Author: "New Author", Language: "English", Pages: 200}
+	newBook := models.%[3]v{Title: "New Book", Author: "New Author", Language: "English", Pages: 200}
 	payload, _ := json.Marshal(newBook)
 
 	rr := setup(opertaion, route, payload)
@@ -557,7 +577,7 @@ func Test_%[1]v_POST(t *testing.T) {
 
 // 	assert.Equal(t, http.StatusNotFound, rr.Code)
 // }
-`, crudName, projectName)
+`, crudName, projectName, utils.Capitalize(crudName))
 
 	return data
 }
