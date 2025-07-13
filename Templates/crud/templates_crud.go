@@ -476,7 +476,7 @@ func test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, a
 			var %[1]v []models.%[3]v
 			err := json.Unmarshal(rr.Body.Bytes(), &%[1]v)
 
-			assert.LessOrEqual(t, 2, len(%[1]v), "Expected records greater than 1")
+			assert.LessOrEqual(t, len(%[1]v), 2, "Expected records greater than 1")
 			common_cases(http.StatusOK, err)
 
 		case !allRecords:
