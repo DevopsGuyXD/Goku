@@ -53,7 +53,7 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode("No records found")
 
 		case response[0]["message"] == http.StatusBadRequest:
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode("Bad request")
 
 		case len(response) > 0:
@@ -85,7 +85,7 @@ func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode("No records found")
 
 		case response["message"] == http.StatusBadRequest:
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode("Bad request")
 
 		case len(response) > 0:
@@ -154,7 +154,7 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode("Updated successfully")
 
 		case response == http.StatusNotModified:
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNotModified)
 			json.NewEncoder(w).Encode("Record not modified")
 
 		case response == http.StatusBadRequest:
@@ -183,11 +183,11 @@ func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
 
 	switch {
 		case response == http.StatusOK:
-			w.WriteHeader(http.StatusCreated)
+			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode("Deleted successfully")
 
-		case response == http.StatusNotFound:
-			w.WriteHeader(http.StatusOK)
+		case response == http.StatusNotModified:
+			w.WriteHeader(http.StatusNotModified)
 			json.NewEncoder(w).Encode("Record not deleted")
 
 		default:
@@ -326,7 +326,7 @@ func POST_%[1]v(request io.ReadCloser) int {
 
 			} else {
 				%[1]v_list = append(%[1]v_list, %[1]v)
-				return http.StatusOK
+				return http.StatusCreated
 			}
 
 		default:
@@ -509,7 +509,7 @@ func delete_Handler(id int) int {
 		if rowsAffected != 0 {
 			return http.StatusOK
 		} else {
-			return http.StatusNotFound
+			return http.StatusNotModified
 		}
 	}
 
@@ -538,7 +538,7 @@ import (
 )
 
 // -------------------------- TEST CASES
-func test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, allRecords bool) {
+func %[1]v_test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, allRecords bool) {
 
 	common_cases := func(status int, err error) {
 		assert.NoError(t, err, "Failed to unmarshal response")
@@ -576,7 +576,7 @@ func test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, a
 }
 
 // -------------------------- TEST INIT
-func setup(opertaion, route string, payload []byte) *httptest.ResponseRecorder {
+func %[1]v_setup(opertaion, route string, payload []byte) *httptest.ResponseRecorder {
 	os.Setenv("TEST_MODE", "Y")
 
 	rr := httptest.NewRecorder()
@@ -602,9 +602,9 @@ func Test_%[1]v_POST(t *testing.T) {
 
 	for _, data := range %[1]v {
 		payload, _ := json.Marshal(data)
-		rr = setup(opertaion, route, payload)
+		rr = %[1]v_setup(opertaion, route, payload)
 	}
-	test_cases(rr, t, opertaion, allRecords)
+	 %[1]v_test_cases(rr, t, opertaion, allRecords)
 }
 
 // -------------------------- GET /%[1]v
@@ -613,8 +613,8 @@ func Test_%[1]v_GET(t *testing.T) {
 	route := "/%[1]v"
 	allRecords := true
 
-	rr := setup(opertaion, route, nil)
-	test_cases(rr, t, opertaion, allRecords)
+	rr := %[1]v_setup(opertaion, route, nil)
+	 %[1]v_test_cases(rr, t, opertaion, allRecords)
 }
 
 // -------------------------- GET /%[1]v/{id}
@@ -623,8 +623,8 @@ func Test_%[1]v_GET_ID(t *testing.T) {
 	route := "/%[1]v/1"
 	allRecords := false
 
-	rr := setup(opertaion, route, nil)
-	test_cases(rr, t, opertaion, allRecords)
+	rr := %[1]v_setup(opertaion, route, nil)
+	 %[1]v_test_cases(rr, t, opertaion, allRecords)
 }
 
 // -------------------------- PUT /%[1]v/{id}
@@ -637,8 +637,8 @@ func Test_%[1]v_PUT(t *testing.T) {
 	}
 	payload, _ := json.Marshal(update%[1]v)
 
-	rr := setup(opertaion, route, payload)
-	test_cases(rr, t, opertaion, allRecords)
+	rr := %[1]v_setup(opertaion, route, payload)
+	 %[1]v_test_cases(rr, t, opertaion, allRecords)
 }
 
 // -------------------------- DELETE /%[1]v/{id}
@@ -647,8 +647,8 @@ func Test_%[1]v_DELETE(t *testing.T) {
 	route := "/%[1]v/1"
 	allRecords := false
 
-	rr := setup(opertaion, route, nil)
-	test_cases(rr, t, opertaion, allRecords)
+	rr := %[1]v_setup(opertaion, route, nil)
+	 %[1]v_test_cases(rr, t, opertaion, allRecords)
 }
 
 

@@ -14,7 +14,7 @@ func CRUD_Project(crudName string) {
 	sqlite()
 	model(crudName)
 	model_Handlers(crudName)
-	model_Imports()
+	// model_Imports()
 	test_Handler(crudName)
 	utils.Install_Dependencies()
 
@@ -69,7 +69,7 @@ func model(crudName string) {
 	defer file.Close()
 
 	utils.Write_File(file, model_Data(crudName, utils.Project_Name()))
-	utils.UpdateAppConfig(crudName+"_ct")
+	utils.UpdateAppConfig(crudName + "_ct")
 }
 
 // ============================================================================ CRUD ADD MODEL HANDLERS
@@ -89,6 +89,7 @@ func model_Handlers(crudName string) {
 		defer modelFile.Close()
 
 		utils.AppendToFileBottom(filePath, model_Handler_Data(crudName))
+		model_Imports()
 	}
 }
 
@@ -115,13 +116,12 @@ func test_Handler(crudName string) {
 	folder := "Tests"
 	newFile := []string{folder + "/" + crudName + "_test.go"}
 
-	if !utils.Folder_Exists(folder) {
-		utils.Create_Folder([]string{folder})
-		utils.Create_File(newFile)
+	utils.Create_Folder([]string{folder})
+	utils.Create_File(newFile)
 
-		file := utils.Open_File(newFile[0])
-		defer file.Close()
+	file := utils.Open_File(newFile[0])
+	defer file.Close()
 
-		utils.Write_File(file, test_Data(crudName, utils.Project_Name()))
-	}
+	utils.Write_File(file, test_Data(crudName, utils.Project_Name()))
+
 }
