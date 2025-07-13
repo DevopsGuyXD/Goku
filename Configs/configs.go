@@ -11,11 +11,11 @@ import (
 	utils "github.com/DevopsGuyXD/Goku/Utils"
 )
 
-// ====================================== RUN DEV
-func RunDev() {
+// ============================================================================ RUN DEV
+func Run_Dev() {
 
 	var shell, flag string
-	calledFrom := utils.CalledFromLocation()
+	calledFrom := utils.Called_From_Location()
 
 	if runtime.GOOS == "windows" {
 		shell = "cmd.exe"
@@ -25,7 +25,7 @@ func RunDev() {
 		flag = "-c"
 	}
 
-	fmt.Printf("\n🔧 Running in Dev mode\n\n")
+	utils.Message("🔧 Running in Dev mode")
 
 	cmd := exec.Command(shell, flag, fmt.Sprintf("go run github.com/air-verse/air@latest air --dir \"%s\"", calledFrom))
 	cmd.Stdout = os.Stdout
@@ -33,13 +33,13 @@ func RunDev() {
 	cmd.Stdin = os.Stdin
 
 	err := cmd.Run()
-	utils.CheckForNil(err)
+	utils.Check_For_Err(err)
 
 	os.Exit(0)
 }
 
-// ====================================== CREATE BUILD
-func CreateBuild() {
+// ============================================================================ CREATE BUILD
+func Create_Build() {
 
 	done := make(chan bool)
 
@@ -55,7 +55,7 @@ func CreateBuild() {
 		}
 
 		close(done)
-		fmt.Print("\rBuilding your app \n")
+		fmt.Print("\rBuilding your app ✔\n")
 
 	} else {
 		go utils.Spinner(done, "Building your app")
@@ -69,12 +69,12 @@ func CreateBuild() {
 		}
 
 		close(done)
-		fmt.Print("\rBuilding your app \n")
+		fmt.Print("\rBuilding your app ✔\n")
 	}
 }
 
-// ====================================== DOCKER BUILD
-func CreateDockerImage(dockerImageName string) {
+// ============================================================================ DOCKER BUILD
+func Create_Docker_Image(dockerImageName string) {
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build -t %s .", dockerImageName))
 
 	stdout, err := cmd.StdoutPipe()
@@ -123,15 +123,15 @@ func CreateDockerImage(dockerImageName string) {
 	fmt.Printf("\nDocker build completed successfully \n")
 }
 
-func ListDockerImage(dockerImageName string) {
+func List_Docker_Image(dockerImageName string) {
 	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", dockerImageName)).Output()
-	utils.CheckForNil(err)
+	utils.Check_For_Err(err)
 
 	fmt.Printf("\n%v", string(res))
 }
 
-// ====================================== RUN PRODUCTION
-func RunProd() {
+// ============================================================================ RUN PRODUCTION
+func Run_Prod() {
 
 	var shell, flag string
 
@@ -139,7 +139,7 @@ func RunProd() {
 		shell = "cmd.exe"
 		flag = "/C"
 
-		fmt.Printf("\n🔥 Running in Production mode\n\n")
+		utils.Message("🔥 Running in Production mode")
 
 		cmd := exec.Command(shell, flag, "go run .")
 		cmd.Stdout = os.Stdout
@@ -147,14 +147,14 @@ func RunProd() {
 		cmd.Stdin = os.Stdin
 
 		err := cmd.Run()
-		utils.CheckForNil(err)
+		utils.Check_For_Err(err)
 
 		os.Exit(0)
 	} else {
 		shell = "sh"
 		flag = "-c"
 
-		fmt.Printf("\n🔥 Running in Production mode\n\n")
+		utils.Message("🔥 Running in Production mode")
 
 		cmd := exec.Command(shell, flag, "go run .")
 		cmd.Stdout = os.Stdout
@@ -162,7 +162,7 @@ func RunProd() {
 		cmd.Stdin = os.Stdin
 
 		err := cmd.Run()
-		utils.CheckForNil(err)
+		utils.Check_For_Err(err)
 
 		os.Exit(0)
 	}

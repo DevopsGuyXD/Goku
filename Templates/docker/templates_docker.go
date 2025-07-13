@@ -1,23 +1,16 @@
-package templates
+package templates_docker
 
 import (
-	"fmt"
-	"os"
-
 	utils "github.com/DevopsGuyXD/Goku/Utils"
 )
 
-func DockerFile() {
+// ============================================================================ DOCKER FILE
+func DockerFile() string {
 
 	var data string
 
-	file, err := os.Create("./dockerfile")
-	utils.CheckForNil(err)
-	defer file.Close()
-
-	folder := "Sqlite"
-
-	exists := utils.FolderExists(folder)
+	utils.Create_File([]string{"./dockerfile"})
+	exists := utils.Folder_Exists("Sqlite")
 
 	if exists {
 
@@ -83,7 +76,10 @@ WORKDIR /app
 
     CMD ["./app"]`
 	}
-	utils.WriteFile(file, data)
 
-	fmt.Println("\nAdded dockerfile ")
+	// utils.Write_File(file, data)
+
+	// fmt.Println("\nAdded dockerfile ")
+
+	return data
 }
