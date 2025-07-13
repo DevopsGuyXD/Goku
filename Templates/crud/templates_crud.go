@@ -483,17 +483,19 @@ func setup(opertaion, route string, payload []byte) *httptest.ResponseRecorder {
 
 // -------------------------- POST /%[1]v
 func Test_%[1]v_POST(t *testing.T) {
-	opertaion := "POST"
+	operation := "POST"
 	route := "/%[1]v"
 	allRecords := false
 	%[1]v := []models.%[3]v{
 		{Title: "New %[1]v 1", Author: "New Author 1", Language: "English", Pages: 144},
 		{Title: "New %[1]v 2", Author: "New Author 2", Language: "French", Pages: 164},
 	}
-	payload, _ := json.Marshal(%[1]v)
 
-	rr := setup(opertaion, route, payload)
-	test_cases(rr, t, opertaion, allRecords)
+	for _, b := range %[1]v {
+		payload, _ := json.Marshal(b)
+		rr := setup(operation, route, payload)
+		test_cases(rr, t, operation, allRecords)
+	}
 }
 
 // -------------------------- GET /%[1]v
