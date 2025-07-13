@@ -154,7 +154,8 @@ import (
 )
 
 // -------------------------- %[1]v STRUCT
-var data []%[3]v
+var %[1]v_single %[3]v
+var %[1]v_list []%[3]v
 
 type %[3]v struct {
 	Title    string `+"`json:\"title\"`"+`
@@ -197,80 +198,100 @@ func %[1]v() {
 // -------------------------- GET %[1]v ALL
 func GET_%[1]v_all() []map[string]interface{} {	
 	switch {
-		case os.Getenv("TEST_MODE") == "Y":
+	case os.Getenv("TEST_MODE") == "Y":
 		var result []map[string]interface{}
-		for _, %[1]v := range data {
+		for _, data := range %[1]v_list {
 			result = append(result, map[string]interface{}{
-				"title": &%[1]v.Title,
+				"title": &data.Title,
 			})
 		}
 
 		return result
 
-		default:
-			query := "SELECT * FROM %[1]v"
+	default:
+		query := "SELECT * FROM %[1]v"
 
-			jsonData, err := json.Marshal(get_Handler(query))
-			utils.Check_For_Err(err)
+		jsonData, err := json.Marshal(get_Handler(query))
+		utils.Check_For_Err(err)
 
-			if err = json.Unmarshal(jsonData, &data); err != nil {
-				return []map[string]interface{}{
-					{"message": "Type error"},
-				}
+		if err = json.Unmarshal(jsonData, &%[1]v_list); err != nil {
+			return []map[string]interface{}{
+				{"message": "Type error"},
 			}
-
-			return get_Handler(query)
 		}
+
+		return get_Handler(query)
+	}
 }
 
 // -------------------------- GET %[1]v by ID
 func GET_%[1]v_by_id(id int) map[string]interface{} {
 	switch {
-		case os.Getenv("TEST_MODE") == "Y":
-			return map[string]interface{}{
-				"Title": &data[0].Title,
-			}
-
-		default:
-			query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
-
-			jsonData, err := json.Marshal(get_Handler(query)[0])
-			utils.Check_For_Err(err)
-
-			if err = json.Unmarshal(jsonData, &data); err != nil {
-				return map[string]interface{}{
-					"message": "Type error",
-				}
-			}
-
-			return get_Handler(query)[0]
+	case os.Getenv("TEST_MODE") == "Y":
+		return map[string]interface{}{
+			"Title": &%[1]v_list[0].Title,
 		}
+
+	default:
+		query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
+
+		result := get_Handler(query)
+		if len(result) == 0 || len(result[0]) == 0 {
+			return map[string]interface{}{
+				"message": fmt.Sprintf("No record with ID: %%v", id),
+			}
+		}
+
+		b, err := json.Marshal(result[0])
+		utils.Check_For_Err(err)
+
+		if err = json.Unmarshal(b, &%[1]v_single); err != nil {
+			return map[string]interface{}{
+				"message": "Type error",
+			}
+		}
+
+		return result[0]
+	}
 }
 
 // -------------------------- CREATE %[1]v RECORD
 func POST_%[1]v(request io.ReadCloser) string {
 	switch {
-		case os.Getenv("TEST_MODE") == "Y":
-			if err := json.NewDecoder(request).Decode(&data); err != nil {
-				return "Invalid JSON"
-			} else {
-				return "Created successfully"
-			}
-			
-		default:
-			err := json.NewDecoder(request).Decode(&data)
-			utils.Check_For_Err(err)
-
-			return post_Handler(data)
+	case os.Getenv("TEST_MODE") == "Y":
+		if err := json.NewDecoder(request).Decode(&%[1]v_single); err != nil {
+			return "Invalid JSON"
+		} else {
+			return "Created successfully"
 		}
+
+	default:
+		err := json.NewDecoder(request).Decode(&%[1]v_single)
+		utils.Check_For_Err(err)
+		defer request.Close()
+
+		return post_Handler(%[1]v_single)
+	}
 }
 
 // -------------------------- UPDATE %[1]v
 func UPDATE_%[1]v(id string, request io.ReadCloser) string {
-	err := json.NewDecoder(request).Decode(&data)
-	utils.Check_For_Err(err)
+	switch {
+	case os.Getenv("TEST_MODE") == "Y":
+		var result []map[string]interface{}
+		for _, b := range %[1]v_list {
+			result = append(result, map[string]interface{}{
+				"title": &b.Title,
+			})
+		}
+		return "Updated successfully"
+	default:
+		err := json.NewDecoder(request).Decode(&%[1]v_single)
+		utils.Check_For_Err(err)
+		defer request.Close()
 
-	return update_Handler(id, data)
+		return update_Handler(id, %[1]v_single)
+	}
 }
 
 // -------------------------- DELETE %[1]v
@@ -326,7 +347,7 @@ func get_Handler(query string) []map[string]interface{} {
 }
 
 // -------------------------- CREATE HANDLER
-func post_Handler(data interface{}) string {
+func post_Handler(data %[2]v) string {
 
 	db := initDB()
 	defer db.Close()
@@ -357,7 +378,7 @@ func post_Handler(data interface{}) string {
 }
 
 // -------------------------- UPDATE HANDLER
-func update_Handler(id string, data interface{}) string {
+func update_Handler(id string, data %[2]v) string {
 	db := initDB()
 	defer db.Close()
 
@@ -414,7 +435,7 @@ func delete_Handler(id string) string {
 	}
 
 	return response
-}`, crudName)
+}`, crudName, utils.Capitalize(crudName))
 
 	return data
 }
