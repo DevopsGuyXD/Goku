@@ -200,9 +200,10 @@ func GET_%[1]v_all() []map[string]interface{} {
 	
 	switch {
 	case os.Getenv("TEST_MODE") == "Y":
-		return []map[string]interface{}{{
-			"message": "Created successfully",
-		}}
+		return []map[string]interface{}{
+			{"title": "New Book 1"},
+			{"title": "New Book 2"},
+		}
 
 	default:
 		query := "SELECT * FROM %[1]v"
@@ -225,7 +226,7 @@ func GET_%[1]v_by_id(id int) map[string]interface{} {
 	switch {
 	case os.Getenv("TEST_MODE") == "Y":
 		return map[string]interface{}{
-			"message": "Created successfully",
+			"title": "New Book",
 		}
 
 	default:
@@ -493,25 +494,25 @@ func Test_%[1]v_POST(t *testing.T) {
 	test_cases(rr, t, opertaion, allRecords)
 }
 
-// // -------------------------- GET /%[1]v
-// func Test_%[1]v_GET(t *testing.T) {
-// 	opertaion := "GET"
-// 	route := "/%[1]v"
-// 	allRecords := true
+// -------------------------- GET /%[1]v
+func Test_%[1]v_GET(t *testing.T) {
+	opertaion := "GET"
+	route := "/%[1]v"
+	allRecords := true
 
-// 	rr := setup(opertaion, route, nil)
-// 	test_cases(rr, t, opertaion, allRecords)
-// }
+	rr := setup(opertaion, route, nil)
+	test_cases(rr, t, opertaion, allRecords)
+}
 
-// // -------------------------- GET /%[1]v/{id}
-// func Test_%[1]v_GET_ID(t *testing.T) {
-// 	opertaion := "GET"
-// 	route := "/%[1]v/1"
-// 	allRecords := false
+// -------------------------- GET /%[1]v/{id}
+func Test_%[1]v_GET_ID(t *testing.T) {
+	opertaion := "GET"
+	route := "/%[1]v/1"
+	allRecords := false
 
-// 	rr := setup(opertaion, route, nil)
-// 	test_cases(rr, t, opertaion, allRecords)
-// }
+	rr := setup(opertaion, route, nil)
+	test_cases(rr, t, opertaion, allRecords)
+}
 
 // // -------------------------- PUT /%[1]v/{id}
 // func Test_%[1]v_PUT(t *testing.T) {
