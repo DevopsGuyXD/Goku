@@ -195,15 +195,17 @@ func %[1]v() {
 }
 
 // -------------------------- GET %[1]v ALL
-func GET_%[1]v_all() []map[string]interface{} {
-	var data []%[3]v
-	
+func GET_%[1]v_all() []map[string]interface{} {	
 	switch {
 		case os.Getenv("TEST_MODE") == "Y":
-			return []map[string]interface{}{
-				{"title": "New %[1]v 1", "author": "New Author 1", "language": "English", "pages": 144},
-				{"title": "New %[1]v 2", "author": "New Author 2", "language": "French", "pages": 164},
-			}
+		var result []map[string]interface{}
+		for _, %[1]v := range data {
+			result = append(result, map[string]interface{}{
+				"title": &%[1]v.Title, // use lowercase key
+			})
+		}
+
+		return result
 
 		default:
 			query := "SELECT * FROM %[1]v"
@@ -438,6 +440,7 @@ import (
 
 // -------------------------- TEST CASES
 func test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, allRecords bool) {
+
 	common_cases := func(status int, err error) {
 		assert.NoError(t, err, "Failed to unmarshal response")
 		assert.Contains(t, rr.Header().Get("Content-Type"), "application/json")
@@ -464,6 +467,10 @@ func test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, a
 
 	case opertaion == "POST":
 		common_cases(http.StatusCreated, nil)
+
+	case opertaion == "PUT":
+		common_cases(http.StatusOK, nil)
+
 	}
 }
 
@@ -483,19 +490,17 @@ func setup(opertaion, route string, payload []byte) *httptest.ResponseRecorder {
 
 // -------------------------- POST /%[1]v
 func Test_%[1]v_POST(t *testing.T) {
-	operation := "POST"
+	opertaion := "POST"
 	route := "/%[1]v"
 	allRecords := false
 	%[1]v := []models.%[3]v{
 		{Title: "New %[1]v 1", Author: "New Author 1", Language: "English", Pages: 144},
 		{Title: "New %[1]v 2", Author: "New Author 2", Language: "French", Pages: 164},
 	}
+	payload, _ := json.Marshal(%[1]v)
 
-	for _, b := range %[1]v {
-		payload, _ := json.Marshal(b)
-		rr := setup(operation, route, payload)
-		test_cases(rr, t, operation, allRecords)
-	}
+	rr := setup(opertaion, route, payload)
+	test_cases(rr, t, opertaion, allRecords)
 }
 
 // -------------------------- GET /%[1]v
@@ -518,28 +523,19 @@ func Test_%[1]v_GET_ID(t *testing.T) {
 	test_cases(rr, t, opertaion, allRecords)
 }
 
-// // -------------------------- PUT /%[1]v/{id}
-// func Test_%[1]v_PUT(t *testing.T) {
+// -------------------------- PUT /%[1]v/{id}
+func Test_%[1]v_PUT(t *testing.T) {
+	opertaion := "PUT"
+	route := "/%[1]v"
+	allRecords := false
+	updateBook := []models.%[3]v{
+		{Title: "New %[1]v updated"},
+	}
+	payload, _ := json.Marshal(updateBook)
 
-// 	os.Setenv("TEST_MODE", "Y")
-// 	rr := httptest.NewRecorder()
-// 	router := routes.RouteCollection()
-
-// 	updatedBook := Book{
-// 		Title:    "Updated Book",
-// 		Author:   "Updated Author",
-// 		Language: "Hindi",
-// 		Pages:    300,
-// 	}
-// 	payload, _ := json.Marshal(updatedBook)
-
-// 	req, err := http.NewRequest("PUT", "/%[1]v/1", bytes.NewBuffer(payload))
-// 	req.Header.Set("Content-Type", "application/json")
-// 	utils.Check_For_Err(err)
-// 	router.ServeHTTP(rr, req)
-
-// 	assert.Equal(t, http.StatusOK, rr.Code)
-// }
+	rr := setup(opertaion, route, payload)
+	test_cases(rr, t, opertaion, allRecords)
+}
 
 // // -------------------------- DELETE /%[1]v/{id}
 // func Test_%[1]v_DELETE(t *testing.T) {
