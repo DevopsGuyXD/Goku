@@ -28,7 +28,6 @@ func controller_Data(crudName, project string) string {
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -45,14 +44,25 @@ import (
 // @Router /%[1]v [get]
 func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	response := models.GET_%[1]v_all()
 
-	if response != nil {
-		json.NewEncoder(w).Encode(response)
-	} else {
-		json.NewEncoder(w).Encode("No records found")
+	switch {
+		case response[0]["message"] == http.StatusOK:
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode("No records found")
+
+		case response[0]["message"] == http.StatusBadRequest:
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode("Bad request")
+
+		case len(response) > 0:
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(response)
+
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode("Internal server error")
 	}
 }
 
@@ -64,17 +74,27 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 // @Router /%[1]v/{id} [get]
 func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	utils.Check_For_Err(err)
 	response := models.GET_%[1]v_by_id(id)
 
-	if response != nil {
-		json.NewEncoder(w).Encode(response)
-	} else {
-		response := fmt.Sprintf("No record with ID: %%d", id)
-		json.NewEncoder(w).Encode(response)
+	switch {
+		case response["message"] == http.StatusOK:
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode("No records found")
+
+		case response["message"] == http.StatusBadRequest:
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode("Bad request")
+
+		case len(response) > 0:
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(response)
+
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode("Internal server error")
 	}
 }
 
@@ -92,13 +112,23 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	response := models.POST_%[1]v(request)
 
-	if response == "Created successfully" {
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(response)
-	} else{
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(response)
-	} 
+	switch {
+		case response == http.StatusCreated:
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode("Created successfully")
+
+		case response == http.StatusOK:
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode("Record not created")
+
+		case response == http.StatusBadRequest:
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("Bad request")
+
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode("Internal server error")
+	}
 }
 
 // -------------------------- %[1]v UPDATE BY ID
@@ -118,7 +148,23 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 
 	response := models.UPDATE_%[1]v(id, request)
 
-	json.NewEncoder(w).Encode(response)
+	switch {
+		case response == http.StatusCreated:
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode("Updated successfully")
+
+		case response == http.StatusNotModified:
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode("Record not modified")
+
+		case response == http.StatusBadRequest:
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("Bad request")
+
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode("Internal server error")
+	}
 }
 
 // -------------------------- %[1]v DELETE
@@ -135,7 +181,13 @@ func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
 
 	response := models.DELETE_%[1]v(id)
 
-	json.NewEncoder(w).Encode(response)
+	if response == "Deleted successfully" {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
+	}
 }`, crudName, project)
 
 	return data
@@ -150,6 +202,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"strings"
 
@@ -201,105 +254,116 @@ func %[1]v_ct() {
 // -------------------------- GET %[1]v ALL
 func GET_%[1]v_all() []map[string]interface{} {	
 	switch {
-	case os.Getenv("TEST_MODE") == "Y":
-		var result []map[string]interface{}
-		for _, data := range %[1]v_list {
-			result = append(result, map[string]interface{}{
-				"title": &data.Title,
-			})
-		}
-
-		return result
-
-	default:
-		query := "SELECT * FROM %[1]v"
-
-		jsonData, err := json.Marshal(get_Handler(query))
-		utils.Check_For_Err(err)
-
-		if err = json.Unmarshal(jsonData, &%[1]v_list); err != nil {
-			return []map[string]interface{}{
-				{"message": "Type error"},
+		case os.Getenv("TEST_MODE") == "Y":
+			var result []map[string]interface{}
+			for _, data := range %[1]v_list {
+				result = append(result, map[string]interface{}{
+					"title": &data.Title,
+				})
 			}
-		}
 
-		return get_Handler(query)
+			return result
+
+		default:
+			query := "SELECT * FROM %[1]v"
+
+			jsonData, err := json.Marshal(get_Handler(query))
+			utils.Check_For_Err(err)
+
+			if err = json.Unmarshal(jsonData, &%[1]v_list); err != nil {
+				return []map[string]interface{}{
+					{"message": http.StatusBadRequest},
+				}
+			}
+
+			return get_Handler(query)
 	}
 }
 
 // -------------------------- GET %[1]v by ID
 func GET_%[1]v_by_id(id int) map[string]interface{} {
 	switch {
-	case os.Getenv("TEST_MODE") == "Y":
-		return map[string]interface{}{
-			"Title": &%[1]v_list[id-1].Title,
-		}
-
-	default:
-		query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
-
-		result := get_Handler(query)
-		if len(result) == 0 || len(result[0]) == 0 {
+		case os.Getenv("TEST_MODE") == "Y":
 			return map[string]interface{}{
-				"message": fmt.Sprintf("No record with ID: %%v", id),
+				"Title": &%[1]v_list[id-1].Title,
 			}
-		}
 
-		b, err := json.Marshal(result[0])
-		utils.Check_For_Err(err)
+		default:
+			query := fmt.Sprintf("SELECT * FROM %[1]v WHERE id = %%d", id)
 
-		if err = json.Unmarshal(b, &%[1]v); err != nil {
-			return map[string]interface{}{
-				"message": "Type error",
+			result := get_Handler(query)
+			if len(result) == 0 || len(result[0]) == 0 {
+				return map[string]interface{}{
+					"message": http.StatusOK,
+				}
 			}
-		}
 
-		return result[0]
+			b, err := json.Marshal(result[0])
+			utils.Check_For_Err(err)
+
+			if err = json.Unmarshal(b, &%[1]v); err != nil {
+				return map[string]interface{}{
+					"message": http.StatusBadRequest,
+				}
+			}
+
+			return result[0]
 	}
 }
 
 // -------------------------- CREATE %[1]v RECORD
-func POST_%[1]v(request io.ReadCloser) string {
+func POST_%[1]v(request io.ReadCloser) int {
 	switch {
-	case os.Getenv("TEST_MODE") == "Y":
-		if err := json.NewDecoder(request).Decode(&%[1]v); err != nil {
-			return "Invalid JSON"
-		} else {
-		 	%[1]v_list = append(%[1]v_list, %[1]v)
-			return "Created successfully"
+		case os.Getenv("TEST_MODE") == "Y":
+			if err := json.NewDecoder(request).Decode(&%[1]v); err != nil {
+				return http.StatusBadRequest
+
+			} else {
+				%[1]v_list = append(%[1]v_list, %[1]v)
+				return http.StatusOK
+			}
+
+		default:
+			err := json.NewDecoder(request).Decode(&%[1]v)
+			utils.Check_For_Err(err)
+			defer request.Close()
+
+			return post_Handler(%[1]v)
 		}
-
-	default:
-		err := json.NewDecoder(request).Decode(&%[1]v)
-		utils.Check_For_Err(err)
-		defer request.Close()
-
-		return post_Handler(%[1]v)
-	}
 }
 
 // -------------------------- UPDATE %[1]v
-func UPDATE_%[1]v(id int, request io.ReadCloser) string {
+func UPDATE_%[1]v(id int, request io.ReadCloser) int {
 	switch {
-	case os.Getenv("TEST_MODE") == "Y":
-		%[1]v_list[id-1].Title = "New %[1]v 3"
-		if %[1]v_list[id-1].Title == "New %[1]v 3" {
-			return "Updated successfully"
+		case os.Getenv("TEST_MODE") == "Y":
+			%[1]v_list[id-1].Title = "New %[1]v 3"
+			if %[1]v_list[id-1].Title == "New %[1]v 3" {
+				return http.StatusOK
+			}
+			return http.StatusInternalServerError
+
+		default:
+			err := json.NewDecoder(request).Decode(&%[1]v)
+			utils.Check_For_Err(err)
+			defer request.Close()
+
+			return update_Handler(id, %[1]v)
 		}
-		return "Error updating"
-
-	default:
-		err := json.NewDecoder(request).Decode(&%[1]v)
-		utils.Check_For_Err(err)
-		defer request.Close()
-
-		return update_Handler(id, %[1]v)
-	}
 }
 
 // -------------------------- DELETE %[1]v
 func DELETE_%[1]v(id int) string {
-	return delete_Handler(id)
+	switch {
+		case os.Getenv("TEST_MODE") == "Y":
+			%[1]v_list = append(%[1]v_list[:id-1], %[1]v_list[id:]...)
+			if len(%[1]v_list) == 1 {
+				return "Deleted successfully"
+			}
+			return "Error updating"
+
+		default:
+			return delete_Handler(id)
+		}
 }`, crudName, projectName, utils.Capitalize(crudName))
 
 	return data
@@ -346,11 +410,17 @@ func get_Handler(query string) []map[string]interface{} {
 		response = append(response, row)
 	}
 
+	if len(response) == 0 {
+		return []map[string]interface{}{
+			{"message": http.StatusOK},
+		}
+	}
+
 	return response
 }
 
 // -------------------------- CREATE HANDLER
-func post_Handler(data interface{}) string {
+func post_Handler(data interface{}) int {
 
 	db := initDB()
 	defer db.Close()
@@ -373,15 +443,17 @@ func post_Handler(data interface{}) string {
 	query := fmt.Sprintf("INSERT INTO %[1]v (%%s) VALUES (%%s)", strings.Join(cols, ", "), strings.Join(vals, ", "))
 
 	if res, err := db.Exec(query, args...); err != nil {
-		return "DB error"
+		return http.StatusInternalServerError
+
 	} else if rows, _ := res.RowsAffected(); rows > 0 {
-		return "Created successfully"
+		return http.StatusCreated
 	}
-	return "No records created"
+
+	return http.StatusOK
 }
 
 // -------------------------- UPDATE HANDLER
-func update_Handler(id int, data interface{}) string {
+func update_Handler(id int, data interface{}) int {
 	db := initDB()
 	defer db.Close()
 
@@ -404,11 +476,12 @@ func update_Handler(id int, data interface{}) string {
 	query := fmt.Sprintf("UPDATE %[1]v SET %%s WHERE id = ?", strings.Join(vals, ", "))
 
 	if res, err := db.Exec(query, args...); err != nil {
-		return "DB update error"
+		return http.StatusInternalServerError
+
 	} else if rows, _ := res.RowsAffected(); rows > 0 {
-		return "Updated successfully"
+		return http.StatusOK
 	}
-	return "No records updated"
+	return http.StatusNotModified
 }
 
 // -------------------------- DELETE HANDLER
@@ -495,6 +568,8 @@ func test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, a
 	case opertaion == "PUT":
 		common_cases(http.StatusOK, nil)
 
+	case opertaion == "DELETE":
+		common_cases(http.StatusOK, nil)
 	}
 }
 
@@ -564,19 +639,16 @@ func Test_%[1]v_PUT(t *testing.T) {
 	test_cases(rr, t, opertaion, allRecords)
 }
 
-// // -------------------------- DELETE /%[1]v/{id}
-// func Test_%[1]v_DELETE(t *testing.T) {
+// -------------------------- DELETE /%[1]v/{id}
+func Test_%[1]v_DELETE(t *testing.T) {
+	opertaion := "DELETE"
+	route := "/%[1]v/1"
+	allRecords := false
 
-// 	os.Setenv("TEST_MODE", "Y")
-// 	rr := httptest.NewRecorder()
-// 	router := routes.RouteCollection()
+	rr := setup(opertaion, route, nil)
+	test_cases(rr, t, opertaion, allRecords)
+}
 
-// 	req, err := http.NewRequest("DELETE", "/%[1]v/1", nil)
-// 	utils.Check_For_Err(err)
-// 	router.ServeHTTP(rr, req)
-
-// 	assert.Equal(t, http.StatusOK, rr.Code)
-// }
 
 // // -------------------------- Error Case: GET Nonexistent
 // func Test_%[1]v_GET_NotFound(t *testing.T) {

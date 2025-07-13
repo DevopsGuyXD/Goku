@@ -101,6 +101,7 @@ func model_Imports() {
 		`"fmt"`,
 		`"strings"`,
 		`"reflect"`,
+		`"net/http"`,
 
 		fmt.Sprintf(`config "github.com/DevopsGuyXD/%v/Config"`, utils.Project_Name()),
 		fmt.Sprintf(`utils "github.com/DevopsGuyXD/%v/Utils"`, utils.Project_Name()),
