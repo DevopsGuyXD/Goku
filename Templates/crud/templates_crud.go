@@ -112,7 +112,8 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	utils.Check_For_Err(err)
 	request := r.Body
 
 	response := models.UPDATE_%[1]v(id, request)
@@ -129,7 +130,9 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	utils.Check_For_Err(err)
+
 	response := models.DELETE_%[1]v(id)
 
 	json.NewEncoder(w).Encode(response)
@@ -229,7 +232,7 @@ func GET_%[1]v_by_id(id int) map[string]interface{} {
 	switch {
 	case os.Getenv("TEST_MODE") == "Y":
 		return map[string]interface{}{
-			"Title": &%[1]v_list[0].Title,
+			"Title": &%[1]v_list[id-1].Title,
 		}
 
 	default:
@@ -276,16 +279,15 @@ func POST_%[1]v(request io.ReadCloser) string {
 }
 
 // -------------------------- UPDATE %[1]v
-func UPDATE_%[1]v(id string, request io.ReadCloser) string {
+func UPDATE_%[1]v(id int, request io.ReadCloser) string {
 	switch {
 	case os.Getenv("TEST_MODE") == "Y":
-		var result []map[string]interface{}
-		for _, b := range %[1]v_list {
-			result = append(result, map[string]interface{}{
-				"title": &b.Title,
-			})
+		%[1]v_list[id-1].Title = "New %[1]v 3"
+		if %[1]v_list[id-1].Title == "New %[1]v 3" {
+			return "Updated successfully"
 		}
-		return "Updated successfully"
+		return "Error updating"
+
 	default:
 		err := json.NewDecoder(request).Decode(&%[1]v)
 		utils.Check_For_Err(err)
@@ -296,7 +298,7 @@ func UPDATE_%[1]v(id string, request io.ReadCloser) string {
 }
 
 // -------------------------- DELETE %[1]v
-func DELETE_%[1]v(id string) string {
+func DELETE_%[1]v(id int) string {
 	return delete_Handler(id)
 }`, crudName, projectName, utils.Capitalize(crudName))
 
@@ -379,7 +381,7 @@ func post_Handler(data interface{}) string {
 }
 
 // -------------------------- UPDATE HANDLER
-func update_Handler(id string, data interface{}) string {
+func update_Handler(id int, data interface{}) string {
 	db := initDB()
 	defer db.Close()
 
@@ -410,14 +412,14 @@ func update_Handler(id string, data interface{}) string {
 }
 
 // -------------------------- DELETE HANDLER
-func delete_Handler(id string) string {
+func delete_Handler(id int) string {
 
 	db := initDB()
 	defer db.Close()
 
 	var response string
 
-	query := fmt.Sprintf("DELETE FROM %[1]v WHERE id=%%s", id)
+	query := fmt.Sprintf("DELETE FROM %[1]v WHERE id=%%d", id)
 
 	res, err := db.Exec(query)
 	if err != nil {
@@ -554,7 +556,7 @@ func Test_%[1]v_PUT(t *testing.T) {
 	route := "/%[1]v/1"
 	allRecords := false
 	update%[1]v := []models.%[3]v{
-		{Title: "New %[1]v updated"},
+		{Title: "New %[1]v 3"},
 	}
 	payload, _ := json.Marshal(update%[1]v)
 
