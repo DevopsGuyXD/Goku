@@ -201,7 +201,7 @@ func GET_%[1]v_all() []map[string]interface{} {
 		var result []map[string]interface{}
 		for _, %[1]v := range data {
 			result = append(result, map[string]interface{}{
-				"title": &%[1]v.Title, // use lowercase key
+				"title": &%[1]v.Title,
 			})
 		}
 
