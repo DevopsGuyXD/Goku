@@ -154,7 +154,7 @@ import (
 )
 
 // -------------------------- %[1]v STRUCT
-var data %[3]v
+var data []%[3]v
 
 type %[3]v struct {
 	Title    string `+"`json:\"title\"`"+`
@@ -201,8 +201,8 @@ func GET_%[1]v_all() []map[string]interface{} {
 	switch {
 		case os.Getenv("TEST_MODE") == "Y":
 			return []map[string]interface{}{
-				{"title": "New Book 1"},
-				{"title": "New Book 2"},
+				{"title": "New %[1]v 1", "author": "New Author 1", "language": "English", "pages": 144},
+				{"title": "New %[1]v 2", "author": "New Author 2", "language": "French", "pages": 164},
 			}
 
 		default:
@@ -226,7 +226,7 @@ func GET_%[1]v_by_id(id int) map[string]interface{} {
 	switch {
 		case os.Getenv("TEST_MODE") == "Y":
 			return map[string]interface{}{
-				"title": "New Book",
+				"Title": &data[0].Title,
 			}
 
 		default:
@@ -438,33 +438,32 @@ import (
 
 // -------------------------- TEST CASES
 func test_cases(rr *httptest.ResponseRecorder, t *testing.T, opertaion string, allRecords bool) {
+	common_cases := func(status int, err error) {
+		assert.NoError(t, err, "Failed to unmarshal response")
+		assert.Contains(t, rr.Header().Get("Content-Type"), "application/json")
+		assert.Equal(t, status, rr.Code)
+	}
+
 	switch {
-
 	case opertaion == "GET":
-		common_cases := func(err error) {
-			assert.NoError(t, err, "Failed to unmarshal response")
-			assert.Contains(t, rr.Header().Get("Content-Type"), "application/json")
-			assert.Equal(t, http.StatusOK, rr.Code)
-		}
-
 		switch {
 		case allRecords:
-			var book []models.%[3]v
-			err := json.Unmarshal(rr.Body.Bytes(), &book)
+			var %[1]v []models.%[3]v
+			err := json.Unmarshal(rr.Body.Bytes(), &%[1]v)
 
-			assert.LessOrEqual(t, 2, len(book), "Expected records greater than 1")
-			common_cases(err)
+			assert.LessOrEqual(t, 2, len(%[1]v), "Expected records greater than 1")
+			common_cases(http.StatusOK, err)
 
 		case !allRecords:
-			var book models.%[3]v
-			err := json.Unmarshal(rr.Body.Bytes(), &book)
+			var %[1]v models.%[3]v
+			err := json.Unmarshal(rr.Body.Bytes(), &%[1]v)
 
-			assert.Equal(t, "New Book", book.Title, "Expected Title to be 'New Book'")
-			common_cases(err)
+			assert.Equal(t, "New %[1]v 1", %[1]v.Title, "Expected Title to be 'New %[1]v 1'")
+			common_cases(http.StatusOK, err)
 		}
 
 	case opertaion == "POST":
-		assert.Equal(t, http.StatusCreated, rr.Code)
+		common_cases(http.StatusCreated, nil)
 	}
 }
 
@@ -487,8 +486,11 @@ func Test_%[1]v_POST(t *testing.T) {
 	opertaion := "POST"
 	route := "/%[1]v"
 	allRecords := false
-	newBook := models.%[3]v{Title: "New Book", Author: "New Author", Language: "English", Pages: 200}
-	payload, _ := json.Marshal(newBook)
+	%[1]v := []models.%[3]v{
+		{Title: "New %[1]v 1", Author: "New Author 1", Language: "English", Pages: 144},
+		{Title: "New %[1]v 2", Author: "New Author 2", Language: "French", Pages: 164},
+	}
+	payload, _ := json.Marshal(%[1]v)
 
 	rr := setup(opertaion, route, payload)
 	test_cases(rr, t, opertaion, allRecords)
