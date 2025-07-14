@@ -55,6 +55,7 @@ func Init_Swagger() {
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("go run github.com/swaggo/swag/cmd/swag@v1.8.12 init --dir \"%s\"", calledFrom))
 	err := cmd.Run()
 	if err != nil {
+
 		fmt.Printf("\rUpdating ❌\n")
 		close(done)
 		return
@@ -62,7 +63,7 @@ func Init_Swagger() {
 
 	close(done)
 
-	fmt.Print("\rUpdating ✔\n\n")
+	fmt.Print("\rUpdating ✔\n")
 }
 
 // ============================================================================ INIT Air

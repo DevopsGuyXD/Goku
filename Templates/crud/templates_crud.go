@@ -334,7 +334,7 @@ func POST_%[1]v(request io.ReadCloser) int {
 			utils.Check_For_Err(err)
 			defer request.Close()
 
-			return post_Handler(%[1]v)
+			return post_Handler(%[1]v, "%[1]v")
 		}
 }
 
@@ -353,7 +353,7 @@ func UPDATE_%[1]v(id int, request io.ReadCloser) int {
 			utils.Check_For_Err(err)
 			defer request.Close()
 
-			return update_Handler(id, %[1]v)
+			return update_Handler(id, %[1]v, "%[1]v")
 		}
 }
 
@@ -368,7 +368,7 @@ func DELETE_%[1]v(id int) int {
 			return http.StatusInternalServerError
 
 		default:
-			return delete_Handler(id)
+			return delete_Handler(id, "%[1]v")
 	}
 }`, crudName, projectName, utils.Capitalize(crudName))
 
@@ -426,7 +426,7 @@ func get_Handler(query string) []map[string]interface{} {
 }
 
 // -------------------------- CREATE HANDLER
-func post_Handler(data interface{}) int {
+func post_Handler(data interface{}, api string) int {
 
 	db := initDB()
 	defer db.Close()
@@ -446,7 +446,7 @@ func post_Handler(data interface{}) int {
 		}
 	}
 
-	query := fmt.Sprintf("INSERT INTO %[1]v (%%s) VALUES (%%s)", strings.Join(cols, ", "), strings.Join(vals, ", "))
+	query := fmt.Sprintf("INSERT INTO " + api + " (%%s) VALUES (%%s)", strings.Join(cols, ", "), strings.Join(vals, ", "))
 
 	if res, err := db.Exec(query, args...); err != nil {
 		return http.StatusInternalServerError
@@ -459,7 +459,7 @@ func post_Handler(data interface{}) int {
 }
 
 // -------------------------- UPDATE HANDLER
-func update_Handler(id int, data interface{}) int {
+func update_Handler(id int, data interface{}, api string) int {
 	db := initDB()
 	defer db.Close()
 
@@ -479,7 +479,7 @@ func update_Handler(id int, data interface{}) int {
 	}
 
 	args = append(args, id)
-	query := fmt.Sprintf("UPDATE %[1]v SET %%s WHERE id = ?", strings.Join(vals, ", "))
+	query := fmt.Sprintf("UPDATE " + api + " SET %%s WHERE id = ?", strings.Join(vals, ", "))
 
 	if res, err := db.Exec(query, args...); err != nil {
 		return http.StatusInternalServerError
@@ -491,12 +491,12 @@ func update_Handler(id int, data interface{}) int {
 }
 
 // -------------------------- DELETE HANDLER
-func delete_Handler(id int) int {
+func delete_Handler(id int, api string) int {
 
 	db := initDB()
 	defer db.Close()
 
-	query := fmt.Sprintf("DELETE FROM %[1]v WHERE id=%%d", id)
+	query := fmt.Sprintf("DELETE FROM " + api + " WHERE id=%%d", id)
 
 	res, err := db.Exec(query)
 	if err != nil {
@@ -513,7 +513,7 @@ func delete_Handler(id int) int {
 		}
 	}
 
-}`, crudName, utils.Capitalize(crudName))
+}`)
 
 	return data
 }
