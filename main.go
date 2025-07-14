@@ -34,7 +34,8 @@ func main() {
 			utils.Creator()
 
 		case os.Args[1] == "add-docker":
-			// templates.DockerFile()
+			utils.Create_File([]string{"dockerfile"})
+			utils.Write_File(utils.Open_File("dockerfile"), templates_starter.DockerFile_Data())
 
 		case os.Args[1] == "swag":
 			utils.Init_Swagger()
@@ -61,10 +62,6 @@ func main() {
 
 			configs.Run_Prod()
 
-		case os.Args[1] == "docker" && os.Args[2] != "":
-			dockerImageName := strings.ToLower(os.Args[2])
-			configs.List_Docker_Image(dockerImageName)
-
 		case os.Args[1] == "add-crud" && os.Args[2] != "":
 			crudName := os.Args[2]
 			templates_curd.CRUD_Project(crudName)
@@ -73,9 +70,13 @@ func main() {
 			project := strings.ToLower(os.Args[2])
 			templates_starter.Starter_Project(project)
 
-		case os.Args[1] == "build-docker" && os.Args[2] != "":
+		case os.Args[1] == "docker" && os.Args[2] != "":
 			dockerImageName := strings.ToLower(os.Args[2])
 			configs.Create_Docker_Image(dockerImageName)
+
+		case os.Args[1] == "dl" && os.Args[2] != "":
+			dockerImageName := strings.ToLower(os.Args[2])
+			configs.List_Docker_Image(dockerImageName)
 
 		default:
 			fmt.Printf("Go1: Bad option\n")

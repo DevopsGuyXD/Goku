@@ -13,7 +13,7 @@ import (
 // ============================================================================ CREATE FOLDER
 func Create_Folder(folders []string) {
 	for _, folder := range folders {
-		if !strings.Contains(folder, ".") && !Folder_Exists(folder) {
+		if !strings.Contains(folder, ".") && !strings.Contains(folder, "dockerfile") && !Folder_Exists(folder) {
 			err := os.Mkdir(folder, 0755)
 			Check_For_Err(err)
 		}

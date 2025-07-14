@@ -28,6 +28,10 @@ func fileController(project, folder string) (*os.File, string) {
 		data = mod_Data(project)
 		file = create_open_file(folder)
 
+	case strings.Contains(folder, "dockerfile"):
+		data = DockerFile_Data()
+		file = create_open_file(folder)
+
 	case strings.Contains(folder, "Routes"):
 		data = routes_Data(project)
 		file = create_open_file(folder)
@@ -256,3 +260,39 @@ func InitEnvFile() {
 	err := godotenv.Load(".env")
 	Check_For_Err(err)
 }`
+
+// ============================================================================ dockerfile DATA
+func DockerFile_Data() string {
+
+	data := `FROM golang:1.23.5 AS builder
+WORKDIR /app
+
+    ENV CGO_ENABLED=0 \
+        GOOS=linux \
+        GOARCH=amd64
+
+    COPY go.mod go.sum ./
+    RUN go mod download
+
+    COPY . .
+
+    RUN go build -o app
+
+FROM alpine:latest
+WORKDIR /app
+
+    RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+    USER appuser
+
+    COPY --from=builder /app/app .
+    COPY --from=builder /app/.env .
+
+    EXPOSE 8000
+
+    HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD wget --spider -q http://localhost:8000/health || exit 1
+
+    CMD ["./app"]`
+
+	return data
+}

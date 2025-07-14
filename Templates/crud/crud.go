@@ -19,7 +19,8 @@ func CRUD_Project(crudName string) {
 	utils.Install_Dependencies()
 
 	// -------------------- DONE STATUS
-	fmt.Printf("\rAdding \"%v\" ✔\n\n", crudName)
+	fmt.Println()
+	fmt.Printf("\rAdding \"%v\" ✔\n", crudName)
 }
 
 // ============================================================================ CRUD ADD ROUTE

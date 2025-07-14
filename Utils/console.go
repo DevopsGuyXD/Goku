@@ -34,10 +34,10 @@ func All_Options() {
     goku run build
     goku run start
     goku add-crud <NAME>
-    goku add-docker
-    goku build-docker <NAME:TAG> -> Note: TAG will be "latest" if not specified
-    goku swag
-    goku docker <NAME>
+	goku swag
+	goku add-docker
+    goku docker <NAME:TAG> -> Note: TAG will be "latest" if not specified
+	goku dl <NAME>
 `)
 }
 

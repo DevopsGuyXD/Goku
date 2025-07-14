@@ -26,6 +26,7 @@ func Install_Dependencies() {
 	Init_Swagger()
 
 	done := make(chan bool)
+	fmt.Println()
 	go Spinner(done, "Installing Dependencies")
 
 	cmd := exec.Command("sh", "-c", "go mod tidy")
@@ -41,13 +42,14 @@ func Install_Dependencies() {
 	}
 
 	close(done)
-	fmt.Printf("\rInstalling Dependencies ✔\n\n")
+	fmt.Printf("\rInstalling Dependencies ✔\n")
 }
 
 // ============================================================================ INIT SWAGGER
 func Init_Swagger() {
 
 	done := make(chan bool)
+	fmt.Println()
 	go Spinner(done, "Updating")
 
 	calledFrom := Called_From_Location()
@@ -62,7 +64,6 @@ func Init_Swagger() {
 	}
 
 	close(done)
-
 	fmt.Print("\rUpdating ✔\n")
 }
 

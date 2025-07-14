@@ -44,6 +44,7 @@ func Create_Build() {
 	done := make(chan bool)
 
 	if runtime.GOOS == "windows" {
+		fmt.Println()
 		go utils.Spinner(done, "Building your app")
 
 		cmd := exec.Command("sh", "-c", "go build -o ./dist/app.exe . && cp .env ./dist")
@@ -69,6 +70,7 @@ func Create_Build() {
 		}
 
 		close(done)
+		fmt.Println()
 		fmt.Print("\rBuilding your app ✔\n")
 	}
 }
