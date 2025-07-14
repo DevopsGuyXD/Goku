@@ -649,37 +649,7 @@ func Test_%[1]v_DELETE(t *testing.T) {
 
 	rr := %[1]v_setup(opertaion, route, nil)
 	 %[1]v_test_cases(rr, t, opertaion, allRecords)
-}
-
-
-// // -------------------------- Error Case: GET Nonexistent
-// func Test_%[1]v_GET_NotFound(t *testing.T) {
-
-// 	os.Setenv("TEST_MODE", "Y")
-// 	rr := httptest.NewRecorder()
-// 	router := routes.RouteCollection()
-
-// 	req, err := http.NewRequest("GET", "/%[1]v/9999", nil)
-// 	utils.Check_For_Err(err)
-// 	router.ServeHTTP(rr, req)
-
-// 	assert.Equal(t, http.StatusNotFound, rr.Code)
-// }
-
-// // -------------------------- Error Case: DELETE Nonexistent
-// func Test_%[1]v_DELETE_NotFound(t *testing.T) {
-
-// 	os.Setenv("TEST_MODE", "Y")
-// 	rr := httptest.NewRecorder()
-// 	router := routes.RouteCollection()
-
-// 	req, err := http.NewRequest("DELETE", "/%[1]v/9999", nil)
-// 	utils.Check_For_Err(err)
-// 	router.ServeHTTP(rr, req)
-
-// 	assert.Equal(t, http.StatusNotFound, rr.Code)
-// }
-`, crudName, projectName, utils.Capitalize(crudName))
+}`, crudName, projectName, utils.Capitalize(crudName))
 
 	return data
 }
