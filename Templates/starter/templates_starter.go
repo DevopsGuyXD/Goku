@@ -75,8 +75,8 @@ func create_open_file(folder_or_File string) *os.File {
 }
 
 // ============================================================================ .env DATA
-var env_Data = `
-PORT=":8000"
+var env_Data = 
+`PORT=":8000"
 GOKU_VERSION="v1.0.0"`
 
 // ============================================================================ go.mod DATA
