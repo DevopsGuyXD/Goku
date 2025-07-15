@@ -76,64 +76,6 @@ func Create_Build() {
 	}
 }
 
-// ============================================================================ DOCKER BUILD
-func Create_Docker_Image(dockerImageName string) {
-	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build -t %s .", dockerImageName))
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		fmt.Println("Error getting StdoutPipe:", err)
-		return
-	}
-
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		fmt.Println("Error getting StderrPipe:", err)
-		return
-	}
-
-	if err := cmd.Start(); err != nil {
-		fmt.Println("Error starting command:", err)
-		return
-	}
-
-	// Regex to remove BuildKit prefixes like: #5 or #12
-	buildkitPrefix := regexp.MustCompile(`^#\d+\s*`)
-
-	// Stream stdout
-	go func() {
-		scanner := bufio.NewScanner(stdout)
-		for scanner.Scan() {
-			line := buildkitPrefix.ReplaceAllString(scanner.Text(), "")
-			fmt.Println(line)
-		}
-	}()
-
-	// Stream stderr
-	go func() {
-		scanner := bufio.NewScanner(stderr)
-		for scanner.Scan() {
-			line := buildkitPrefix.ReplaceAllString(scanner.Text(), "")
-			fmt.Println(line)
-		}
-	}()
-
-	if err := cmd.Wait(); err != nil {
-		fmt.Println("Command finished with error:", err)
-		return
-	}
-
-	fmt.Printf("\nDocker build completed successfully \n")
-}
-
-// ============================================================================ LIST DOCKER IMAGES BELONGING TO SPECIFIC APP
-func List_Docker_Image(dockerImageName string) {
-	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", dockerImageName)).Output()
-	utils.Check_For_Err(err)
-
-	fmt.Printf("\n%v", string(res))
-}
-
 // ============================================================================ RUN PRODUCTION
 func Run_Prod() {
 
@@ -202,4 +144,62 @@ func Run_Tests() {
 	utils.Check_For_Err(err)
 
 	os.Exit(0)
+}
+
+// ============================================================================ DOCKER BUILD
+func Build_Docker_Image(dockerImageName string) {
+	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build -t %s .", dockerImageName))
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Println("Error getting StdoutPipe:", err)
+		return
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		fmt.Println("Error getting StderrPipe:", err)
+		return
+	}
+
+	if err := cmd.Start(); err != nil {
+		fmt.Println("Error starting command:", err)
+		return
+	}
+
+	// Regex to remove BuildKit prefixes like: #5 or #12
+	buildkitPrefix := regexp.MustCompile(`^#\d+\s*`)
+
+	// Stream stdout
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			line := buildkitPrefix.ReplaceAllString(scanner.Text(), "")
+			fmt.Println(line)
+		}
+	}()
+
+	// Stream stderr
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			line := buildkitPrefix.ReplaceAllString(scanner.Text(), "")
+			fmt.Println(line)
+		}
+	}()
+
+	if err := cmd.Wait(); err != nil {
+		fmt.Println("Command finished with error:", err)
+		return
+	}
+
+	fmt.Printf("\nDocker build completed successfully \n")
+}
+
+// ============================================================================ LIST DOCKER IMAGES BELONGING TO SPECIFIC APP
+func List_Docker_Image(dockerImageName string) {
+	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", dockerImageName)).Output()
+	utils.Check_For_Err(err)
+
+	fmt.Printf("\n%v", string(res))
 }

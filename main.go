@@ -73,9 +73,9 @@ func main() {
 			project := strings.ToLower(os.Args[2])
 			templates_starter.Starter_Project(project)
 
-		case os.Args[1] == "dockerize" && os.Args[2] != "":
+		case os.Args[1] == "build-docker" && os.Args[2] != "":
 			dockerImageName := strings.ToLower(os.Args[2])
-			configs.Create_Docker_Image(dockerImageName)
+			configs.Build_Docker_Image(dockerImageName)
 
 		case os.Args[1] == "dl" && os.Args[2] != "":
 			dockerImageName := strings.ToLower(os.Args[2])

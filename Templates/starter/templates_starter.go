@@ -285,7 +285,7 @@ WORKDIR /app
 
     COPY --from=builder /app/app .
     COPY --from=builder /app/.env .
-	COPY --from=builder /app/Sqlite ./Sqlite
+	RUN if [ -d /app/Sqlite ]; then cp -r /app/Sqlite ./Sqlite; fi
 
     EXPOSE 8000
 
