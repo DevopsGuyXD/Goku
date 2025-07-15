@@ -207,12 +207,24 @@ func Build_Docker_Image() {
 // ============================================================================ LIST DOCKER IMAGES BELONGING TO SPECIFIC APP
 func List_Docker_Image() {
 
-	image := strings.Split(utils.Called_From_Location(), `\`)
+	// image := strings.Split(utils.Called_From_Location(), `\`)
 
-	fmt.Println()
-
-	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", image[len(image)-1])).Output()
+	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls")).Output()
 	utils.Check_For_Err(err)
 
-	fmt.Printf("%v", string(res))
+	fmt.Printf("\n%v", string(res))
+}
+
+// ============================================================================ TAG DOCKER IMAGE
+func Tag_Docker_Image(project string) {
+
+	image := strings.Split(utils.Called_From_Location(), `\`)
+
+	_, err := exec.Command("sh", "-c", fmt.Sprintf("docker tag %s %s", image[len(image)-1], project)).Output()
+	utils.Check_For_Err(err)
+
+	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", project)).Output()
+	utils.Check_For_Err(err)
+
+	fmt.Printf("\n%v", string(res))
 }
