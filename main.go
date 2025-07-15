@@ -42,6 +42,7 @@ func main() {
 
 		default:
 			fmt.Printf("Go1: Bad option\n")
+			utils.All_Options()
 		}
 
 	// ============================================================================ create-project | dev | build | start
@@ -79,7 +80,7 @@ func main() {
 			configs.List_Docker_Image(dockerImageName)
 
 		default:
-			fmt.Printf("Go1: Bad op\n")
+			fmt.Printf("Go1: Bad option\n")
 			utils.All_Options()
 		}
 
