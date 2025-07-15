@@ -60,7 +60,7 @@ func All_Options() {
       goku add-docker                    | Add a Dockerfile to the project
       goku build-docker                  | Build a Docker image for the project
       goku list-docker                   | List Docker images associated with the project
-      goku tag-docker                    | Tag Docker images associated with the project
+      goku tag-docker <name:tag>         | Tag Docker images associated with the project
 `)
 }
 

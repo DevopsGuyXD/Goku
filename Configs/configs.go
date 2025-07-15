@@ -207,9 +207,12 @@ func Build_Docker_Image() {
 // ============================================================================ LIST DOCKER IMAGES BELONGING TO SPECIFIC APP
 func List_Docker_Image() {
 
-	// image := strings.Split(utils.Called_From_Location(), `\`)
+	image := strings.Split(utils.Called_From_Location(), `\`)
 
-	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls")).Output()
+	image_Id, err := exec.Command("sh", "-c", fmt.Sprintf("docker images --format '{{.ID}}' %v", image[len(image)-1])).Output()
+	utils.Check_For_Err(err)
+
+	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls | grep %v", string(image_Id))).Output()
 	utils.Check_For_Err(err)
 
 	fmt.Printf("\n%v", string(res))
