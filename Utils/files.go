@@ -168,3 +168,18 @@ func UpdateAppConfig(crudName string) {
 
 	InsertIntoFileAfter(topLine, filePath, data)
 }
+
+// ============================================================================ RETURN LINE FROM FILE
+func ReturnLineFromFile(data *os.File) string {
+
+	scanner := bufio.NewScanner(data)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, "PORT") {
+			return line
+		}
+	}
+
+	return ""
+}

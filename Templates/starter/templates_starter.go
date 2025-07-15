@@ -75,8 +75,7 @@ func create_open_file(folder_or_File string) *os.File {
 }
 
 // ============================================================================ .env DATA
-var env_Data = 
-`PORT=":8000"
+var env_Data = `PORT="8000"
 GOKU_VERSION="v1.0.0"`
 
 // ============================================================================ go.mod DATA
@@ -109,11 +108,12 @@ import (
 // -------------------------- Main
 func main() {
 	util.InitEnvFile()
+	port := ":" + os.Getenv("PORT")
 
-	fmt.Printf("Listening on http://localhost" + os.Getenv("PORT") + "\n")
+	fmt.Printf("Listening on http://localhost" + port + "\n")
 
 	server := route.RouteCollection()
-	err := http.ListenAndServe(os.Getenv("PORT"), server)
+	err := http.ListenAndServe(port, server)
 	util.Check_For_Err(err)
 }
 
@@ -285,6 +285,8 @@ WORKDIR /app
 FROM alpine:latest
 WORKDIR /app
 
+	ARG PORT
+
     RUN addgroup -S appgroup && adduser -S appuser -G appgroup
     USER appuser
 
@@ -292,10 +294,10 @@ WORKDIR /app
     COPY --from=builder /app/.env .
 	RUN if [ -d /app/Sqlite ]; then cp -r /app/Sqlite ./Sqlite; fi
 
-    EXPOSE 8000
+    EXPOSE $PORT
 
     HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD wget --spider -q http://localhost:8000/health || exit 1
+    CMD wget --spider -q http://localhost:$PORT/health || exit 1
 
     CMD ["./app"]`
 

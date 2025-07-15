@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strings"
 
 	utils "github.com/DevopsGuyXD/Goku/Utils"
 )
@@ -148,7 +149,13 @@ func Run_Tests() {
 
 // ============================================================================ DOCKER BUILD
 func Build_Docker_Image(dockerImageName string) {
-	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build -t %s .", dockerImageName))
+
+	data := utils.Open_File(utils.Called_From_Location() + "/.env")
+	line := utils.ReturnLineFromFile(data)
+
+	parts := strings.Split(line, `"`)
+
+	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build --build-arg PORT=%v -t %s .", parts[1], dockerImageName))
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
