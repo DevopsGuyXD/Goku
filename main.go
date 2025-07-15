@@ -37,6 +37,9 @@ func main() {
 			utils.Create_File([]string{"dockerfile"})
 			utils.Write_File(utils.Open_File("dockerfile"), templates_starter.DockerFile_Data())
 
+		case os.Args[1] == "build-docker":
+			configs.Build_Docker_Image()
+
 		case os.Args[1] == "test":
 			configs.Run_Tests()
 
@@ -72,10 +75,6 @@ func main() {
 		case os.Args[1] == "create-project" && os.Args[2] != "":
 			project := strings.ToLower(os.Args[2])
 			templates_starter.Starter_Project(project)
-
-		case os.Args[1] == "build-docker" && os.Args[2] != "":
-			dockerImageName := strings.ToLower(os.Args[2])
-			configs.Build_Docker_Image(dockerImageName)
 
 		case os.Args[1] == "dl" && os.Args[2] != "":
 			dockerImageName := strings.ToLower(os.Args[2])
