@@ -23,7 +23,7 @@ func Creator() {
 // ============================================================================ ERROR HANDLING
 func All_Options() {
 	fmt.Printf(`  
-  Options:
+  ⭐ Options:
 
       -h, --help        Show help information  
       -v, --version     Show CLI version  
@@ -50,8 +50,10 @@ func All_Options() {
 
   🐳 Docker Integration:
 
+    ☆ Note: Please ensure that Docker is installed and actively running on your system.
+
       goku add-docker          | Add a Dockerfile to the project
-      goku docker <name[:tag]> | Build a Docker image for the project.(Defaults to "latest" tag if not specified)
+      goku dockerize <name[:tag]> | Build a Docker image for the project.(Defaults to "latest" tag if not specified)
       goku dl <name>           | List Docker images associated with the project
 `)
 }
