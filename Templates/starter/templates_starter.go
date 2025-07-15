@@ -110,7 +110,7 @@ func main() {
 	util.InitEnvFile()
 	port := ":" + os.Getenv("PORT")
 
-	fmt.Printf("Listening on http://localhost" + port + "\n")
+	fmt.Printf("\nListening on http://localhost" + port + "\n")
 
 	server := route.RouteCollection()
 	err := http.ListenAndServe(port, server)
