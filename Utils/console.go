@@ -58,7 +58,7 @@ func All_Options() {
     ☆ Please ensure that Docker is installed and actively running on your system ☆
 
       goku add-docker                    | Add a Dockerfile to the project
-      goku build-docker <name[:tag]>     | Build a Docker image for the project.(Defaults to "latest" tag if not specified)
+      goku build-docker                  | Build a Docker image for the project
       goku dl <name>                     | List Docker images associated with the project
 `)
 }

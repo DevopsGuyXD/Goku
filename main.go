@@ -40,6 +40,9 @@ func main() {
 		case os.Args[1] == "build-docker":
 			configs.Build_Docker_Image()
 
+		case os.Args[1] == "dl":
+			configs.List_Docker_Image()
+
 		case os.Args[1] == "test":
 			configs.Run_Tests()
 
@@ -75,10 +78,6 @@ func main() {
 		case os.Args[1] == "create-project" && os.Args[2] != "":
 			project := strings.ToLower(os.Args[2])
 			templates_starter.Starter_Project(project)
-
-		case os.Args[1] == "dl" && os.Args[2] != "":
-			dockerImageName := strings.ToLower(os.Args[2])
-			configs.List_Docker_Image(dockerImageName)
 
 		default:
 			fmt.Printf("\nGoku: Invalid option. Please use one of the supported options.\n\n ☆  goku -h\n")
