@@ -111,7 +111,6 @@ func main() {
 	util.InitEnvFile()
 
 	fmt.Printf("Listening on http://localhost" + os.Getenv("PORT") + "\n")
-	fmt.Printf("Swagger: http://localhost" + os.Getenv("PORT") + "/swagger/index.html" + "\n")
 
 	server := route.RouteCollection()
 	err := http.ListenAndServe(os.Getenv("PORT"), server)

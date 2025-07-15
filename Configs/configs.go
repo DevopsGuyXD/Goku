@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"runtime"
 
@@ -141,14 +142,17 @@ func Run_Prod() {
 		shell = "cmd.exe"
 		flag = "/C"
 
+		file, err := filepath.Glob(utils.Called_From_Location() + "/dist/*.exe")
+		utils.Check_For_Err(err)
+
 		utils.Message("🔥 Running in Production mode")
 
-		cmd := exec.Command(shell, flag, "go run .")
+		cmd := exec.Command(shell, flag, file[0])
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 
-		err := cmd.Run()
+		err = cmd.Run()
 		utils.Check_For_Err(err)
 
 		os.Exit(0)
@@ -156,14 +160,17 @@ func Run_Prod() {
 		shell = "sh"
 		flag = "-c"
 
+		file, err := filepath.Glob(utils.Called_From_Location() + "/dist/*")
+		utils.Check_For_Err(err)
+
 		utils.Message("🔥 Running in Production mode")
 
-		cmd := exec.Command(shell, flag, "go run .")
+		cmd := exec.Command(shell, flag, file[0])
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 
-		err := cmd.Run()
+		err = cmd.Run()
 		utils.Check_For_Err(err)
 
 		os.Exit(0)

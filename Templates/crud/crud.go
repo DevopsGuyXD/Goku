@@ -80,7 +80,7 @@ func model_Handlers(crudName string) {
 
 	targets := map[string]bool{
 		"// -------------------------- GET HANDLER":    false,
-		"// -------------------------- CREATE HANDLER": false,
+		"// -------------------------- POST HANDLER":   false,
 		"// -------------------------- UPDATE HANDLER": false,
 		"// -------------------------- DELETE HANDLER": false,
 	}

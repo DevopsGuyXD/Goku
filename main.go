@@ -56,7 +56,7 @@ func main() {
 		case os.Args[1] == "run" && os.Args[2] == "start":
 			_, err := os.Stat("./dist")
 			if err != nil {
-				fmt.Printf("\nYou will need to \"build\" your code first\n\n \tRun \"goku run build\"\n")
+				fmt.Printf("\nBuild step required: Please compile your code before proceeding.\n\n Use the following command:\n goku run build\n")
 				os.Exit(0)
 			}
 

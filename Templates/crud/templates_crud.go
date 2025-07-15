@@ -425,7 +425,7 @@ func get_Handler(query string) []map[string]interface{} {
 	return response
 }
 
-// -------------------------- CREATE HANDLER
+// -------------------------- POST HANDLER
 func post_Handler(data interface{}, api string) int {
 
 	db := initDB()

@@ -76,12 +76,6 @@ func init_air() {
 	Check_For_Err(err)
 }
 
-// ============================================================================ CREATE FOLDER
-// func Create_Sub_Folder(project string) {
-// 	err := os.Mkdir(project, 0755)
-// 	Check_For_Err(err)
-// }
-
 // ============================================================================ GET PROJECT NAME
 func Project_Name() string {
 	dir, err := os.Getwd()
