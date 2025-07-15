@@ -41,7 +41,7 @@ func fileController(project, folder string) (*os.File, string) {
 		file = create_open_file(folder)
 
 	case strings.Contains(folder, "Config"):
-		data = config_Data
+		data = config_Data(project)
 		file = create_open_file(folder)
 
 	case strings.Contains(folder, "Models"):
@@ -132,7 +132,7 @@ func routes_Data(project string) string {
 
 import (
 	controller "github.com/DevopsGuyXD/%[1]v/Controller"
-	_ "github.com/DevopsGuyXD/myapp/docs"
+	_ "github.com/DevopsGuyXD/%[1]v/docs"
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -211,13 +211,15 @@ func GET_NotAllowed(w http.ResponseWriter, r *http.Request) {
 }
 
 // ============================================================================ config.go DATA
-var config_Data = `
+func config_Data(project string) string {
+
+	data := fmt.Sprintf(`
 package config
 
 import (
 	"database/sql"
 	
-	utils "github.com/DevopsGuyXD/myapp/Utils"
+	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 	_ "modernc.org/sqlite"
 )
 
@@ -227,7 +229,10 @@ func InitDatabase() *sql.DB {
 	utils.Check_For_Err(err)
 
 	return database
-}`
+}`, project)
+
+	return data
+}
 
 // ============================================================================ models.go DATA
 var model_Data = `package models
