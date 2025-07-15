@@ -79,7 +79,7 @@ func main() {
 			configs.List_Docker_Image(dockerImageName)
 
 		default:
-			fmt.Printf("Go1: Bad option\n")
+			fmt.Printf("Go1: Bad op\n")
 			utils.All_Options()
 		}
 
