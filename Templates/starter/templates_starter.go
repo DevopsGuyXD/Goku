@@ -285,6 +285,7 @@ WORKDIR /app
 
     COPY --from=builder /app/app .
     COPY --from=builder /app/.env .
+	COPY --from=builder /app/Sqlite ./Sqlite
 
     EXPOSE 8000
 

@@ -46,8 +46,13 @@ func All_Options() {
 
       goku add-crud <name>               | Generate CRUD logic for the specified resource
       goku swag                          | Generate or update Swagger documentation
-    
 
+
+  🧪 Testing & Validation:
+
+      goku test                          | Run all project tests to validate functionality
+
+      
   🐳 Docker Integration:
 
     ☆ Note: Please ensure that Docker is installed and actively running on your system.

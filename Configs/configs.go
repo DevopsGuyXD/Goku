@@ -126,6 +126,7 @@ func Create_Docker_Image(dockerImageName string) {
 	fmt.Printf("\nDocker build completed successfully \n")
 }
 
+// ============================================================================ LIST DOCKER IMAGES BELONGING TO SPECIFIC APP
 func List_Docker_Image(dockerImageName string) {
 	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", dockerImageName)).Output()
 	utils.Check_For_Err(err)
@@ -175,4 +176,30 @@ func Run_Prod() {
 
 		os.Exit(0)
 	}
+}
+
+// ============================================================================ RUN TESTS
+func Run_Tests() {
+	var shell, flag string
+	// calledFrom := utils.Called_From_Location()
+
+	if runtime.GOOS == "windows" {
+		shell = "cmd.exe"
+		flag = "/C"
+	} else {
+		shell = "sh"
+		flag = "-c"
+	}
+
+	utils.Message("🧪 Running tests")
+
+	cmd := exec.Command(shell, flag, "go test ./Tests -count=1")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+
+	err := cmd.Run()
+	utils.Check_For_Err(err)
+
+	os.Exit(0)
 }

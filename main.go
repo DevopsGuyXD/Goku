@@ -37,6 +37,9 @@ func main() {
 			utils.Create_File([]string{"dockerfile"})
 			utils.Write_File(utils.Open_File("dockerfile"), templates_starter.DockerFile_Data())
 
+		case os.Args[1] == "test":
+			configs.Run_Tests()
+
 		case os.Args[1] == "swag":
 			utils.Init_Swagger()
 
