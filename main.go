@@ -41,8 +41,7 @@ func main() {
 			utils.Init_Swagger()
 
 		default:
-			fmt.Printf("Go1: Bad option\n")
-			utils.All_Options()
+			fmt.Printf("\nGoku: Invalid option. Please use one of the supported options.\n\n ☆  goku -h\n")
 		}
 
 	// ============================================================================ create-project | dev | build | start
@@ -80,13 +79,11 @@ func main() {
 			configs.List_Docker_Image(dockerImageName)
 
 		default:
-			fmt.Printf("Go1: Bad option\n")
-			utils.All_Options()
+			fmt.Printf("\nGoku: Invalid option. Please use one of the supported options.\n\n ☆  goku -h\n")
 		}
 
 	default:
-		fmt.Printf("Go1: Bad option\n")
-		utils.All_Options()
+		fmt.Printf("\nGoku: Invalid option. Please use one of the supported options.\n\n ☆  goku -h\n")
 	}
 
 }
