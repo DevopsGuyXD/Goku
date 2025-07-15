@@ -37,24 +37,24 @@ func All_Options() {
 
   🔧 Run & Build:
 
-      goku run dev   | Start the project in development mode
-      goku run build | Build/compile the project for production
-      goku run start | Run the compiled project in production mode
+      goku run dev                       | Start the project in development mode
+      goku run build                     | Build/compile the project for production
+      goku run start                     | Run the compiled project in production mode
 
 
   ⚙️  Feature Additions:
 
-      goku add-crud <name> | Generate CRUD logic for the specified resource
-      goku swag            | Generate or update Swagger documentation
+      goku add-crud <name>               | Generate CRUD logic for the specified resource
+      goku swag                          | Generate or update Swagger documentation
     
 
   🐳 Docker Integration:
 
     ☆ Note: Please ensure that Docker is installed and actively running on your system.
 
-      goku add-docker             | Add a Dockerfile to the project
-      goku dockerize <name[:tag]> | Build a Docker image for the project.(Defaults to "latest" tag if not specified)
-      goku dl <name>              | List Docker images associated with the project
+      goku add-docker                    | Add a Dockerfile to the project
+      goku dockerize <name[:tag]>        | Build a Docker image for the project.(Defaults to "latest" tag if not specified)
+      goku dl <name>                     | List Docker images associated with the project
 `)
 }
 
