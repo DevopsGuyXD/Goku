@@ -25,19 +25,34 @@ func All_Options() {
 	fmt.Printf(`  
   Options:
 
-    -h | --help
-    -v | --version
-    -i | --install
+      -h, --help        Show help information  
+      -v, --version     Show CLI version  
+      -i, --install     Install project dependencies
 
-    goku create-project mytestapp
-    goku run dev
-    goku run build
-    goku run start
-    goku add-crud <NAME>
-	goku swag
-	goku add-docker
-    goku docker <NAME:TAG> -> Note: TAG will be "latest" if not specified
-	goku dl <NAME>
+
+  🚀 Project Commands:
+
+      goku create-project <project-name> | Create a new Goku project
+
+
+  🔧 Run & Build:
+
+      goku run dev   | Start the project in development mode
+      goku run build | Build/compile the project for production
+      goku run start | Run the compiled project in production mode
+
+
+  ⚙️  Feature Additions:
+
+      goku add-crud <name> | Generate CRUD logic for the specified resource
+      goku swag            | Generate or update Swagger documentation
+    
+
+  🐳 Docker Integration:
+
+      goku add-docker          | Add a Dockerfile to the project
+      goku docker <name[:tag]> | Build a Docker image for the project.(Defaults to "latest" tag if not specified)
+      goku dl <name>           | List Docker images associated with the project
 `)
 }
 
