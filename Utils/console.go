@@ -61,7 +61,7 @@ func All_Options() {
       goku moby-build                    | Build a Docker image for the project
       goku moby-list                     | List Docker images associated with the project
       goku moby-tag <name:tag>           | Tag Docker images associated with the project
-      goku moby-run <tag> <name:tag>     | Run Docker image
+      goku moby-run <tag> <name:tag>     | Run the Docker image. Defaults to the project image if <name:tag> is empty
 `)
 }
 

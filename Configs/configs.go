@@ -238,6 +238,7 @@ func Tag_Docker_Image(project string) {
 func Run_Docker_Image(port int, image string) {
 
 	var shell, flag string
+	var cmd *exec.Cmd
 
 	if runtime.GOOS == "windows" {
 		shell = "cmd.exe"
@@ -249,7 +250,14 @@ func Run_Docker_Image(port int, image string) {
 
 	utils.Message("🐳 Running container")
 
-	cmd := exec.Command(shell, flag, fmt.Sprintf("docker run -p %d:8000 %s", port, image))
+	if image == "" {
+		default_image := strings.Split(utils.Called_From_Location(), `\`)
+		cmd = exec.Command(shell, flag, fmt.Sprintf("docker run -p %d:8000 %s", port, default_image[len(default_image)-1]))
+
+	} else {
+		cmd = exec.Command(shell, flag, fmt.Sprintf("docker run -p %d:8000 %s", port, image))
+	}
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin

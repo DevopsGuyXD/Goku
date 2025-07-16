@@ -84,6 +84,12 @@ func main() {
 			project := strings.ToLower(os.Args[2])
 			configs.Tag_Docker_Image(project)
 
+		// case os.Args[1] == "moby-run" && os.Args[2] != "":
+		// 	port, err := strconv.Atoi(os.Args[2])
+		// 	utils.Check_For_Err(err)
+
+		// 	configs.Run_Docker_Image(port, "")
+
 		default:
 			fmt.Printf("\nGoku: Invalid option. Please use one of the supported options.\n\n ☆  goku -h\n")
 		}
@@ -91,10 +97,12 @@ func main() {
 	// ============================================================================ create-project | dev | build | start
 	case len(os.Args) == 4:
 		switch {
-		case os.Args[1] == "mody-run" && os.Args[2] != "" && os.Args[3] != "":
+		case os.Args[1] == "moby-run" && os.Args[2] != "" && os.Args[3] != "":
+
 			port, err := strconv.Atoi(os.Args[2])
 			utils.Check_For_Err(err)
 			image := os.Args[3]
+
 			configs.Run_Docker_Image(port, image)
 		}
 
