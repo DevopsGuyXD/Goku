@@ -233,3 +233,29 @@ func Tag_Docker_Image(project string) {
 
 	fmt.Printf("\n%v", string(res))
 }
+
+// ============================================================================ RUN DOCKER IMAGE
+func Run_Docker_Image(port int, image string) {
+
+	var shell, flag string
+
+	if runtime.GOOS == "windows" {
+		shell = "cmd.exe"
+		flag = "/C"
+	} else {
+		shell = "sh"
+		flag = "-c"
+	}
+
+	utils.Message("🐳 Running container")
+
+	cmd := exec.Command(shell, flag, fmt.Sprintf("docker run -p %d:8000 %s", port, image))
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+
+	err := cmd.Run()
+	utils.Check_For_Err(err)
+
+	os.Exit(0)
+}

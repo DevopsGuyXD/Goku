@@ -57,10 +57,11 @@ func All_Options() {
 
     ☆ Please ensure that Docker is installed and actively running on your system ☆
 
-      goku add-docker                    | Add a Dockerfile to the project
-      goku build-docker                  | Build a Docker image for the project
-      goku list-docker                   | List Docker images associated with the project
-      goku tag-docker <name:tag>         | Tag Docker images associated with the project
+      goku moby                          | Add a Dockerfile to the project
+      goku moby-build                    | Build a Docker image for the project
+      goku moby-list                     | List Docker images associated with the project
+      goku moby-tag <name:tag>           | Tag Docker images associated with the project
+      goku moby-run <tag> <name:tag>     | Run Docker image
 `)
 }
 
@@ -82,5 +83,5 @@ func Spinner(done chan bool, message string) {
 
 // ============================================================================ MESSAGE
 func Message(message string) {
-	fmt.Printf("\n%v\n\n", message)
+	fmt.Printf("\n%v\n", message)
 }
