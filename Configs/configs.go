@@ -217,7 +217,7 @@ func List_Docker_Image() {
 	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls | grep %v", string(image_Id))).Output()
 	utils.Check_For_Err(err)
 
-	fmt.Printf("\n%v", string(res))
+	fmt.Printf("\nREPOSITORY   TAG       IMAGE ID       CREATED          SIZE\n%v", string(res))
 }
 
 // ============================================================================ TAG DOCKER IMAGE

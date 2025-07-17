@@ -34,14 +34,14 @@ func main() {
 		case os.Args[1] == "--creator" || os.Args[1] == "-c":
 			utils.Creator()
 
-		case os.Args[1] == "moby":
+		case os.Args[1] == "dock":
 			utils.Create_File([]string{"dockerfile"})
 			utils.Write_File(utils.Open_File("dockerfile"), templates_starter.DockerFile_Data())
 
-		case os.Args[1] == "moby-build":
+		case os.Args[1] == "dock-build":
 			configs.Build_Docker_Image()
 
-		case os.Args[1] == "moby-list":
+		case os.Args[1] == "dock-list":
 			configs.List_Docker_Image()
 
 		case os.Args[1] == "test":
@@ -80,15 +80,15 @@ func main() {
 			project := strings.ToLower(os.Args[2])
 			templates_starter.Starter_Project(project)
 
-		case os.Args[1] == "moby-tag" && os.Args[2] != "":
+		case os.Args[1] == "dock-tag" && os.Args[2] != "":
 			project := strings.ToLower(os.Args[2])
 			configs.Tag_Docker_Image(project)
 
-		// case os.Args[1] == "moby-run" && os.Args[2] != "":
-		// 	port, err := strconv.Atoi(os.Args[2])
-		// 	utils.Check_For_Err(err)
+		case os.Args[1] == "dock-run" && os.Args[2] != "":
+			port, err := strconv.Atoi(os.Args[2])
+			utils.Check_For_Err(err)
 
-		// 	configs.Run_Docker_Image(port, "")
+			configs.Run_Docker_Image(port, "")
 
 		default:
 			fmt.Printf("\nGoku: Invalid option. Please use one of the supported options.\n\n ☆  goku -h\n")
@@ -97,7 +97,7 @@ func main() {
 	// ============================================================================ create-project | dev | build | start
 	case len(os.Args) == 4:
 		switch {
-		case os.Args[1] == "moby-run" && os.Args[2] != "" && os.Args[3] != "":
+		case os.Args[1] == "dock-run" && os.Args[2] != "" && os.Args[3] != "":
 
 			port, err := strconv.Atoi(os.Args[2])
 			utils.Check_For_Err(err)

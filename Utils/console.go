@@ -57,11 +57,11 @@ func All_Options() {
 
     ☆ Please ensure that Docker is installed and actively running on your system ☆
 
-      goku moby                          | Add a Dockerfile to the project
-      goku moby-build                    | Build a Docker image for the project
-      goku moby-list                     | List Docker images associated with the project
-      goku moby-tag <name:tag>           | Tag Docker images associated with the project
-      goku moby-run <tag> <name:tag>     | Run the Docker image. Defaults to the project image if <name:tag> is empty
+      goku dock                          | Add a Dockerfile to the project
+      goku dock-build                    | Build a Docker image for the project
+      goku dock-list                     | List Docker images associated with the project
+      goku dock-tag <name:tag>           | Tag Docker images associated with the project
+      goku dock-run <tag> <name:tag>     | Run the Docker image. Defaults to the project image if <name:tag> is empty
 `)
 }
 
