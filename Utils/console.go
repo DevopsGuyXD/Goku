@@ -61,7 +61,7 @@ func All_Options() {
       goku dock-build                    | Build a Docker image for the project
       goku dock-list                     | List Docker images associated with the project
       goku dock-tag <name:tag>           | Tag Docker images associated with the project
-      goku dock-run <tag> <name:tag>     | Run the Docker image. Defaults to the project image if <name:tag> is empty
+      goku dock-run <port> <name:tag>     | Run the Docker image. Defaults to the project image if <name:tag> is empty
 `)
 }
 
