@@ -99,27 +99,40 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	models "github.com/DevopsGuyXD/%[1]v/Models"
-	route "github.com/DevopsGuyXD/%[1]v/Routes"
-	util "github.com/DevopsGuyXD/%[1]v/Utils"
+	routes "github.com/DevopsGuyXD/%[1]v/Routes"
+	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 )
-
-// -------------------------- Main
-func main() {
-	util.InitEnvFile()
-	port := ":" + os.Getenv("PORT")
-
-	fmt.Printf("\nListening on http://localhost" + port + "\n")
-
-	server := route.RouteCollection()
-	err := http.ListenAndServe(port, server)
-	util.Check_For_Err(err)
-}
 
 // -------------------------- INIT
 func init() {
 	models.AppModels()
+}
+
+// -------------------------- Start server
+func StartServer(port string) {
+	server := &http.Server{
+		Addr:         port,
+		Handler:      routes.RouteCollection(),
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	err := server.ListenAndServe()
+	utils.Check_For_Err(err)
+}
+
+// -------------------------- Main
+func main() {
+	utils.InitEnvFile()
+	port := ":" + os.Getenv("PORT")
+
+	fmt.Printf("\nListening on http://localhost" + port + "\n")
+
+	StartServer(port)
 }`, project)
 
 	return data

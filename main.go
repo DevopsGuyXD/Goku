@@ -61,7 +61,7 @@ func main() {
 			configs.Run_Dev()
 
 		case os.Args[1] == "run" && os.Args[2] == "build":
-			configs.Create_Build()
+			configs.Create_Build("--scan=true")
 
 		case os.Args[1] == "run" && os.Args[2] == "start":
 			_, err := os.Stat("./dist")
@@ -97,6 +97,10 @@ func main() {
 	// ============================================================================ create-project | dev | build | start
 	case len(os.Args) == 4:
 		switch {
+
+		case os.Args[1] == "run" && os.Args[2] == "build" && os.Args[3] == "--scan=false":
+			configs.Create_Build(os.Args[3])
+
 		case os.Args[1] == "dock-run" && os.Args[2] != "" && os.Args[3] != "":
 
 			port, err := strconv.Atoi(os.Args[2])

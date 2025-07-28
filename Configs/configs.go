@@ -41,9 +41,15 @@ func Run_Dev() {
 }
 
 // ============================================================================ CREATE BUILD
-func Create_Build() {
+func Create_Build(scan string) {
 
 	done := make(chan bool)
+
+	if scan == "--scan=true" {
+		utils.RunScan()
+	} else {
+		fmt.Printf("\nWarning: Scan skipped. It is strongly recommended not to skip this step\n")
+	}
 
 	if runtime.GOOS == "windows" {
 		fmt.Println()

@@ -38,7 +38,7 @@ func All_Options() {
   🔧 Run & Build:
 
       goku run dev                       | Start the project in development mode
-      goku run build                     | Build/compile the project for production
+      goku run build                     | Build/compile the project for production. Use --scan=false to skip gosec from scanning your code
       goku run start                     | Run the compiled project in production mode
 
 

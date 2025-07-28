@@ -121,3 +121,14 @@ func Check_If_Lines_Exist(filePath string, targets map[string]bool) bool {
 
 	return true
 }
+
+// ============================================================================ RUN SCAN
+func RunScan() {
+	cmd := exec.Command("sh", "-c", "go run github.com/securego/gosec/v2/cmd/gosec@latest ./...")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		os.Exit(1)
+	}
+}
