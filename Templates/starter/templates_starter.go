@@ -176,7 +176,7 @@ import (
 	"net/http"
 	"os"
 
-	util "github.com/DevopsGuyXD/%[1]v/Utils"
+	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 )
 
 // -------------------------- HOME CONTROLLER
@@ -187,11 +187,12 @@ import (
 func GET_home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	util.InitEnvFile()
+	utils.InitEnvFile()
 
 	message := "Welcome to Goku " + os.Getenv("GOKU_VERSION")
 
-	json.NewEncoder(w).Encode(message)
+	err := json.NewEncoder(w).Encode(message)
+	utils.Check_For_Err(err)
 }
 
 // -------------------------- HEALTH CONTROLLER
@@ -202,11 +203,12 @@ func GET_home(w http.ResponseWriter, r *http.Request) {
 func GET_health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	util.InitEnvFile()
+	utils.InitEnvFile()
 
 	message := "Healthy!!"
 
-	json.NewEncoder(w).Encode(message)
+	err := json.NewEncoder(w).Encode(message)
+	utils.Check_For_Err(err)
 }
 
 // -------------------------- NOT ALLOWED CONTROLLER
@@ -216,7 +218,8 @@ func GET_NotAllowed(w http.ResponseWriter, r *http.Request) {
 
 	message := "NA"
 
-	json.NewEncoder(w).Encode(message)
+	err := json.NewEncoder(w).Encode(message)
+	utils.Check_For_Err(err)
 
 }`, project)
 

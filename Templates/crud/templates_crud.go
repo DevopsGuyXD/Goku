@@ -50,19 +50,23 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response[0]["message"] == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("No records found")
+			err := json.NewEncoder(w).Encode("No records found")
+			utils.Check_For_Err(err)
 
 		case response[0]["message"] == http.StatusBadRequest:
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Bad request")
+			err := json.NewEncoder(w).Encode("Bad request")
+			utils.Check_For_Err(err)
 
 		case len(response) > 0:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(response)
+			err := json.NewEncoder(w).Encode(response)
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }
 
@@ -82,19 +86,23 @@ func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response["message"] == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("No records found")
+			err := json.NewEncoder(w).Encode("No records found")
+			utils.Check_For_Err(err)
 
 		case response["message"] == http.StatusBadRequest:
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Bad request")
+			err := json.NewEncoder(w).Encode("Bad request")
+			utils.Check_For_Err(err)
 
 		case len(response) > 0:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(response)
+			err := json.NewEncoder(w).Encode(response)
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }
 
@@ -115,19 +123,23 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response == http.StatusCreated:
 			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode("Created successfully")
+			err := json.NewEncoder(w).Encode("Created successfully")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Record not created")
+			err := json.NewEncoder(w).Encode("Record not created")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusBadRequest:
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Bad request")
+			err := json.NewEncoder(w).Encode("Bad request")
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }
 
@@ -151,19 +163,23 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Updated successfully")
+			err := json.NewEncoder(w).Encode("Updated successfully")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusNotModified:
 			w.WriteHeader(http.StatusNotModified)
-			json.NewEncoder(w).Encode("Record not modified")
+			err := json.NewEncoder(w).Encode("Record not modified")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusBadRequest:
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Bad request")
+			err := json.NewEncoder(w).Encode("Bad request")
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }
 
@@ -184,15 +200,18 @@ func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Deleted successfully")
+			err := json.NewEncoder(w).Encode("Deleted successfully")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusNotModified:
 			w.WriteHeader(http.StatusNotModified)
-			json.NewEncoder(w).Encode("Record not deleted")
+			err := json.NewEncoder(w).Encode("Record not deleted")
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }`, crudName, project)
 
@@ -236,7 +255,8 @@ func %[1]v_ct() {
 
 	createDomainsTable, err := db.Prepare(table)
 	utils.Check_For_Err(err)
-	createDomainsTable.Exec()
+	_, err = createDomainsTable.Exec()
+	utils.Check_For_Err(err)
 
 	columnsToAdd := []string{
 		// "title VARCHAR(25)",
