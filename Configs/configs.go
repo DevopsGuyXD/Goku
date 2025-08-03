@@ -183,10 +183,8 @@ func Build_Docker_Image() {
 		return
 	}
 
-	// Regex to remove BuildKit prefixes like: #5 or #12
 	buildkitPrefix := regexp.MustCompile(`^#\d+\s*`)
 
-	// Stream stdout
 	go func() {
 		scanner := bufio.NewScanner(stdout)
 		for scanner.Scan() {
@@ -195,7 +193,6 @@ func Build_Docker_Image() {
 		}
 	}()
 
-	// Stream stderr
 	go func() {
 		scanner := bufio.NewScanner(stderr)
 		for scanner.Scan() {
@@ -210,34 +207,6 @@ func Build_Docker_Image() {
 	}
 
 	fmt.Printf("\nDocker build completed successfully \n")
-}
-
-// ============================================================================ LIST DOCKER IMAGES BELONGING TO SPECIFIC APP
-func List_Docker_Image() {
-
-	image := strings.Split(utils.Called_From_Location(), `\`)
-
-	image_Id, err := exec.Command("sh", "-c", fmt.Sprintf("docker images --format '{{.ID}}' %v", image[len(image)-1])).Output()
-	utils.Check_For_Err(err)
-
-	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls | grep %v", string(image_Id))).Output()
-	utils.Check_For_Err(err)
-
-	fmt.Printf("\nREPOSITORY   TAG       IMAGE ID       CREATED          SIZE\n%v", string(res))
-}
-
-// ============================================================================ TAG DOCKER IMAGE
-func Tag_Docker_Image(project string) {
-
-	image := strings.Split(utils.Called_From_Location(), `\`)
-
-	_, err := exec.Command("sh", "-c", fmt.Sprintf("docker tag %s %s", image[len(image)-1], project)).Output()
-	utils.Check_For_Err(err)
-
-	res, err := exec.Command("sh", "-c", fmt.Sprintf("docker image ls %s", project)).Output()
-	utils.Check_For_Err(err)
-
-	fmt.Printf("\n%v", string(res))
 }
 
 // ============================================================================ RUN DOCKER IMAGE

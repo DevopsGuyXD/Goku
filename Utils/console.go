@@ -25,44 +25,42 @@ func All_Options() {
 	fmt.Printf(`  
   ⭐ Options:
 
-      -h, --help        Show help information  
-      -v, --version     Show CLI version  
-      -i, --install     Install project dependencies
+       -h, --help        Show help information  
+       -v, --version     Show CLI version  
+       -i, --install     Install project dependencies
 
 
   🚀 Project Commands:
 
-      goku create-project <project-name> | Create a new Goku project
+       goku create-project <project-name> | Create a new Goku project
 
 
   🔧 Run & Build:
 
-      goku run dev                       | Start the project in development mode
-      goku run build                     | Build/compile the project for production. Use --scan=false to skip gosec from scanning your code
-      goku run start                     | Run the compiled project in production mode
+       goku run dev                       | Start the project in development mode
+       goku run build                     | Build/compile the project for production. Use --scan=false to skip gosec from scanning your code
+       goku run start                     | Run the compiled project in production mode
 
 
   ⚙️  Feature Additions:
 
-      goku add-crud <name>               | Generate CRUD logic for the specified resource
-      goku swag                          | Generate or update Swagger documentation
+       goku add-crud <name>               | Generate CRUD logic for the specified resource
+       goku swag                          | Generate or update Swagger documentation
 
 
   🧪 Testing & Validation:
 
-      goku scan                          | Run a vulnerability scan
-      goku test                          | Run all project tests to validate functionality
+       goku scan                          | Run a vulnerability scan
+       goku test                          | Run all project tests to validate functionality
 
       
   🐳 Docker Integration:
 
-    ☆ Please ensure that Docker is installed and actively running on your system ☆
+      ☆ Please ensure that Docker is installed and actively running on your system ☆
 
-      goku dock                          | Add a Dockerfile to the project
-      goku dock-build                    | Build a Docker image for the project
-      goku dock-list                     | List Docker images associated with the project
-      goku dock-tag <name:tag>           | Tag Docker images associated with the project
-      goku dock-run <port> <name:tag>    | Run the Docker image. Defaults to the project image if <name:tag> is empty
+       goku dock                          | Add a Dockerfile to the project
+       goku dock-build                    | Build a Docker image for the project
+       goku dock-run <port>               | Run the Docker image with latest tag on your desired port
 `)
 }
 

@@ -41,9 +41,6 @@ func main() {
 		case os.Args[1] == "dock-build":
 			configs.Build_Docker_Image()
 
-		case os.Args[1] == "dock-list":
-			configs.List_Docker_Image()
-
 		case os.Args[1] == "swag":
 			utils.Init_Swagger()
 
@@ -83,10 +80,6 @@ func main() {
 			project := strings.ToLower(os.Args[2])
 			templates_starter.Starter_Project(project)
 
-		case os.Args[1] == "dock-tag" && os.Args[2] != "":
-			project := strings.ToLower(os.Args[2])
-			configs.Tag_Docker_Image(project)
-
 		case os.Args[1] == "dock-run" && os.Args[2] != "":
 			port, err := strconv.Atoi(os.Args[2])
 			utils.Check_For_Err(err)
@@ -103,14 +96,6 @@ func main() {
 
 		case os.Args[1] == "run" && os.Args[2] == "build" && os.Args[3] == "--scan=false":
 			configs.Create_Build(os.Args[3])
-
-		case os.Args[1] == "dock-run" && os.Args[2] != "" && os.Args[3] != "":
-
-			port, err := strconv.Atoi(os.Args[2])
-			utils.Check_For_Err(err)
-			image := os.Args[3]
-
-			configs.Run_Docker_Image(port, image)
 		}
 
 	default:
