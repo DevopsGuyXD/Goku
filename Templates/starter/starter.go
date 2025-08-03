@@ -13,7 +13,6 @@ func Starter_Project(project string) {
 	folders := []string{
 		project,
 		project + "\\main.go",
-		project + "\\.env",
 		project + "\\go.mod",
 		project + "\\dockerfile",
 		project + "\\Routes",

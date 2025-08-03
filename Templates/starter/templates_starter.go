@@ -20,10 +20,6 @@ func fileController(project, folder string) (*os.File, string) {
 		data = main_Data(project)
 		file = create_open_file(folder)
 
-	case strings.Contains(folder, ".env"):
-		data = env_Data
-		file = create_open_file(folder)
-
 	case strings.Contains(folder, "go.mod"):
 		data = mod_Data(project)
 		file = create_open_file(folder)
@@ -74,10 +70,6 @@ func create_open_file(folder_or_File string) *os.File {
 	return file
 }
 
-// ============================================================================ .env DATA
-var env_Data = `PORT="8000"
-GOKU_VERSION="v1.0.0"`
-
 // ============================================================================ go.mod DATA
 func mod_Data(project string) string {
 
@@ -98,9 +90,9 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
+	config "github.com/DevopsGuyXD/myapp/Config"
 	models "github.com/DevopsGuyXD/%[1]v/Models"
 	routes "github.com/DevopsGuyXD/%[1]v/Routes"
 	utils "github.com/DevopsGuyXD/%[1]v/Utils"
@@ -127,9 +119,7 @@ func StartServer(port string) {
 
 // -------------------------- Main
 func main() {
-	utils.InitEnvFile()
-	port := ":" + os.Getenv("PORT")
-
+	port := ":" + config.EnvConfig()["PORT"]
 	fmt.Printf("\nListening on http://localhost" + port + "\n")
 
 	StartServer(port)
@@ -174,8 +164,8 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 
+	config "github.com/DevopsGuyXD/myapp/Config"
 	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 )
 
@@ -187,9 +177,7 @@ import (
 func GET_home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	utils.InitEnvFile()
-
-	message := "Welcome to Goku " + os.Getenv("GOKU_VERSION")
+	message := "Welcome to Goku " + config.EnvConfig()["VERSION"]
 
 	err := json.NewEncoder(w).Encode(message)
 	utils.Check_For_Err(err)
@@ -202,8 +190,6 @@ func GET_home(w http.ResponseWriter, r *http.Request) {
 // @Router /health [get]
 func GET_health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
-	utils.InitEnvFile()
 
 	message := "Healthy!!"
 
@@ -245,6 +231,16 @@ func InitDatabase() *sql.DB {
 	utils.Check_For_Err(err)
 
 	return database
+}
+
+// -------------------------- ENV CONFIG
+func EnvConfig() map[string]string {
+	env := map[string]string{
+		"PORT":    "8000",
+		"VERSION": "v0.0.1",
+	}
+
+	return env
 }`, project)
 
 	return data
@@ -264,7 +260,6 @@ package utils
 
 import (
 	"log"
-	"github.com/joho/godotenv"
 )
 
 // -------------------------- Error Handling
@@ -273,12 +268,6 @@ func Check_For_Err(err error) {
 		log.Println(err)
 		return
 	}
-}
-
-// -------------------------- .env Init
-func InitEnvFile() {
-	err := godotenv.Load(".env")
-	Check_For_Err(err)
 }`
 
 // ============================================================================ dockerfile DATA
@@ -307,7 +296,6 @@ WORKDIR /app
     USER appuser
 
     COPY --from=builder /app/app .
-    COPY --from=builder /app/.env .
 	RUN if [ -d /app/Sqlite ]; then cp -r /app/Sqlite ./Sqlite; fi
 
     EXPOSE $PORT
