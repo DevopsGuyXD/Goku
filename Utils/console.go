@@ -50,6 +50,7 @@ func All_Options() {
 
   🧪 Testing & Validation:
 
+      goku scan                          | Run a vulnerability scan
       goku test                          | Run all project tests to validate functionality
 
       

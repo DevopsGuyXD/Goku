@@ -44,11 +44,14 @@ func main() {
 		case os.Args[1] == "dock-list":
 			configs.List_Docker_Image()
 
-		case os.Args[1] == "test":
-			configs.Run_Tests()
-
 		case os.Args[1] == "swag":
 			utils.Init_Swagger()
+
+		case os.Args[1] == "scan":
+			utils.RunScan()
+
+		case os.Args[1] == "test":
+			configs.Run_Tests()
 
 		default:
 			fmt.Printf("\nGoku: Invalid option. Please use one of the supported options.\n\n ☆  goku -h\n")
