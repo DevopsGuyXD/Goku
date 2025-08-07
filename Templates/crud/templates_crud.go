@@ -50,19 +50,23 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response[0]["message"] == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("No records found")
+			err := json.NewEncoder(w).Encode("No records found")
+			utils.Check_For_Err(err)
 
 		case response[0]["message"] == http.StatusBadRequest:
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Bad request")
+			err := json.NewEncoder(w).Encode("Bad request")
+			utils.Check_For_Err(err)
 
 		case len(response) > 0:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(response)
+			err := json.NewEncoder(w).Encode(response)
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }
 
@@ -82,19 +86,23 @@ func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response["message"] == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("No records found")
+			err := json.NewEncoder(w).Encode("No records found")
+			utils.Check_For_Err(err)
 
 		case response["message"] == http.StatusBadRequest:
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Bad request")
+			err := json.NewEncoder(w).Encode("Bad request")
+			utils.Check_For_Err(err)
 
 		case len(response) > 0:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(response)
+			err := json.NewEncoder(w).Encode(response)
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }
 
@@ -115,19 +123,23 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response == http.StatusCreated:
 			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode("Created successfully")
+			err := json.NewEncoder(w).Encode("Created successfully")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Record not created")
+			err := json.NewEncoder(w).Encode("Record not created")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusBadRequest:
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Bad request")
+			err := json.NewEncoder(w).Encode("Bad request")
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }
 
@@ -151,19 +163,23 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Updated successfully")
+			err := json.NewEncoder(w).Encode("Updated successfully")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusNotModified:
 			w.WriteHeader(http.StatusNotModified)
-			json.NewEncoder(w).Encode("Record not modified")
+			err := json.NewEncoder(w).Encode("Record not modified")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusBadRequest:
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Bad request")
+			err := json.NewEncoder(w).Encode("Bad request")
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }
 
@@ -184,15 +200,18 @@ func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
 	switch {
 		case response == http.StatusOK:
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Deleted successfully")
+			err := json.NewEncoder(w).Encode("Deleted successfully")
+			utils.Check_For_Err(err)
 
 		case response == http.StatusNotModified:
 			w.WriteHeader(http.StatusNotModified)
-			json.NewEncoder(w).Encode("Record not deleted")
+			err := json.NewEncoder(w).Encode("Record not deleted")
+			utils.Check_For_Err(err)
 
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Internal server error")
+			err := json.NewEncoder(w).Encode("Internal server error")
+			utils.Check_For_Err(err)
 	}
 }`, crudName, project)
 
@@ -236,7 +255,8 @@ func %[1]v_ct() {
 
 	createDomainsTable, err := db.Prepare(table)
 	utils.Check_For_Err(err)
-	createDomainsTable.Exec()
+	_, err = createDomainsTable.Exec()
+	utils.Check_For_Err(err)
 
 	columnsToAdd := []string{
 		// "title VARCHAR(25)",
@@ -334,7 +354,7 @@ func POST_%[1]v(request io.ReadCloser) int {
 			utils.Check_For_Err(err)
 			defer request.Close()
 
-			return post_Handler(%[1]v)
+			return post_Handler(%[1]v, "%[1]v")
 		}
 }
 
@@ -353,7 +373,7 @@ func UPDATE_%[1]v(id int, request io.ReadCloser) int {
 			utils.Check_For_Err(err)
 			defer request.Close()
 
-			return update_Handler(id, %[1]v)
+			return update_Handler(id, %[1]v, "%[1]v")
 		}
 }
 
@@ -368,7 +388,7 @@ func DELETE_%[1]v(id int) int {
 			return http.StatusInternalServerError
 
 		default:
-			return delete_Handler(id)
+			return delete_Handler(id, "%[1]v")
 	}
 }`, crudName, projectName, utils.Capitalize(crudName))
 
@@ -425,8 +445,8 @@ func get_Handler(query string) []map[string]interface{} {
 	return response
 }
 
-// -------------------------- CREATE HANDLER
-func post_Handler(data interface{}) int {
+// -------------------------- POST HANDLER
+func post_Handler(data interface{}, api string) int {
 
 	db := initDB()
 	defer db.Close()
@@ -446,7 +466,7 @@ func post_Handler(data interface{}) int {
 		}
 	}
 
-	query := fmt.Sprintf("INSERT INTO %[1]v (%%s) VALUES (%%s)", strings.Join(cols, ", "), strings.Join(vals, ", "))
+	query := fmt.Sprintf("INSERT INTO " + api + " (%%s) VALUES (%%s)", strings.Join(cols, ", "), strings.Join(vals, ", "))
 
 	if res, err := db.Exec(query, args...); err != nil {
 		return http.StatusInternalServerError
@@ -459,7 +479,7 @@ func post_Handler(data interface{}) int {
 }
 
 // -------------------------- UPDATE HANDLER
-func update_Handler(id int, data interface{}) int {
+func update_Handler(id int, data interface{}, api string) int {
 	db := initDB()
 	defer db.Close()
 
@@ -479,7 +499,7 @@ func update_Handler(id int, data interface{}) int {
 	}
 
 	args = append(args, id)
-	query := fmt.Sprintf("UPDATE %[1]v SET %%s WHERE id = ?", strings.Join(vals, ", "))
+	query := fmt.Sprintf("UPDATE " + api + " SET %%s WHERE id = ?", strings.Join(vals, ", "))
 
 	if res, err := db.Exec(query, args...); err != nil {
 		return http.StatusInternalServerError
@@ -491,12 +511,12 @@ func update_Handler(id int, data interface{}) int {
 }
 
 // -------------------------- DELETE HANDLER
-func delete_Handler(id int) int {
+func delete_Handler(id int, api string) int {
 
 	db := initDB()
 	defer db.Close()
 
-	query := fmt.Sprintf("DELETE FROM %[1]v WHERE id=%%d", id)
+	query := fmt.Sprintf("DELETE FROM " + api + " WHERE id=%%d", id)
 
 	res, err := db.Exec(query)
 	if err != nil {
@@ -513,7 +533,7 @@ func delete_Handler(id int) int {
 		}
 	}
 
-}`, crudName, utils.Capitalize(crudName))
+}`)
 
 	return data
 }
@@ -649,37 +669,7 @@ func Test_%[1]v_DELETE(t *testing.T) {
 
 	rr := %[1]v_setup(opertaion, route, nil)
 	 %[1]v_test_cases(rr, t, opertaion, allRecords)
-}
-
-
-// // -------------------------- Error Case: GET Nonexistent
-// func Test_%[1]v_GET_NotFound(t *testing.T) {
-
-// 	os.Setenv("TEST_MODE", "Y")
-// 	rr := httptest.NewRecorder()
-// 	router := routes.RouteCollection()
-
-// 	req, err := http.NewRequest("GET", "/%[1]v/9999", nil)
-// 	utils.Check_For_Err(err)
-// 	router.ServeHTTP(rr, req)
-
-// 	assert.Equal(t, http.StatusNotFound, rr.Code)
-// }
-
-// // -------------------------- Error Case: DELETE Nonexistent
-// func Test_%[1]v_DELETE_NotFound(t *testing.T) {
-
-// 	os.Setenv("TEST_MODE", "Y")
-// 	rr := httptest.NewRecorder()
-// 	router := routes.RouteCollection()
-
-// 	req, err := http.NewRequest("DELETE", "/%[1]v/9999", nil)
-// 	utils.Check_For_Err(err)
-// 	router.ServeHTTP(rr, req)
-
-// 	assert.Equal(t, http.StatusNotFound, rr.Code)
-// }
-`, crudName, projectName, utils.Capitalize(crudName))
+}`, crudName, projectName, utils.Capitalize(crudName))
 
 	return data
 }

@@ -19,7 +19,8 @@ func CRUD_Project(crudName string) {
 	utils.Install_Dependencies()
 
 	// -------------------- DONE STATUS
-	fmt.Printf("\rAdding \"%v\" ✔\n\n", crudName)
+	fmt.Println()
+	fmt.Printf("\rAdding \"%v\" ✔\n", crudName)
 }
 
 // ============================================================================ CRUD ADD ROUTE
@@ -79,7 +80,7 @@ func model_Handlers(crudName string) {
 
 	targets := map[string]bool{
 		"// -------------------------- GET HANDLER":    false,
-		"// -------------------------- CREATE HANDLER": false,
+		"// -------------------------- POST HANDLER":   false,
 		"// -------------------------- UPDATE HANDLER": false,
 		"// -------------------------- DELETE HANDLER": false,
 	}

@@ -13,8 +13,8 @@ func Starter_Project(project string) {
 	folders := []string{
 		project,
 		project + "\\main.go",
-		project + "\\.env",
 		project + "\\go.mod",
+		project + "\\dockerfile",
 		project + "\\Routes",
 		project + "\\Controller",
 		project + "\\Config",
@@ -34,5 +34,6 @@ func Starter_Project(project string) {
 	}
 
 	// -------------------- DONE STATUS
-	fmt.Printf("\n\rCreating %v ✔\n\n", project)
+	fmt.Println()
+	fmt.Printf("\rCreating %v ✔\n", project)
 }

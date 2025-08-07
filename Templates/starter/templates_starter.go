@@ -20,12 +20,12 @@ func fileController(project, folder string) (*os.File, string) {
 		data = main_Data(project)
 		file = create_open_file(folder)
 
-	case strings.Contains(folder, ".env"):
-		data = env_Data
-		file = create_open_file(folder)
-
 	case strings.Contains(folder, "go.mod"):
 		data = mod_Data(project)
+		file = create_open_file(folder)
+
+	case strings.Contains(folder, "dockerfile"):
+		data = DockerFile_Data()
 		file = create_open_file(folder)
 
 	case strings.Contains(folder, "Routes"):
@@ -37,7 +37,7 @@ func fileController(project, folder string) (*os.File, string) {
 		file = create_open_file(folder)
 
 	case strings.Contains(folder, "Config"):
-		data = config_Data
+		data = config_Data(project)
 		file = create_open_file(folder)
 
 	case strings.Contains(folder, "Models"):
@@ -70,11 +70,6 @@ func create_open_file(folder_or_File string) *os.File {
 	return file
 }
 
-// ============================================================================ .env DATA
-var env_Data = `
-PORT=":8000"
-GOKU_VERSION="v1.0.0"`
-
 // ============================================================================ go.mod DATA
 func mod_Data(project string) string {
 
@@ -95,28 +90,39 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
+	"time"
 
+	config "github.com/DevopsGuyXD/myapp/Config"
 	models "github.com/DevopsGuyXD/%[1]v/Models"
-	route "github.com/DevopsGuyXD/%[1]v/Routes"
-	util "github.com/DevopsGuyXD/%[1]v/Utils"
+	routes "github.com/DevopsGuyXD/%[1]v/Routes"
+	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 )
-
-// -------------------------- Main
-func main() {
-	util.InitEnvFile()
-
-	fmt.Printf("Listening on http://localhost" + os.Getenv("PORT") + "\n")
-	fmt.Printf("Swagger: http://localhost" + os.Getenv("PORT") + "/swagger/index.html" + "\n")
-
-	server := route.RouteCollection()
-	err := http.ListenAndServe(os.Getenv("PORT"), server)
-	util.Check_For_Err(err)
-}
 
 // -------------------------- INIT
 func init() {
 	models.AppModels()
+}
+
+// -------------------------- Start server
+func StartServer(port string) {
+	server := &http.Server{
+		Addr:         port,
+		Handler:      routes.RouteCollection(),
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	err := server.ListenAndServe()
+	utils.Check_For_Err(err)
+}
+
+// -------------------------- Main
+func main() {
+	port := ":" + config.EnvConfig()["PORT"]
+	fmt.Printf("\nListening on http://localhost" + port + "\n")
+
+	StartServer(port)
 }`, project)
 
 	return data
@@ -129,7 +135,7 @@ func routes_Data(project string) string {
 
 import (
 	controller "github.com/DevopsGuyXD/%[1]v/Controller"
-	_ "github.com/DevopsGuyXD/myapp/docs"
+	_ "github.com/DevopsGuyXD/%[1]v/docs"
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -158,9 +164,9 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 
-	util "github.com/DevopsGuyXD/%[1]v/Utils"
+	config "github.com/DevopsGuyXD/myapp/Config"
+	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 )
 
 // -------------------------- HOME CONTROLLER
@@ -171,11 +177,10 @@ import (
 func GET_home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	util.InitEnvFile()
+	message := "Welcome to Goku " + config.EnvConfig()["VERSION"]
 
-	message := "Welcome to Goku " + os.Getenv("GOKU_VERSION")
-
-	json.NewEncoder(w).Encode(message)
+	err := json.NewEncoder(w).Encode(message)
+	utils.Check_For_Err(err)
 }
 
 // -------------------------- HEALTH CONTROLLER
@@ -186,11 +191,10 @@ func GET_home(w http.ResponseWriter, r *http.Request) {
 func GET_health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	util.InitEnvFile()
-
 	message := "Healthy!!"
 
-	json.NewEncoder(w).Encode(message)
+	err := json.NewEncoder(w).Encode(message)
+	utils.Check_For_Err(err)
 }
 
 // -------------------------- NOT ALLOWED CONTROLLER
@@ -200,7 +204,8 @@ func GET_NotAllowed(w http.ResponseWriter, r *http.Request) {
 
 	message := "NA"
 
-	json.NewEncoder(w).Encode(message)
+	err := json.NewEncoder(w).Encode(message)
+	utils.Check_For_Err(err)
 
 }`, project)
 
@@ -208,13 +213,15 @@ func GET_NotAllowed(w http.ResponseWriter, r *http.Request) {
 }
 
 // ============================================================================ config.go DATA
-var config_Data = `
+func config_Data(project string) string {
+
+	data := fmt.Sprintf(`
 package config
 
 import (
 	"database/sql"
 	
-	utils "github.com/DevopsGuyXD/myapp/Utils"
+	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 	_ "modernc.org/sqlite"
 )
 
@@ -224,7 +231,20 @@ func InitDatabase() *sql.DB {
 	utils.Check_For_Err(err)
 
 	return database
-}`
+}
+
+// -------------------------- ENV CONFIG
+func EnvConfig() map[string]string {
+	env := map[string]string{
+		"PORT":    "8000",
+		"VERSION": "v0.0.1",
+	}
+
+	return env
+}`, project)
+
+	return data
+}
 
 // ============================================================================ models.go DATA
 var model_Data = `package models
@@ -240,7 +260,6 @@ package utils
 
 import (
 	"log"
-	"github.com/joho/godotenv"
 )
 
 // -------------------------- Error Handling
@@ -249,10 +268,42 @@ func Check_For_Err(err error) {
 		log.Println(err)
 		return
 	}
-}
-
-// -------------------------- .env Init
-func InitEnvFile() {
-	err := godotenv.Load(".env")
-	Check_For_Err(err)
 }`
+
+// ============================================================================ dockerfile DATA
+func DockerFile_Data() string {
+
+	data := `FROM golang:1.23.5 AS builder
+WORKDIR /app
+
+    ENV CGO_ENABLED=0 \
+        GOOS=linux \
+        GOARCH=amd64
+
+    COPY go.mod go.sum ./
+    RUN go mod download
+
+    COPY . .
+
+    RUN go build -o app
+
+FROM alpine:latest
+WORKDIR /app
+
+	ARG PORT
+
+    RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+    USER appuser
+
+    COPY --from=builder /app/app .
+	RUN if [ -d /app/Sqlite ]; then cp -r /app/Sqlite ./Sqlite; fi
+
+    EXPOSE $PORT
+
+    HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD wget --spider -q http://localhost:$PORT/health || exit 1
+
+    CMD ["./app"]`
+
+	return data
+}
