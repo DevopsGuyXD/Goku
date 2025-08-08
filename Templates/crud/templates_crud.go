@@ -74,6 +74,7 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 // @Description Single %[1]v
 // @Tags %[1]v
 // @Produce json
+// @Param id path int true "%[1]v ID"
 // @Success 200 {array} map[string]interface{}
 // @Router /%[1]v/{id} [get]
 func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
@@ -148,6 +149,7 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 // @Tags %[1]v
 // @Accept json
 // @Produce json
+// @Param id path int true "%[1]v ID"
 // @Param data body object true "Update record"
 // @Success 200 {array} map[string]interface{}
 // @Router /%[1]v/{id} [put]
@@ -187,6 +189,7 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 // @Description Delete %[1]v
 // @Tags %[1]v
 // @Produce json
+// @Param id path int true "%[1]v ID"
 // @Success 200 {array} map[string]interface{}
 // @Router /%[1]v/{id} [delete]
 func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
