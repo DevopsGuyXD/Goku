@@ -3,6 +3,7 @@ package templates_starter
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	utils "github.com/DevopsGuyXD/Goku/Utils"
@@ -58,8 +59,8 @@ func create_open_file(folder_or_File string) *os.File {
 	var filePath string
 
 	if utils.Folder_Exists(folder_or_File) {
-		folderParsed := strings.Split(folder_or_File, "\\")
-		filePath = folder_or_File + "/" + strings.ToLower(folderParsed[1]) + ".go"
+		_, folderName := filepath.Split(folder_or_File)
+		filePath = filepath.Join(folder_or_File, strings.ToLower(folderName)+".go")
 	} else {
 		filePath = folder_or_File
 	}
