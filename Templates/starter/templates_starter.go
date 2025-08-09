@@ -285,16 +285,21 @@ WORKDIR /app
 
     COPY . .
 
-    RUN go build -o ./dist/app
-	RUN [ -d "./Sqlite" ] && cp -r ./Sqlite ./dist || echo "Sqlite folder not found"
+    RUN go build -o ./dist/app \
+        && [ -d "./Sqlite" ] && cp -r ./Sqlite ./dist || echo "Sqlite folder not found"
 
 FROM alpine:latest
 WORKDIR /app
 
-    RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-    USER appuser
+    RUN addgroup -S goku && adduser -S goku -G goku
 
-	COPY --from=builder /app/dist/ .
+    COPY --from=builder /app/dist/ .
+
+    RUN chown -R goku:goku ./Sqlite \
+        && chmod 775 ./Sqlite \
+        && chmod 664 ./Sqlite/app.db
+
+    USER goku
 
     EXPOSE 8000
 

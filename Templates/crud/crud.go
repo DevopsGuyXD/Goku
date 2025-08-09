@@ -14,7 +14,6 @@ func CRUD_Project(crudName string) {
 	sqlite()
 	model(crudName)
 	model_Handlers(crudName)
-	// model_Imports()
 	test_Handler(crudName)
 	utils.Install_Dependencies()
 
