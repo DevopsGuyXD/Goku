@@ -57,6 +57,8 @@ func create_open_file(folder_or_File string) *os.File {
 
 	var filePath string
 
+	fmt.Println(folder_or_File)
+
 	if utils.Folder_Exists(folder_or_File) {
 		folderParsed := strings.Split(folder_or_File, "\\")
 		filePath = folder_or_File + "/" + strings.ToLower(folderParsed[1]) + ".go"
