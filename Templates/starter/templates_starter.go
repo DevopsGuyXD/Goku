@@ -285,7 +285,8 @@ WORKDIR /app
 
     COPY . .
 
-    RUN go build -o app
+    RUN go build -o ./dist/app
+	RUN [ -d "./Sqlite" ] && cp -r ./Sqlite ./dist || echo "Sqlite folder not found"
 
 FROM alpine:latest
 WORKDIR /app
@@ -295,8 +296,7 @@ WORKDIR /app
     RUN addgroup -S appgroup && adduser -S appuser -G appgroup
     USER appuser
 
-    COPY --from=builder /app/app .
-	RUN if [ -d /app/Sqlite ]; then cp -r /app/Sqlite ./Sqlite; fi
+	COPY --from=builder /app/dist/ .
 
     EXPOSE $PORT
 

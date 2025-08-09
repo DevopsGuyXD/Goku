@@ -55,7 +55,7 @@ func Create_Build(scan string) {
 		fmt.Println()
 		go utils.Spinner(done, "Building your app")
 
-		cmd := exec.Command("sh", "-c", "go build -o ./dist/app.exe")
+		cmd := exec.Command("sh", "-c", "go build -o ./dist/app.exe && cp -r ./Sqlite ./dist")
 		err := cmd.Run()
 		if err != nil {
 			fmt.Printf("\rBuilding your app ❌\n")
