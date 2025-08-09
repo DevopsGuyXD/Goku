@@ -58,9 +58,9 @@ func All_Options() {
 
       ☆ Please ensure that Docker is installed and actively running on your system ☆
 
-       goku dock                          | Add a Dockerfile to the project
-       goku dock-build                    | Build a Docker image for the project
-       goku dock-run <port>               | Run the Docker image with latest tag on your desired port
+       goku moby                       | Add a Dockerfile to the project
+       goku m-build                    | Build a Docker image for the project
+       goku m-run <port>               | Run the Docker image with latest tag on your desired port
 `)
 }
 

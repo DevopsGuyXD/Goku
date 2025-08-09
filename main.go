@@ -34,11 +34,11 @@ func main() {
 		case os.Args[1] == "--creator" || os.Args[1] == "-c":
 			utils.Creator()
 
-		case os.Args[1] == "dock":
+		case os.Args[1] == "moby":
 			utils.Create_File([]string{"dockerfile"})
 			utils.Write_File(utils.Open_File("dockerfile"), templates_starter.DockerFile_Data())
 
-		case os.Args[1] == "dock-build":
+		case os.Args[1] == "m-build":
 			configs.Build_Docker_Image()
 
 		case os.Args[1] == "swag":
@@ -80,7 +80,7 @@ func main() {
 			project := strings.ToLower(os.Args[2])
 			templates_starter.Starter_Project(project)
 
-		case os.Args[1] == "dock-run" && os.Args[2] != "":
+		case os.Args[1] == "m-run" && os.Args[2] != "":
 			port, err := strconv.Atoi(os.Args[2])
 			utils.Check_For_Err(err)
 
