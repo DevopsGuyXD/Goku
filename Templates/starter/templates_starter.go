@@ -291,17 +291,15 @@ WORKDIR /app
 FROM alpine:latest
 WORKDIR /app
 
-	ARG PORT
-
     RUN addgroup -S appgroup && adduser -S appuser -G appgroup
     USER appuser
 
 	COPY --from=builder /app/dist/ .
 
-    EXPOSE $PORT
+    EXPOSE 8000
 
     HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD wget --spider -q http://localhost:$PORT/health || exit 1
+    CMD wget --spider -q http://localhost:8000/health || exit 1
 
     CMD ["./app"]`
 

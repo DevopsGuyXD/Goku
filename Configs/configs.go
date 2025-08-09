@@ -158,13 +158,9 @@ func Run_Tests() {
 // ============================================================================ DOCKER BUILD
 func Build_Docker_Image() {
 
-	data := utils.Open_File(utils.Called_From_Location() + "/.env")
-	line := utils.ReturnLineFromFile(data)
-	parts := strings.Split(line, `"`)
-
 	image := strings.Split(utils.Called_From_Location(), `\`)
 
-	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build --build-arg PORT=%v -t %s .", parts[1], image[len(image)-1]))
+	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker build -t %s .", image[len(image)-1]))
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
