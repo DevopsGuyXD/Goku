@@ -51,7 +51,8 @@ func Install_Dependencies() {
 	}
 
 	close(done)
-	fmt.Printf("\rInstalling Dependencies ✔\n")
+	// fmt.Printf("\rInstalling Dependencies ✔\n")
+	fmt.Printf("\nInstalling Dependencies ✔\n")
 }
 
 // ============================================================================ INIT SWAGGER
@@ -73,7 +74,7 @@ func Init_Swagger() {
 	}
 
 	close(done)
-	fmt.Print("\rUpdating ✔\n")
+	fmt.Print("\rUpdating ✔")
 }
 
 // ============================================================================ INIT Air
