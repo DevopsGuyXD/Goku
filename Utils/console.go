@@ -13,7 +13,7 @@ func Version() {
   | |  _  | | | | | ' /   | | | |
   | |_| | | |_| | | . \   | |_| |
    \____|  \___/  |_|\_\   \___/  v1.0.0
-   `)
+`)
 }
 
 // ============================================================================ CREATOR
@@ -62,7 +62,7 @@ func All_Options() {
        goku moby                       | Add a Dockerfile to the project
        goku m-build                    | Build a Docker image for the project
        goku m-run <port>               | Run the Docker image with latest tag on your desired port
-       `)
+`)
 }
 
 // ============================================================================ SPINNER
