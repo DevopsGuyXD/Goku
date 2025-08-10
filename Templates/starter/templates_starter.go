@@ -93,7 +93,7 @@ import (
 	"net/http"
 	"time"
 
-	config "github.com/DevopsGuyXD/myapp/Config"
+	config "github.com/DevopsGuyXD/%[1]v/Config"
 	models "github.com/DevopsGuyXD/%[1]v/Models"
 	routes "github.com/DevopsGuyXD/%[1]v/Routes"
 	utils "github.com/DevopsGuyXD/%[1]v/Utils"
@@ -166,7 +166,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	config "github.com/DevopsGuyXD/myapp/Config"
+	config "github.com/DevopsGuyXD/%[1]v/Config"
 	utils "github.com/DevopsGuyXD/%[1]v/Utils"
 )
 
