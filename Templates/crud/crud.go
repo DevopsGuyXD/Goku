@@ -88,7 +88,7 @@ func model_Handlers(crudName string) {
 		modelFile := utils.Open_File(filePath)
 		defer modelFile.Close()
 
-		utils.AppendToFileBottom(filePath, model_Handler_Data(crudName))
+		utils.AppendToFileBottom(filePath, model_Handler_Data())
 		model_Imports()
 	}
 }
@@ -99,10 +99,8 @@ func model_Imports() {
 	filePath := "./Models/models.go"
 	imports := []string{
 		`"database/sql"`,
-		`"fmt"`,
-		`"strings"`,
-		`"reflect"`,
 		`"net/http"`,
+		`sq "github.com/Masterminds/squirrel"`,
 
 		fmt.Sprintf(`config "github.com/DevopsGuyXD/%v/Config"`, utils.Project_Name()),
 		fmt.Sprintf(`utils "github.com/DevopsGuyXD/%v/Utils"`, utils.Project_Name()),
