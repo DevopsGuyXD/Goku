@@ -102,8 +102,8 @@ func model_Imports() {
 		`"net/http"`,
 		`sq "github.com/Masterminds/squirrel"`,
 
-		fmt.Sprintf(`config "github.com/DevopsGuyXD/%v/Config"`, utils.Project_Name()),
-		fmt.Sprintf(`utils "github.com/DevopsGuyXD/%v/Utils"`, utils.Project_Name()),
+		fmt.Sprintf(`config "github.com/DevopsGuyXD/%v/config"`, utils.Project_Name()),
+		fmt.Sprintf(`utils "github.com/DevopsGuyXD/%v/utils"`, utils.Project_Name()),
 	}
 
 	utils.UpdateImport(filePath, imports)

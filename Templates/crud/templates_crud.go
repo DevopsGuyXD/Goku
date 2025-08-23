@@ -31,8 +31,8 @@ import (
 	"net/http"
 	"strconv"
 
-	models "github.com/DevopsGuyXD/%[2]v/Models"
-	utils "github.com/DevopsGuyXD/%[2]v/Utils"
+	models "github.com/DevopsGuyXD/%[2]v/models"
+	utils "github.com/DevopsGuyXD/%[2]v/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -234,7 +234,7 @@ import (
 	"os"
 	"strings"
 
-	utils "github.com/DevopsGuyXD/%[2]v/Utils"
+	utils "github.com/DevopsGuyXD/%[2]v/utils"
 )
 
 // -------------------------- %[1]v STRUCT
@@ -537,9 +537,9 @@ import (
 	"os"
 	"testing"
 
-	models "github.com/DevopsGuyXD/%[2]v/Models"
-	routes "github.com/DevopsGuyXD/%[2]v/Routes"
-	utils "github.com/DevopsGuyXD/%[2]v/Utils"
+	models "github.com/DevopsGuyXD/%[2]v/models"
+	routes "github.com/DevopsGuyXD/%[2]v/routes"
+	utils "github.com/DevopsGuyXD/%[2]v/utils"
 	"github.com/stretchr/testify/assert"
 )
 

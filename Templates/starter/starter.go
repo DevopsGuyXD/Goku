@@ -16,11 +16,11 @@ func Starter_Project(project string) {
 		filepath.Join(project, "main.go"),
 		filepath.Join(project, "go.mod"),
 		filepath.Join(project, "dockerfile"),
-		filepath.Join(project, "Routes"),
-		filepath.Join(project, "Controller"),
-		filepath.Join(project, "Config"),
-		filepath.Join(project, "Models"),
-		filepath.Join(project, "Utils"),
+		filepath.Join(project, "routes"),
+		filepath.Join(project, "controller"),
+		filepath.Join(project, "config"),
+		filepath.Join(project, "models"),
+		filepath.Join(project, "utils"),
 	}
 
 	// -------------------- CREATE FOLDERS
