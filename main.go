@@ -72,7 +72,7 @@ func main() {
 
 			configs.Run_Prod()
 
-		case os.Args[1] == "add-crud" && os.Args[2] != "":
+		case os.Args[1] == "crud" && os.Args[2] != "":
 			crudName := os.Args[2]
 			templates_curd.CRUD_Project(crudName)
 
