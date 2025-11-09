@@ -45,7 +45,7 @@ func All_Options() {
 
   ⚙️  Feature Additions:
 
-       goku crud <name>               | Generate CRUD logic for the specified resource
+       goku crud <name>                   | Generate CRUD logic for the specified resource
        goku swag                          | Generate or update Swagger documentation
 
 
