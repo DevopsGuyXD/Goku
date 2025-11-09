@@ -27,22 +27,32 @@ func Install_Dependencies() {
 
 	done := make(chan bool)
 	fmt.Println()
-	go Spinner(done, "Installing Dependencies")
+	// go Spinner(done, "Installing Dependencies")
 
 	cmd := exec.Command("sh", "-c", "go mod tidy")
-	err := cmd.Run()
-	if err != nil {
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
 		fmt.Printf("\rInstalling Dependencies ❌\n")
 		close(done)
 		return
 	}
+
+	// if err != nil {
+	// 	fmt.Printf("\rInstalling Dependencies ❌\n")
+	// 	close(done)
+	// 	return
+	// }
 
 	if !Files_Exists(".air.toml") {
 		init_air()
 	}
 
 	close(done)
-	fmt.Printf("\rInstalling Dependencies ✔\n")
+	// fmt.Printf("\rInstalling Dependencies ✔\n")
+	fmt.Printf("\nInstalling Dependencies ✔\n")
 }
 
 // ============================================================================ INIT SWAGGER
@@ -64,7 +74,7 @@ func Init_Swagger() {
 	}
 
 	close(done)
-	fmt.Print("\rUpdating ✔\n")
+	fmt.Print("\rUpdating ✔")
 }
 
 // ============================================================================ INIT Air

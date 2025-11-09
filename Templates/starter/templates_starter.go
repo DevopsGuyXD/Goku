@@ -3,6 +3,7 @@ package templates_starter
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	utils "github.com/DevopsGuyXD/Goku/Utils"
@@ -28,23 +29,23 @@ func fileController(project, folder string) (*os.File, string) {
 		data = DockerFile_Data()
 		file = create_open_file(folder)
 
-	case strings.Contains(folder, "Routes"):
+	case strings.Contains(folder, "routes"):
 		data = routes_Data(project)
 		file = create_open_file(folder)
 
-	case strings.Contains(folder, "Controller"):
+	case strings.Contains(folder, "controller"):
 		data = controller_Data(project)
 		file = create_open_file(folder)
 
-	case strings.Contains(folder, "Config"):
+	case strings.Contains(folder, "config"):
 		data = config_Data(project)
 		file = create_open_file(folder)
 
-	case strings.Contains(folder, "Models"):
+	case strings.Contains(folder, "models"):
 		data = model_Data
 		file = create_open_file(folder)
 
-	case strings.Contains(folder, "Utils"):
+	case strings.Contains(folder, "utils"):
 		data = utils_Data
 		file = create_open_file(folder)
 	}
@@ -58,8 +59,8 @@ func create_open_file(folder_or_File string) *os.File {
 	var filePath string
 
 	if utils.Folder_Exists(folder_or_File) {
-		folderParsed := strings.Split(folder_or_File, "\\")
-		filePath = folder_or_File + "/" + strings.ToLower(folderParsed[1]) + ".go"
+		_, folderName := filepath.Split(folder_or_File)
+		filePath = filepath.Join(folder_or_File, strings.ToLower(folderName)+".go")
 	} else {
 		filePath = folder_or_File
 	}
@@ -92,10 +93,10 @@ import (
 	"net/http"
 	"time"
 
-	config "github.com/DevopsGuyXD/myapp/Config"
-	models "github.com/DevopsGuyXD/%[1]v/Models"
-	routes "github.com/DevopsGuyXD/%[1]v/Routes"
-	utils "github.com/DevopsGuyXD/%[1]v/Utils"
+	config "github.com/DevopsGuyXD/%[1]v/config"
+	models "github.com/DevopsGuyXD/%[1]v/models"
+	routes "github.com/DevopsGuyXD/%[1]v/routes"
+	utils "github.com/DevopsGuyXD/%[1]v/utils"
 )
 
 // -------------------------- INIT
@@ -134,7 +135,7 @@ func routes_Data(project string) string {
 	data := fmt.Sprintf(`package routes
 
 import (
-	controller "github.com/DevopsGuyXD/%[1]v/Controller"
+	controller "github.com/DevopsGuyXD/%[1]v/controller"
 	_ "github.com/DevopsGuyXD/%[1]v/docs"
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -165,8 +166,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	config "github.com/DevopsGuyXD/myapp/Config"
-	utils "github.com/DevopsGuyXD/%[1]v/Utils"
+	config "github.com/DevopsGuyXD/%[1]v/config"
+	utils "github.com/DevopsGuyXD/%[1]v/utils"
 )
 
 // -------------------------- HOME CONTROLLER
@@ -221,7 +222,7 @@ package config
 import (
 	"database/sql"
 	
-	utils "github.com/DevopsGuyXD/%[1]v/Utils"
+	utils "github.com/DevopsGuyXD/%[1]v/utils"
 	_ "modernc.org/sqlite"
 )
 
@@ -285,23 +286,26 @@ WORKDIR /app
 
     COPY . .
 
-    RUN go build -o app
+    RUN go build -o ./dist/app \
+        && [ -d "./Sqlite" ] && cp -r ./Sqlite ./dist || echo "Sqlite folder not found"
 
 FROM alpine:latest
 WORKDIR /app
 
-	ARG PORT
+    RUN addgroup -S goku && adduser -S goku -G goku
 
-    RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-    USER appuser
+    COPY --from=builder /app/dist/ .
 
-    COPY --from=builder /app/app .
-	RUN if [ -d /app/Sqlite ]; then cp -r /app/Sqlite ./Sqlite; fi
+    RUN chown -R goku:goku ./Sqlite \
+        && chmod 775 ./Sqlite \
+        && chmod 664 ./Sqlite/app.db
 
-    EXPOSE $PORT
+    USER goku
+
+    EXPOSE 8000
 
     HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD wget --spider -q http://localhost:$PORT/health || exit 1
+    CMD wget --spider -q http://localhost:8000/health || exit 1
 
     CMD ["./app"]`
 

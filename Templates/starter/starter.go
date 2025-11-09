@@ -2,6 +2,7 @@ package templates_starter
 
 import (
 	"fmt"
+	"path/filepath"
 
 	utils "github.com/DevopsGuyXD/Goku/Utils"
 )
@@ -12,14 +13,15 @@ func Starter_Project(project string) {
 	// -------------------- FOLDER LIST
 	folders := []string{
 		project,
-		project + "\\main.go",
-		project + "\\go.mod",
-		project + "\\dockerfile",
-		project + "\\Routes",
-		project + "\\Controller",
-		project + "\\Config",
-		project + "\\Models",
-		project + "\\Utils"}
+		filepath.Join(project, "main.go"),
+		filepath.Join(project, "go.mod"),
+		filepath.Join(project, "dockerfile"),
+		filepath.Join(project, "routes"),
+		filepath.Join(project, "controller"),
+		filepath.Join(project, "config"),
+		filepath.Join(project, "models"),
+		filepath.Join(project, "utils"),
+	}
 
 	// -------------------- CREATE FOLDERS
 	utils.Create_Folder(folders)

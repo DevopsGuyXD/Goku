@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/DevopsGuyXD/Goku/Templates/common"
@@ -13,7 +14,7 @@ import (
 // ============================================================================ CREATE FOLDER
 func Create_Folder(folders []string) {
 	for _, folder := range folders {
-		if !strings.Contains(folder, ".") && !strings.Contains(folder, "dockerfile") && !Folder_Exists(folder) {
+		if !strings.Contains(filepath.Base(folder), ".") && !strings.EqualFold(filepath.Base(folder), "dockerfile") && !Folder_Exists(folder) {
 			err := os.Mkdir(folder, 0755)
 			Check_For_Err(err)
 		}

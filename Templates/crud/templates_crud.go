@@ -31,8 +31,8 @@ import (
 	"net/http"
 	"strconv"
 
-	models "github.com/DevopsGuyXD/%[2]v/Models"
-	utils "github.com/DevopsGuyXD/%[2]v/Utils"
+	models "github.com/DevopsGuyXD/%[2]v/models"
+	utils "github.com/DevopsGuyXD/%[2]v/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -74,6 +74,7 @@ func GET_%[1]v(w http.ResponseWriter, r *http.Request) {
 // @Description Single %[1]v
 // @Tags %[1]v
 // @Produce json
+// @Param id path int true "%[1]v ID"
 // @Success 200 {array} map[string]interface{}
 // @Router /%[1]v/{id} [get]
 func GET_%[1]v_id(w http.ResponseWriter, r *http.Request) {
@@ -148,6 +149,7 @@ func POST_%[1]v(w http.ResponseWriter, r *http.Request) {
 // @Tags %[1]v
 // @Accept json
 // @Produce json
+// @Param id path int true "%[1]v ID"
 // @Param data body object true "Update record"
 // @Success 200 {array} map[string]interface{}
 // @Router /%[1]v/{id} [put]
@@ -187,6 +189,7 @@ func UPDATE_%[1]v(w http.ResponseWriter, r *http.Request) {
 // @Description Delete %[1]v
 // @Tags %[1]v
 // @Produce json
+// @Param id path int true "%[1]v ID"
 // @Success 200 {array} map[string]interface{}
 // @Router /%[1]v/{id} [delete]
 func DELETE_%[1]v(w http.ResponseWriter, r *http.Request) {
@@ -231,7 +234,7 @@ import (
 	"os"
 	"strings"
 
-	utils "github.com/DevopsGuyXD/%[2]v/Utils"
+	utils "github.com/DevopsGuyXD/%[2]v/utils"
 )
 
 // -------------------------- %[1]v STRUCT
@@ -278,10 +281,12 @@ func %[1]v_ct() {
 }
 
 // -------------------------- GET %[1]v ALL
-func GET_%[1]v_all() []map[string]interface{} {	
+func GET_%[1]v_all() []map[string]interface{} {
+
+	var result []map[string]interface{}
+
 	switch {
 		case os.Getenv("TEST_MODE") == "Y":
-			var result []map[string]interface{}
 			for _, data := range %[1]v_list {
 				result = append(result, map[string]interface{}{
 					"title": &data.Title,
@@ -301,7 +306,7 @@ func GET_%[1]v_all() []map[string]interface{} {
 					{"message": http.StatusBadRequest},
 				}
 			}
-
+				
 			return get_Handler(query)
 	}
 }
@@ -350,6 +355,7 @@ func POST_%[1]v(request io.ReadCloser) int {
 			}
 
 		default:
+			var %[1]v map[string]interface{}
 			err := json.NewDecoder(request).Decode(&%[1]v)
 			utils.Check_For_Err(err)
 			defer request.Close()
@@ -369,6 +375,7 @@ func UPDATE_%[1]v(id int, request io.ReadCloser) int {
 			return http.StatusInternalServerError
 
 		default:
+			var %[1]v map[string]interface{}
 			err := json.NewDecoder(request).Decode(&%[1]v)
 			utils.Check_For_Err(err)
 			defer request.Close()
@@ -396,8 +403,8 @@ func DELETE_%[1]v(id int) int {
 }
 
 // ============================================================================ MODELS HANDLERS
-func model_Handler_Data(crudName string) string {
-	data := fmt.Sprintf(`
+func model_Handler_Data() string {
+	data := `
 // -------------------------- INIT DB
 func initDB() *sql.DB {
 	var database = config.InitDatabase()
@@ -446,27 +453,15 @@ func get_Handler(query string) []map[string]interface{} {
 }
 
 // -------------------------- POST HANDLER
-func post_Handler(data interface{}, api string) int {
+func post_Handler(data map[string]interface{}, api string) int {
 
 	db := initDB()
 	defer db.Close()
 
-	var cols, vals []string
-	val := reflect.ValueOf(data)
-	typ := reflect.TypeOf(data)
-	args := make([]interface{}, 0, typ.NumField())
-
-	for i := 0; i < typ.NumField(); i++ {
-		tag := typ.Field(i).Tag.Get("json")
-
-		if tag != "" {
-			cols = append(cols, tag)
-			vals = append(vals, "?")
-			args = append(args, val.Field(i).Interface())
-		}
-	}
-
-	query := fmt.Sprintf("INSERT INTO " + api + " (%%s) VALUES (%%s)", strings.Join(cols, ", "), strings.Join(vals, ", "))
+	query, args, err := sq.Insert(api).
+		SetMap(data).
+		ToSql()
+	utils.Check_For_Err(err)
 
 	if res, err := db.Exec(query, args...); err != nil {
 		return http.StatusInternalServerError
@@ -479,27 +474,16 @@ func post_Handler(data interface{}, api string) int {
 }
 
 // -------------------------- UPDATE HANDLER
-func update_Handler(id int, data interface{}, api string) int {
+func update_Handler(id int, data map[string]interface{}, api string) int {
+
 	db := initDB()
 	defer db.Close()
 
-	var vals []string
-	val := reflect.ValueOf(data)
-	typ := reflect.TypeOf(data)
-	args := make([]interface{}, 0, typ.NumField())
-
-	for i := 0; i < typ.NumField(); i++ {
-		field := val.Field(i)
-		tag := typ.Field(i).Tag.Get("json")
-
-		if tag != "" && !field.IsZero() {
-			vals = append(vals, fmt.Sprintf("%%s = ?", tag))
-			args = append(args, field.Interface())
-		}
-	}
-
-	args = append(args, id)
-	query := fmt.Sprintf("UPDATE " + api + " SET %%s WHERE id = ?", strings.Join(vals, ", "))
+	query, args, err := sq.Update(api).
+		SetMap(data).
+		Where(sq.Eq{"id": id}).
+		ToSql()
+	utils.Check_For_Err(err)
 
 	if res, err := db.Exec(query, args...); err != nil {
 		return http.StatusInternalServerError
@@ -516,9 +500,12 @@ func delete_Handler(id int, api string) int {
 	db := initDB()
 	defer db.Close()
 
-	query := fmt.Sprintf("DELETE FROM " + api + " WHERE id=%%d", id)
+	query, args, err := sq.Delete(api).
+		Where(sq.Eq{"id": id}).
+		ToSql()
+	utils.Check_For_Err(err)
 
-	res, err := db.Exec(query)
+	res, err := db.Exec(query, args...)
 	if err != nil {
 		return http.StatusInternalServerError
 
@@ -532,8 +519,7 @@ func delete_Handler(id int, api string) int {
 			return http.StatusNotModified
 		}
 	}
-
-}`)
+}`
 
 	return data
 }
@@ -551,9 +537,9 @@ import (
 	"os"
 	"testing"
 
-	models "github.com/DevopsGuyXD/%[2]v/Models"
-	routes "github.com/DevopsGuyXD/%[2]v/Routes"
-	utils "github.com/DevopsGuyXD/%[2]v/Utils"
+	models "github.com/DevopsGuyXD/%[2]v/models"
+	routes "github.com/DevopsGuyXD/%[2]v/routes"
+	utils "github.com/DevopsGuyXD/%[2]v/utils"
 	"github.com/stretchr/testify/assert"
 )
 

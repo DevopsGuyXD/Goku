@@ -7,12 +7,13 @@ import (
 
 // ============================================================================ GOKU VERSION
 func Version() {
-	fmt.Println(
+	fmt.Printf(
 		`    ____    ___    _  __   _   _ 
    / ___|  / _ \  | |/ /  | | | |
   | |  _  | | | | | ' /   | | | |
   | |_| | | |_| | | . \   | |_| |
-   \____|  \___/  |_|\_\   \___/  v1.0.0`)
+   \____|  \___/  |_|\_\   \___/  v1.0.0
+`)
 }
 
 // ============================================================================ CREATOR
@@ -44,7 +45,7 @@ func All_Options() {
 
   ⚙️  Feature Additions:
 
-       goku add-crud <name>               | Generate CRUD logic for the specified resource
+       goku crud <name>               | Generate CRUD logic for the specified resource
        goku swag                          | Generate or update Swagger documentation
 
 
@@ -58,9 +59,9 @@ func All_Options() {
 
       ☆ Please ensure that Docker is installed and actively running on your system ☆
 
-       goku dock                          | Add a Dockerfile to the project
-       goku dock-build                    | Build a Docker image for the project
-       goku dock-run <port>               | Run the Docker image with latest tag on your desired port
+       goku moby                       | Add a Dockerfile to the project
+       goku m-build                    | Build a Docker image for the project
+       goku m-run <port>               | Run the Docker image with latest tag on your desired port
 `)
 }
 
