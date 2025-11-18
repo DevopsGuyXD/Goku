@@ -74,7 +74,7 @@ func Init_Swagger() {
 	}
 
 	close(done)
-	fmt.Print("\rUpdating ✔")
+	fmt.Printf("\rUpdating ✔\n")
 }
 
 // ============================================================================ INIT Air
